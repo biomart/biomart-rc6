@@ -1,0 +1,27 @@
+<?xml version="1.0"?>  
+<bindings xmlns="http://www.mozilla.org/xbl"
+	xmlns:html="http://www.w3.org/1999/xhtml">
+
+	<binding id="text-overflow">
+		<implementation>
+			<constructor>
+			<![CDATA[
+				var w_0 = this.clientWidth,
+					r, w, l, t;
+				this.style.width = 'auto';
+				this.style.overflow = 'visible';
+				w = this.clientWidth;
+				if (w_0 < w) {
+					l = this.textContent.length;
+					r = (w-w_0)/w;
+					t = ~~(l*r);
+					this.textContent = this.textContent.substr(0,l-t-3) + '...';
+				}
+				this.style.width = '';
+				this.style.overflow = '';
+			]]>
+			</constructor>
+		</implementation>
+	</binding>
+
+</bindings>

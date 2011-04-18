@@ -1,0 +1,592 @@
+package org.biomart.api.rest;
+
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.google.inject.Singleton;
+import com.hp.hpl.jena.query.DataSource;
+import com.hp.hpl.jena.query.DatasetFactory;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
+
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryParseException;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.sparql.core.TriplePath;
+import com.hp.hpl.jena.sparql.lang.ParserSPARQL11;
+import com.hp.hpl.jena.sparql.syntax.Element;
+import com.hp.hpl.jena.sparql.syntax.ElementGroup;
+import com.hp.hpl.jena.sparql.syntax.ElementPathBlock;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+import org.biomart.api.Portal;
+import org.biomart.api.arq.QueryEngine;
+import org.biomart.api.arq.QueryMetaData;
+import org.biomart.api.factory.MartRegistryFactory;
+import org.biomart.api.lite.Filter;
+import org.biomart.api.lite.Attribute;
+import org.biomart.api.lite.Dataset;
+import org.biomart.api.lite.Mart;
+import org.biomart.api.rdf.Ontology;
+import org.biomart.api.rdf.RDFClass;
+import org.biomart.api.rdf.RDFObject;
+import org.biomart.api.rdf.RDFProperty;
+import org.biomart.common.exceptions.FunctionalException;
+import org.biomart.common.exceptions.TechnicalException;
+
+/**
+ *
+ * @author Joachim Baran
+ */
+@Singleton
+@Path("/semantic")
+public class SPARQLResource {
+    @Context HttpServletRequest request;
+    @Context UriInfo uriInfo;
+    @Inject Injector injector;
+
+    private MartRegistryFactory factory;
+    
+    // Cache: Mart -> Dataset -> Ontology
+    private Map<Mart, Map<String, Ontology>> ontologyCache = new HashMap<Mart, Map<String, Ontology>>();
+
+    // Used as regexp:
+    static protected final String RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
+    static protected final String BIOMART_HAS_VALUE = "http://www.biomart.org/ontology#has_value";
+
+    // Error responses:
+    static protected final String RDF_MC_PROPERTY_SYNTAX_ERROR = "The property 'rdf' of '%s' is ill-formatted. Sorry.";
+    static protected final String RDF_MART_UNKNOWN = "A mart with the name '%s' is not known. Sorry.";
+    static protected final String RDF_SPARQL_GROUP_SIZE_UNSUPPORTED = "Only one group is allowed per query. Sorry.";
+    static protected final String RDF_SPARQL_SUBJECT_VARIABLE_UNSUPPORTED = "Variables are not allowed in the subject. Sorry.";
+    static protected final String RDF_SPARQL_X_UNSUPPORTED = "This kind of SPARQL-query is not supported. Sorry.";
+    static protected final String RDF_SPARQL_NOT_ELEMENTGROUP = "Only queries with a top-level element group are supported. Sorry.";
+    static protected final String RDF_SPARQL_MALFORMED = "The query is malformed. Terribly sorry.";
+    static protected final String RPC_QUERY_IO_FAILURE = "Query failed to execute due to an IO error. Terribly sorry.";
+
+    private class SPARQLException extends Exception {
+        public SPARQLException(String description) {
+            super(description);
+        }
+    }
+
+    static {
+        QueryEngine.register();
+    }
+
+    @Inject
+    public SPARQLResource(MartRegistryFactory factory) {
+        this.factory = factory;
+    }
+
+    private class StringPair implements Comparable {
+        public String[] pair = new String[2];
+
+        public StringPair(String x, String y) {
+            pair[0] = x;
+            pair[1] = y;
+        }
+
+        public boolean equals(Object o) {
+            if (!(o instanceof StringPair))
+                return false;
+
+            return compareTo(o) == 0;
+        }
+
+        public int compareTo(Object o) {
+            if (!(o instanceof StringPair)) {
+                throw new ClassCastException("Can only compare StringPairs against themselves.");
+            }
+
+            StringPair otherPair = (StringPair)o;
+
+            return (pair[0] + pair[1]).compareTo(otherPair.pair[0] + otherPair.pair[1]);
+        }
+    }
+
+    @Path("{format}/{mart}/get")
+    @GET 
+    public Response queryGetRequestWrapper(
+            @QueryParam("callback") @DefaultValue("") String callback,
+            @PathParam("format") String format,
+            @PathParam("mart") String martName) throws TechnicalException, FunctionalException  {
+        final StringBuilder exceptionResponse = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE Query>");
+
+        try {
+            return queryGetRequest(callback, format, martName);
+        }
+        catch(TechnicalException te) {
+            exceptionResponse.append("A technical problem occurred.");
+        }
+        catch(FunctionalException fe) {
+            exceptionResponse.append("A functional problem occurred.");
+        }
+        catch(SPARQLException se) {
+            exceptionResponse.append("<!-- SPARQL-Exception:");
+            exceptionResponse.append(se.getMessage());
+            exceptionResponse.append("-->\n");
+        }
+
+        return Response.ok(new StreamingOutput() {
+            public void write(OutputStream out) {
+                try {
+                    out.write(exceptionResponse.toString().getBytes());
+                }
+                catch(IOException ioe) {
+                    // Well, if we cannot communicate, then there is
+                    // little that can be done about it.
+                }
+            }
+        }).build();
+    }
+
+    private Response queryGetRequest(
+            String callback,
+            String format,
+            String martName) throws TechnicalException, FunctionalException, SPARQLException  {
+        final Mart mart = new Portal(factory)._registry.getMartByConfigName(martName);
+
+        if (mart == null)
+            throw new SPARQLException(String.format(RDF_MART_UNKNOWN, martName));
+
+        String queryString = request.getParameter("query");
+        Query query = new com.hp.hpl.jena.query.Query();
+
+        try {
+            new ParserSPARQL11().parse(query, queryString);
+        }
+        catch(QueryParseException qpe) {
+            throw new SPARQLException(RDF_SPARQL_MALFORMED);
+        }
+
+        // No namespaces defined, because we are getting rid of the prefix only.
+        RDFObject datasetURI = new RDFObject(query.getGraphURIs().get(0), null);
+        String dataset = datasetURI.getShortName();
+
+        String ontologyUri = getOntologyUrl(martName);
+        Ontology ontology = getOntology(mart, dataset, ontologyUri);
+
+        // Execute query on an empty model to pick up on the mart-dataset(s) to use:
+        QueryExecution queryExecution = QueryExecutionFactory.create(query, ModelFactory.createDefaultModel());
+        queryExecution.execSelect();
+        final QueryMetaData preliminaryMetadata = QueryEngine.factory.getQueryMetadata(query, ontology);
+
+        // It would be nice if it would work like this: (see also QueryEngine transform(OpGraph og, Op op))
+        //String dataset = preliminaryMetadata.getGraph();
+
+        String principalMart = getPrincipalMart(format, martName, dataset, query);
+
+        // Run query on a "principle mart" that adheres to the real mart's structure,
+        // but does not contain any real data.
+        DataSource source = DatasetFactory.create();
+
+        Model model = ModelFactory.createDefaultModel();
+        model.read(new StringReader(principalMart), "");
+
+        // Add named models for multiple datasets?
+        source.addNamedModel(datasetURI.getName(), model);
+        source.setDefaultModel(model);
+        
+        queryExecution = QueryExecutionFactory.create(query, source);
+
+        ResultSet principalResults = queryExecution.execSelect();
+
+        if (!principalResults.hasNext())
+            throw new SPARQLException(RDF_SPARQL_X_UNSUPPORTED);
+
+        QuerySolution principalSolution = principalResults.next();
+
+        // Variable bindings to types/classes and properties:
+        QueryMetaData metadata = QueryEngine.factory.getQueryMetadata(query, ontology);
+
+        Map<String, String> variable2Filter = new HashMap<String, String>();
+        Map<String, String> variable2Attribute = new HashMap<String, String>();
+        StringBuilder variables = new StringBuilder();
+        for (String variable : metadata.getVariables())
+            for (RDFClass rdfClass : ontology.getRDFClasses()) {
+
+                // Is this class involved?
+                if (metadata.getType(variable).equals(rdfClass.getFullName())) {
+                    
+                    // Is this an inquiry about a property that we can return?
+                    if (metadata.getProperty(variable) != null)
+                        
+                        // Yes, so lets bind it to the right attribute:
+                        for (RDFProperty property : rdfClass.getProperties())
+                            if (metadata.getProperty(variable).equals(property.getFullName())) {
+                                String value = metadata.getValue(variable);
+
+                                if (value == null) {
+                                    variable2Attribute.put(variable, property.getAttribute());
+
+                                    if (!metadata.isProjection(variable))
+                                        variables.append("?");
+
+                                    variables.append(variable);
+                                    variables.append(" ");
+                                } else {
+                                    variable2Filter.put(variable, property.getFilter());
+                                }
+                            }
+                    // TODO If no attribute was found -> error
+
+                }
+
+            }
+
+        queryExecution.close();
+        
+        final StringBuffer xmlQuery = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE Query>");
+
+        xmlQuery.append("<!-- RDF:");
+        xmlQuery.append(variables);
+        xmlQuery.append("-->");
+
+        long queryLimit = metadata.getLimit();
+
+        StringBuffer martXMLQuery = new StringBuffer();
+
+        StringBuffer datasets = new StringBuffer();
+        for (String uri : query.getGraphURIs()) {
+            datasetURI = new RDFObject(uri, null);
+            dataset = datasetURI.getShortName();
+
+            if (!datasets.toString().isEmpty())
+                datasets.append(",");
+
+            datasets.append(dataset);
+        }
+
+        martXMLQuery.append("<Query client=\"webbrowser\" processor=\"" + format + "\" limit=\"" + queryLimit + "\" header=\"0\">\n");
+        martXMLQuery.append("\t<Dataset name=\"" + datasets.toString() + "\" config=\"" + martName + "\">\n");
+
+        // Filter list of literal queries:
+        for (String v : variable2Filter.keySet()) {
+            String value = metadata.getValue(v);
+
+            if (value != null)
+                martXMLQuery.append("\t\t<Filter name=\"" + variable2Filter.get(v) + "\" value=\"" + value + "\"/>\n");
+        }
+
+        // Attribute list:
+        for (String v : variable2Attribute.keySet()) {
+            martXMLQuery.append("\t\t<Attribute name=\"" + variable2Attribute.get(v) + "\"/>\n");
+        }
+
+        martXMLQuery.append("\t</Dataset>\n</Query>\n");
+
+        xmlQuery.append("<!-- BioMart XML-Query:\n");
+        xmlQuery.append(martXMLQuery);
+        xmlQuery.append("-->");
+        xmlQuery.append(martXMLQuery);
+
+        ProcessorStreamingOutput stream = new ProcessorStreamingOutput(xmlQuery.toString(),
+                new Portal(factory),
+                false,
+                null,
+                null,
+                new String[] { "application/sparql-results+xml" });
+
+        return Response.ok(stream, stream.getContentType()).build();
+    }
+
+    private String getOntologyUrl(String martName) {
+        String ontologyUrl = System.getProperty("http.url");
+        
+        if(request.isSecure())
+            ontologyUrl = System.getProperty("https.url");
+        ontologyUrl = ontologyUrl + "semantic/" + martName + "/ontology";
+
+        return ontologyUrl;
+    }
+
+    @Path("{mart}/ontology")
+    @GET
+    public Response metadataGetRequestWrapper(
+            @QueryParam("callback") @DefaultValue("") String callback,
+            @PathParam("format") String format,
+            @PathParam("mart") String martName) throws TechnicalException, FunctionalException {
+        final StringBuilder exceptionResponse = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE Query>");
+
+        try {
+            return metadataGetRequest(callback, format, martName);
+        }
+        catch(TechnicalException te) {
+            exceptionResponse.append("A technical problem occurred.");
+        }
+        catch(FunctionalException fe) {
+            exceptionResponse.append("A functional problem occurred.");
+        }
+        catch(SPARQLException se) {
+            exceptionResponse.append("<!-- SPARQL-Exception:");
+            exceptionResponse.append(se.getMessage());
+            exceptionResponse.append("-->\n");
+        }
+
+        return Response.ok(new StreamingOutput() {
+            public void write(OutputStream out) {
+                try {
+                    out.write(exceptionResponse.toString().getBytes());
+                }
+                catch(IOException ioe) {
+                    // Well, if we cannot communicate, then there is
+                    // little that can be done about it.
+                }
+            }
+        }).build();
+    }
+
+    public Response metadataGetRequest(
+            @QueryParam("callback") @DefaultValue("") String callback,
+            @PathParam("format") String format,
+            @PathParam("mart") String martName) throws TechnicalException, FunctionalException, SPARQLException {
+        Mart mart = new Portal(factory)._registry.getMartByConfigName(martName);
+
+        if (mart == null)
+            throw new SPARQLException(String.format(RDF_MART_UNKNOWN, martName));
+
+        final String ontologyUri = getOntologyUrl(martName);
+
+        final StringBuilder rdfOntology = new StringBuilder("<rdf:RDF\n");
+        rdfOntology.append("  xmlns=\"");
+        rdfOntology.append(ontologyUri);
+        rdfOntology.append("#\"\n");
+        rdfOntology.append("  xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n");
+        rdfOntology.append("  xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\"\n");
+        rdfOntology.append("  xmlns:owl=\"http://www.w3.org/2002/07/owl#\"\n");
+
+        rdfOntology.append("  xmlns:datasets=\"");
+        rdfOntology.append(ontologyUri);
+        rdfOntology.append("/datasets#\"\n");
+
+        rdfOntology.append("  xmlns:objects=\"");
+        rdfOntology.append(ontologyUri);
+        rdfOntology.append("/objects#\">\n\n");
+
+        rdfOntology.append("  <owl:Ontology rdf:about=\"");
+        rdfOntology.append(ontologyUri);
+        rdfOntology.append("\"/>\n\n");
+
+        for (Dataset datasetLite : mart.getDatasets()) {
+
+            String dataset = datasetLite.getName();
+
+            Ontology ontology = getOntology(mart, dataset, ontologyUri);
+
+            rdfOntology.append("  <owl:Class rdf:about=\"" + ontologyUri + "/datasets#" + dataset + "\">\n");
+            rdfOntology.append("    <rdfs:label>dataset</rdfs:label>\n");
+            rdfOntology.append("    <rdfs:comment>Generic representation of values in the mart.</rdfs:comment>\n");
+            rdfOntology.append("  </owl:Class>\n\n");
+
+            for (RDFClass rdfClass : ontology.getRDFClasses()) {
+                rdfOntology.append("  <owl:DatatypeProperty rdf:about=\"http://www.biomart.org/ontology#datasetOf\">\n");
+                rdfOntology.append("    <rdfs:label>" + dataset + "</rdfs:label>\n");
+                rdfOntology.append("    <rdfs:domain rdf:resource=\"" + ontologyUri + "/datasets#" + dataset + "\" />\n");
+                rdfOntology.append("    <rdfs:range rdf:resource=\"" + rdfClass.getFullName() + "\" />\n");
+                rdfOntology.append("    <rdfs:comment>Dataset connection</rdfs:comment>\n");
+                rdfOntology.append("  </owl:DatatypeProperty>\n\n");
+
+                rdfOntology.append("  <owl:Class rdf:about=\"" + rdfClass.getFullName() + "\">\n");
+                rdfOntology.append("    <rdfs:label>" + rdfClass.getShortName() + "</rdfs:label>\n");
+                rdfOntology.append("    <rdfs:comment>URI over mart attributes: " + rdfClass.getURIAttributes().toString() + "</rdfs:comment>\n");
+                rdfOntology.append("  </owl:Class>\n\n");
+
+                for (RDFProperty property : rdfClass.getProperties()) {
+                    String attribute = property.getAttribute();
+                    String filter = property.getFilter();
+
+                    if (attribute == null || attribute.isEmpty())
+                        attribute = "-";
+
+                    if (filter == null || filter.isEmpty())
+                        filter = "-";
+
+                    rdfOntology.append("  <owl:DatatypeProperty rdf:about=\"" + property.getFullName() + "\">\n");
+                    rdfOntology.append("    <rdfs:label>" + property.getShortName() + "</rdfs:label>\n");
+                    rdfOntology.append("    <rdfs:domain rdf:resource=\"" + rdfClass.getFullName() + "\" />\n");
+                    rdfOntology.append("    <rdfs:range rdf:resource=\"" + property.getFullRange() + "\" />\n");
+                    rdfOntology.append("    <rdfs:comment>Mart attribute: " +
+                                            attribute +
+                                            ", mart filter: " +
+                                            filter +
+                                            "</rdfs:comment>\n");
+                    rdfOntology.append("  </owl:DatatypeProperty>\n\n");
+                }
+            }
+
+        }
+
+        rdfOntology.append("</rdf:RDF>\n");
+
+        return Response.ok(new StreamingOutput() {
+            public void write(OutputStream out) {
+                try {
+                    out.write(rdfOntology.toString().getBytes());
+                }
+                catch(IOException ioe) {
+                    // Well, if we cannot communicate, then there is
+                    // little that can be done about it.
+                }
+            }
+        }, "application/rdf+xml").build();
+    }
+
+    protected Set<String> getLiterals(Query query) throws SPARQLException {
+        Set<String> literals = new HashSet<String>();
+        Element queryPattern = query.getQueryPattern();
+
+        if (queryPattern instanceof ElementGroup) {
+            List<Element> group = ((ElementGroup)queryPattern).getElements();
+
+            for (Element element : group) {
+                if (element instanceof ElementPathBlock) {
+                    for (TriplePath triplePath : ((ElementPathBlock)element).getPattern()) {
+                        if (triplePath.getObject().isLiteral())
+                            literals.add(triplePath.getObject().getLiteral().getLexicalForm());
+                    }
+                }
+            }
+
+        } else {
+            throw new SPARQLException(String.format(RDF_SPARQL_NOT_ELEMENTGROUP));
+        }
+
+        return literals;
+    }
+
+    protected String getPrincipalMart(String format, String martName, String dataset, Query query) throws SPARQLException {
+        Mart mart = new Portal(factory)._registry.getMartByConfigName(martName);
+
+        if (mart == null)
+            throw new SPARQLException(String.format(RDF_MART_UNKNOWN, martName));
+
+        Set<String> literals = getLiterals(query);
+        literals.add("");
+
+        String ontologyUri = getOntologyUrl(martName);
+        Ontology ontology = getOntology(mart, dataset, ontologyUri);
+
+        final StringBuilder rdfOntology = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rdf:RDF\n");
+        rdfOntology.append("  xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n");
+        rdfOntology.append("  xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\"\n");
+        rdfOntology.append("  xmlns:datasets=\"" + ontologyUri + "/datasets#\"\n");
+        rdfOntology.append("  xmlns:objects=\"" + ontologyUri + "/objects#\">\n\n");
+
+        for (RDFClass rdfClass : ontology.getRDFClasses()) {
+            rdfOntology.append("  <objects:" + rdfClass.getShortName() + ">\n");
+
+            for (RDFProperty property : rdfClass.getProperties()) {
+                for (String literal : literals) {
+                    rdfOntology.append("    <objects:" + property.getShortName() + ">");
+                    rdfOntology.append(literal);
+                    rdfOntology.append("</objects:" + property.getShortName() + ">\n");
+                }
+                
+            }
+
+            rdfOntology.append("  </objects:" + rdfClass.getShortName() + ">\n\n");
+        }
+
+        rdfOntology.append("</rdf:RDF>\n");
+
+        return rdfOntology.toString();
+    }
+
+    protected Ontology getOntology(Mart mart, String dataset, String ontologyUri) throws SPARQLException {
+        Map<String, Ontology> dataset2Ontology = ontologyCache.get(mart);
+
+        if (dataset2Ontology != null) {
+            Ontology ontology = dataset2Ontology.get(dataset);
+
+            if (ontology != null)
+                return ontology;
+        }
+        
+        // Include hidden attributes, filters and containers.
+        List<Filter> filters = mart.getFilters(dataset, true, true);
+        List<Attribute> attributes = mart.getAttributes(dataset, true);
+
+        Ontology ontology = new Ontology();
+
+        ontology.addNamespace("rdf:", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+        ontology.addNamespace("rdfs:", "http://www.w3.org/2000/01/rdf-schema#");
+
+        ontology.addNamespace("datasets:", ontologyUri + "/datasets#");
+        ontology.addNamespace("objects:", ontologyUri + "/objects#");
+
+        for (org.biomart.objects.objects.RDFClass rdfClass : mart.getRDFClasses())
+            ontology.addClass(rdfClass.getName(), rdfClass.getUID().split(","));
+
+        // Look for attribute RDF-defs *after* the classes have been picked up...
+        for (Attribute attribute : attributes) {
+            String rdfProperty = attribute.getRDF();
+
+            if (!attribute.getRDF().isEmpty())
+                addProperty(ontology, attribute.getName(), "", rdfProperty);
+        }
+
+        // Filter settings *will* override attribute settings: they take
+        // precedence. The attribute rdf-property should only be there if
+        // the attribute has no filter associated with it.
+        for (Filter filter : filters) {
+            String rdfProperty = filter.getRDF();
+
+            if (!rdfProperty.isEmpty())
+                addProperty(ontology, filter.getAttributeName(), filter.getName(), rdfProperty);
+        }
+
+        return ontology;
+    }
+
+    private void addProperty(Ontology ontology,
+                String attributeName,
+                String filterName,
+                String rdfString
+            ) throws SPARQLException {
+        if (!rdfString.isEmpty()) {
+            String[] definitions = rdfString.split("\\|");
+
+            for (String definition : definitions) {
+                definition = definition.trim();
+
+                String[] objectPath = definition.split(";");
+
+                if (objectPath.length != 3) {
+                    String name = filterName;
+
+                    if (name.isEmpty())
+                        name = attributeName;
+
+                    throw new SPARQLException(String.format(RDF_MC_PROPERTY_SYNTAX_ERROR, name));
+                }
+
+                ontology.addProperty(
+                        attributeName,
+                        filterName,
+                        objectPath[0], // class name
+                        objectPath[1], // property
+                        objectPath[2]  // range
+                    );
+            }
+        }
+    }
+}

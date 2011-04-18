@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<project name="BioMart" basedir="." default="test_development">
+  <target name="-load.properties" description="Load">
+    <property file="ant.properties"/>
+    <path id="project.test.classpath">
+      <fileset dir="${dist.dir}/lib">
+        <patternset id="project.test.jars">
+          <include name="*.jar"/>
+          <include name="test/*.jar"/>
+          <exclude name="zzNetBox*.jar"/>
+        </patternset>
+      </fileset>
+    </path>
+  </target>
+  <target name="-init" depends="-load.properties">
+    <mkdir dir="${build.classes}/test"/>
+    <mkdir dir="${testoutput.dir}"/>
+    <mkdir dir="${testreport.dir}"/>
+  </target>
+  <target name="clean" depends="-init">
+    <delete>
+      <fileset dir="${testoutput.dir}">
+        <include name="TEST-*.xml"/>
+      </fileset>
+    </delete>
+  </target>
+  <target name="compile.test" depends="-init">
+    <javac srcdir="${test.dir}" destdir="${build.classes}/test" deprecation="${build.deprecation}" depend="no" debug="true" source="1.6">
+      <classpath>
+        <path refid="project.test.classpath"/>
+        <fileset dir="${dist.dir}/lib">
+          <include name="zzNetBox*.jar"/>
+        </fileset>
+      </classpath>
+    </javac>
+  </target>
+  <target name="jar.test" depends="compile.test">
+    <jar destfile="${build.lib}/${name}-${version}-test.jar" basedir="${build.classes}/test/"/>
+  </target>
+  <target name="dist.test" depends="jar.test">
+    <copy file="${build.lib}/${name}-${version}-test.jar" todir="${dist.dir}/lib" overwrite="yes"/>
+  </target>
+  <target name="report">
+    <java classname="org.biomart.configurator.test.OpenUrl" fork="true">
+      <classpath>
+        <fileset dir="${dist.dir}/lib">
+          <include name="${name}-${version}-test.jar"/>
+        </fileset>
+      </classpath>
+    </java>
+  </target>
+  <target name="test.configurator" depends="dist.test">
+    <junit showoutput="true">
+      <classpath>
+        <path refid="project.test.classpath"/>
+        <!-- Include NetBox JARs last due to version inconsistencies -->
+        <fileset dir="${dist.dir}/lib">
+          <include name="zzNetBox*.jar"/>
+        </fileset>
+      </classpath>
+      <formatter type="xml"/>
+      <test name="org.biomart.configurator.test.McTest" outfile="${testoutput.dir}/TEST-McUnitTest"/>
+    </junit>
+  </target>
+  <target name="test.api" depends="dist.test">
+    <junit showoutput="true">
+      <classpath>
+        <path refid="project.test.classpath"/>
+        <!-- Include NetBox JARs last due to version inconsistencies -->
+        <fileset dir="${dist.dir}/lib">
+          <include name="zzNetBox*.jar"/>
+        </fileset>
+      </classpath>
+      <formatter type="xml"/>
+      <test name="org.biomart.api.PortalApiTest" outfile="${testoutput.dir}/TEST-PortalApiTest"/>
+      <test name="org.biomart.api.QueryApiTest" outfile="${testoutput.dir}/TEST-QueryApiTest"/>
+      <test name="org.biomart.api.rest.RestApplicationTest" outfile="${testoutput.dir}/TEST-RestApplicationTest"/>
+    </junit>
+  </target>
+  <target name="showreport" depends="-init">
+    <junitreport todir="${testreport.dir}">
+      <fileset dir="${testoutput.dir}">
+        <include name="TEST-*.xml"/>
+      </fileset>
+      <report format="frames" todir="${testreport.dir}"/>
+    </junitreport>
+    <antcall target="report"/>
+  </target>
+  <target name="test" depends="test.api,test.configurator,showreport"/>
+  <target name="testforhudson" depends="dist.test">
+    <junit showoutput="true">
+      <classpath>
+        <path refid="project.test.classpath"/>
+        <fileset dir="${dist.dir}/lib">
+          <include name="zzNetBox*.jar"/>
+        </fileset>
+      </classpath>
+      <formatter type="xml"/>
+      <test name="org.biomart.configurator.test.McTest" outfile="${testoutput.dir}/TEST-McUnitTest"/>
+    </junit>
+  </target>
+  <target name="test_development" depends="dist.test">
+    <junit showoutput="true">
+      <classpath>
+        <path refid="project.test.classpath"/>
+        <fileset dir="${dist.dir}/lib">
+          <include name="zzNetBox*.jar"/>
+        </fileset>
+      </classpath>
+      <formatter type="xml"/>
+      <test name="org.biomart.configurator.test.McTestDevelopment" outfile="${testoutput.dir}/TEST-McUnitTest"/>
+    </junit>
+    <junitreport todir="${testreport.dir}">
+      <fileset dir="${testoutput.dir}">
+        <include name="TEST-*.xml"/>
+      </fileset>
+      <report format="frames" todir="${testreport.dir}"/>
+    </junitreport>
+    <antcall target="report"/>
+  </target>
+  <target name="test_fast" depends="dist.test">
+    <junit showoutput="true">
+      <classpath>
+        <path refid="project.test.classpath"/>
+        <fileset dir="${dist.dir}/lib">
+          <include name="zzNetBox*.jar"/>
+        </fileset>
+      </classpath>
+      <formatter type="xml"/>
+      <test name="org.biomart.configurator.test.McTestFast" outfile="${testoutput.dir}/TEST-McUnitTest"/>
+    </junit>
+    <junitreport todir="${testreport.dir}">
+      <fileset dir="${testoutput.dir}">
+        <include name="TEST-*.xml"/>
+      </fileset>
+      <report format="frames" todir="${testreport.dir}"/>
+    </junitreport>
+    <antcall target="report"/>
+  </target>
+  <target name="test_slow" depends="dist.test">
+    <junit showoutput="true">
+      <classpath>
+        <path refid="project.test.classpath"/>
+        <fileset dir="${dist.dir}/lib">
+          <include name="zzNetBox*.jar"/>
+        </fileset>
+      </classpath>
+      <formatter type="xml"/>
+      <test name="org.biomart.configurator.test.McTestSlow" outfile="${testoutput.dir}/TEST-McUnitTest"/>
+    </junit>
+    <junitreport todir="${testreport.dir}">
+      <fileset dir="${testoutput.dir}">
+        <include name="TEST-*.xml"/>
+      </fileset>
+      <report format="frames" todir="${testreport.dir}"/>
+    </junitreport>
+    <antcall target="report"/>
+  </target>
+</project>
