@@ -24,6 +24,7 @@ public class App extends PackagesResourceConfig {
          */
         Map<String, MediaType> m = new HashMap<String, MediaType> ();
         m.put("json", MediaType.APPLICATION_JSON_TYPE);
+        m.put("jsonp", MediaType.APPLICATION_JSON_TYPE);
         m.put("xml", MediaType.APPLICATION_XML_TYPE);
         m.put("html", MediaType.TEXT_HTML_TYPE);
         m.put("txt", MediaType.TEXT_PLAIN_TYPE);

@@ -103,7 +103,7 @@
 
 <div id="biomart-loading">
 	<p class="message">
-    <bm:message code="loading" capitalize="true"/> MartForm
+    <bm:message code="loading" capitalize="true"/> MartAnalysis
 	</p>
 	<span class="loading"></span>
 </div>

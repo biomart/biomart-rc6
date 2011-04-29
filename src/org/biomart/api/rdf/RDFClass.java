@@ -26,8 +26,19 @@ public class RDFClass extends RDFObject {
             this.uriAttributes.addAll(Arrays.asList(uriAttributes));
     }
 
-    public void addProperty(RDFProperty property) {
-        properties.add(property);
+    public void addProperty(RDFProperty newProperty) {
+        for (int i = 0; i < properties.size(); i++) {
+            RDFProperty currentProperty = properties.get(i);
+
+            if (currentProperty.isSimilar(newProperty)) {
+                if (currentProperty.getFilter().isEmpty()) {
+                    properties.remove(i);
+                    properties.add(newProperty);
+                }
+                return;
+            }
+        }
+        properties.add(newProperty);
     }
 
     public List<RDFProperty> getProperties() { return Collections.unmodifiableList(properties); }

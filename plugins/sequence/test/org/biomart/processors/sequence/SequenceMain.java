@@ -21,7 +21,11 @@ import org.biomart.processors.TSV;
  */
 public class SequenceMain {
 
-	public static boolean DEBUG = false;
+    static {
+        System.setProperty("biomart.debug", "true");
+        System.setProperty("log.level", "debug");
+    }
+
     public static void main(String[] args) throws Exception {
     	
     	String operation = null;

@@ -1,13 +1,15 @@
 package org.biomart.queryEngine;
 
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -21,8 +23,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Collections;
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.commons.lang.StringUtils;
+import org.biomart.common.exceptions.BioMartException;
 
 import org.biomart.common.exceptions.TechnicalException;
 import org.biomart.common.resources.Log;
@@ -754,7 +758,7 @@ public final class SubQuery {
      * @throws MalformedURLException
      * @throws IOException
      */
-    protected final void executeMartServiceQuery() throws MalformedURLException, IOException {
+    protected final void executeMartServiceQuery() {
 		// Prepare POST data
 		Log.debug("URL: " + this.getWebServiceURL());
 		// make OAuth request if needed
@@ -777,21 +781,31 @@ public final class SubQuery {
         else {
             Log.debug("SENDING INSECURE(non-OAUTH) request");
 
-            URL url = new URL(this.getWebServiceURL());
-            URLConnection urlConnection = url.openConnection();
-            urlConnection.setDoOutput(true);
-            
-            // Construct data
-            String data = URLEncoder.encode("query", "UTF-8") + "="
-            + URLEncoder.encode(this.getQuery(), "UTF-8");
-            Log.debug("QUERY: " + this.getQuery());
+            Client c = new Client();
+            WebResource resource = c.resource(this.getWebServiceURL());
 
-            this.resultSetURL_wr = new OutputStreamWriter(urlConnection.getOutputStream());
-            this.resultSetURL_wr.write(data);
-            this.resultSetURL_wr.flush();
+            MultivaluedMap formData = new MultivaluedMapImpl();
+            formData.add("query", this.getQuery());
 
-            this.resultSetURL = new BufferedReader(
-                new InputStreamReader(urlConnection.getInputStream()));
+            try {
+                InputStream is = resource
+                        .type("application/x-www-form-urlencoded")
+                        .post(InputStream.class, formData);
+
+                // Construct data
+                Log.debug("QUERY: " + this.getQuery());
+                this.resultSetURL = new BufferedReader(
+                    new InputStreamReader(is));
+            } catch(UniformInterfaceException e) {
+                String msg;
+                if (e.getResponse().getStatus() == 405) {
+                    msg = "Method Not Allowed";
+                } else {
+                    msg = e.getResponse().getEntity(String.class);
+                }
+                throw new BioMartException(String.format("HTTP Error %s - %s",
+                        e.getResponse().getStatus(), msg));
+            }
         }
 	}
 

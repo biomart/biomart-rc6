@@ -36,7 +36,7 @@
 }
 
 .biomart .item .ui-autocomplete-input {
-    width: 22em;
+    width: 253px;
 }
 
 /* Datasets and Marts */
@@ -108,7 +108,7 @@
     clear: none;
 }
 .biomart .filters .item.simplerfilter.multiSelect select {
-    width: 300px;
+    width: 270px;
 }
 .biomart .filters .item.simplerfilter .upload-subgroup {
     display: block;
@@ -151,7 +151,10 @@
 .biomart .filters .item.simplerfilter textarea.field {
     line-height: 2em;
     height: 2em;
-    width: 24.6em;
+    width: 260px;
+}
+.biomart .filters .item.simplerfilter textarea.field {
+    width: 270px;
 }
 .biomart .filters .item.simplerfilter a.uploader {
     display: block;
@@ -193,7 +196,7 @@
     font-size: 12px;
     height: 2em;
     line-height: 2em;
-    padding: 0 .5em;
+    padding: 0 5px;
 }
 .ui-prettybox {
     float: left;

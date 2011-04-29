@@ -16,7 +16,7 @@
       <c:if test="${!container.hidden && container.guiType != 'martreport'}">
         <%-- Print container HTML if top level --%>
         <c:if test="${level == 1}">
-          <h3 class="ui-widget-header ui-corner-top level-${level}">${container.displayName}</h3>
+          <h3 class="ui-widget-header ui-corner-top ui-state-active level-${level}">${container.displayName}</h3>
           <div id="${fn:replace(container.name, " ", "")}" 
             class="ui-widget-content ${not empty container.guiContainerList ?  'ui-tabs' : ''} ${container.guiType} level-${level}">
           <%-- Description at the top if not MartSearch --%>

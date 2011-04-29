@@ -22,6 +22,7 @@ public class HttpCentralRegistryProxy {
     	return instance;
     }
 
+
     public boolean userExists(String openid, String groupName, String location) {
         try {
             String urlStr = String.format(location + "rest/verify_user?id=%s&group=%s", openid, groupName);

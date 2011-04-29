@@ -280,6 +280,18 @@ public class GuiContainer extends MartConfiguratorObject {
 		return martPointerList;		
 	}
 	
+	public List<MartPointer> getMartPointerListforMartName(String mart) {
+		List<MartPointer> martPointerList = new ArrayList<MartPointer>();
+		for(MartPointer mp: this.martPointerList) {
+			if(mp.getPropertyValue(XMLElements.MART).equals(mart))
+				martPointerList.add(mp);
+		}
+		for(GuiContainer gc : this.guiContainerList) {
+			martPointerList.addAll(gc.getMartPointerListforMartName(mart));
+		}
+		return martPointerList;		
+	}
+	
 	public Set<MartPointer> getMartPointerListByMartConfig(Mart mart, Config config) {
 		Set<MartPointer> martPointerList = new HashSet<MartPointer>();
 		for(MartPointer mp: this.martPointerList) {

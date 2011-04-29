@@ -6,7 +6,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +25,7 @@ import org.biomart.common.exceptions.TechnicalException;
 import org.biomart.objects.objects.Dataset;
 import org.biomart.objects.objects.Attribute;
 import org.biomart.common.resources.Log;
+import org.biomart.util.String2LongSet;
 
 
 /**
@@ -43,7 +43,7 @@ public final class QueryRunner implements OutputConstants {
     public final Query query;
     public static final int batchSize = 5000;
     public final int [] outputOrder;
-    public final Set<String> uniqueResults = new HashSet<String>();
+    public final String2LongSet uniqueResults = new String2LongSet();
     public volatile OutputStream outputHandle;
     public final ArrayList<ArrayList<String>> finalRT = new ArrayList<ArrayList<String>>();
 
@@ -90,13 +90,14 @@ public final class QueryRunner implements OutputConstants {
         this.outputHandle = outputHandle;
         return this;
     }
-    
+
     /**
      *
      * @throws IOException
      */
     public void printHeader() throws IOException {
-        if(this.query.getHeader().equals("1") || this.query.getHeader().equals("true")) {
+        if(Boolean.parseBoolean(this.query.getHeader().toLowerCase()) ||
+                "1".equals(this.query.getHeader())) {
             int len = this.query.outputDisplayNames.length;
             int i = 0;
             String displayName = this.query.outputDisplayNames[i];
@@ -235,7 +236,7 @@ public final class QueryRunner implements OutputConstants {
             for (int i = 0; i < rows; i++) {
                 res_row = interimRT.get(i);
                 String[] curr_row = new String[cols];
-                
+
                 //Log.debug("output atts length: " +this.outputOrder.length);
                 for (j = 0; j < cols; j++) {
                     // its a pseudo att
@@ -245,22 +246,20 @@ public final class QueryRunner implements OutputConstants {
                     else
                         curr_row[j] = res_row.get(this.outputOrder[j]) == null ? "" : res_row.get(this.outputOrder[j]);
                 }
-                
-                String row = StringUtils.join(curr_row, "\t");
 
-                if (!this.uniqueResults.contains(row)) {
-                    this.outputHandle.write(row.getBytes());
-                    this.outputHandle.write("\n".getBytes());
+                String row = StringUtils.join(curr_row, "\t");
+                byte[] bytes = row.getBytes();
+
+                if (!this.uniqueResults.contains(bytes)) {
+                    this.outputHandle.write(bytes);
+                    this.outputHandle.write((byte)0x0a);
                     // Force write to output stream
                     if (rows%FLUSH_INTERVAL == 0) {
                         this.outputHandle.flush();
-                        if (this.uniqueResults.size() > 500000) {
-                            this.uniqueResults.clear();
-                        }
                     }
                     this.limit--;
                     // Log.debug("row: "+out_row.toString());
-                    this.uniqueResults.add(row);
+                    this.uniqueResults.add(bytes);
                 }
                 if (this.limit == 0) {
                     break;
@@ -314,7 +313,7 @@ public final class QueryRunner implements OutputConstants {
                 String row = out_row.toString();
                 this.outputHandle.write(row.getBytes());
                 this.outputHandle.write("\n".getBytes());
-            }    
+            }
 
            return true;
         }

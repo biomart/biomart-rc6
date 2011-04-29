@@ -36,4 +36,13 @@ public class RDFProperty extends RDFObject {
     public String getRange() { return range; }
 
     public String getFullRange() { return expandPrefix(range); }
+
+    // Similar if everything matches but the filter is empty
+    // in this and/or the other object.
+    public boolean isSimilar(RDFProperty property) {
+        return super.equals(property) &&
+            attribute.equals(property.getAttribute()) &&
+            range.equals(property.getRange()) &&
+            (filter.isEmpty() || property.getFilter().isEmpty());
+    }
 }

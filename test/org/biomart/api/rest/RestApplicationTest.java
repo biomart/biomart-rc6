@@ -18,6 +18,9 @@ import static org.junit.Assert.*;
  */
 public class RestApplicationTest extends JerseyTest {
     static {
+        System.setProperty("biomart.registry.file", "./testdata/restapi.xml");
+        System.setProperty("biomart.registry.key.file", "./testdata/.restapi");
+
         System.setProperty("jersey.test.containerFactory",
                 "com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory");
     }
@@ -46,7 +49,7 @@ public class RestApplicationTest extends JerseyTest {
     public void testGetMartList() throws IOException {
         WebResource webResource = resource();
         String responseMsg = webResource
-                .path("/marts")
+                .path("/martservice/marts")
                 .accept("application/json")
                 .get(String.class);
         ObjectMapper mapper = new ObjectMapper();
@@ -63,7 +66,7 @@ public class RestApplicationTest extends JerseyTest {
     @Test
     public void testGetDatasetList() throws IOException {
         WebResource webResource = resource();
-        String responseMsg = webResource.path("/datasets")
+        String responseMsg = webResource.path("/martservice/datasets")
                 .queryParam("mart", "gene")
                 .accept("application/json")
                 .get(String.class);
@@ -81,7 +84,7 @@ public class RestApplicationTest extends JerseyTest {
     @Test
     public void testGetAllFilters() throws IOException {
         WebResource webResource = resource();
-        String responseMsg = webResource.path("/filters")
+        String responseMsg = webResource.path("/martservice/filters")
                 .queryParam("datasets", "homo_sapiens_core_60_37e")
                 .queryParam("config", "gene")
                 .accept("application/json")
@@ -100,7 +103,7 @@ public class RestApplicationTest extends JerseyTest {
     @Test
     public void testGetAllAttributes() throws IOException {
         WebResource webResource = resource();
-        String responseMsg = webResource.path("/attributes")
+        String responseMsg = webResource.path("/martservice/attributes")
                 .queryParam("datasets", "homo_sapiens_core_60_37e")
                 .queryParam("config", "gene")
                 .accept("application/json")
@@ -120,7 +123,7 @@ public class RestApplicationTest extends JerseyTest {
     @Test
     public void testGetRootGuiContainer() throws IOException {
         WebResource webResource = resource();
-        String responseMsg = webResource.path("/portal")
+        String responseMsg = webResource.path("/martservice/portal")
                 .accept("application/json")
                 .get(String.class);
         ObjectMapper mapper = new ObjectMapper();
@@ -142,7 +145,7 @@ public class RestApplicationTest extends JerseyTest {
     @Test
     public void testGetRootContainer() throws IOException {
         WebResource webResource = resource();
-        String responseMsg = webResource.path("/containers")
+        String responseMsg = webResource.path("/martservice/containers")
                 .queryParam("datasets", "homo_sapiens_core_60_37e")
                 .queryParam("config", "gene")
                 .accept("application/json")
@@ -166,7 +169,7 @@ public class RestApplicationTest extends JerseyTest {
     @Test
     public void testGetMartsForGuiContainer() throws IOException {
         WebResource webResource = resource();
-        String responseMsg = webResource.path("/marts")
+        String responseMsg = webResource.path("/martservice/marts")
                 .queryParam("guicontainer", "default")
                 .accept("application/json")
                 .get(String.class);
@@ -189,7 +192,7 @@ public class RestApplicationTest extends JerseyTest {
     @Test
     public void testGetFilters() throws IOException {
         WebResource webResource = resource();
-        String responseMsg = webResource.path("/filters")
+        String responseMsg = webResource.path("/martservice/filters")
                 .queryParam("datasets", "homo_sapiens_core_60_37e")
                 .queryParam("config", "gene")
                 .queryParam("container", "gene_filter")
@@ -213,7 +216,7 @@ public class RestApplicationTest extends JerseyTest {
     @Test
     public void testGetAttributes() throws IOException {
         WebResource webResource = resource();
-        String responseMsg = webResource.path("/attributes")
+        String responseMsg = webResource.path("/martservice/attributes")
                 .queryParam("datasets", "homo_sapiens_core_60_37e")
                 .queryParam("config", "gene")
                 .queryParam("container", "gene_attribute")
@@ -238,7 +241,7 @@ public class RestApplicationTest extends JerseyTest {
     @Test
     public void testGetProcessorGroups() throws IOException {
         WebResource webResource = resource();
-        String responseMsg = webResource.path("/processorgroups")
+        String responseMsg = webResource.path("/martservice/processorgroups")
                 .queryParam("mart", "gene")
                 .accept("application/json")
                 .get(String.class);
@@ -256,7 +259,7 @@ public class RestApplicationTest extends JerseyTest {
     @Test
     public void testGetProcessors() throws IOException {
         WebResource webResource = resource();
-        String responseMsg = webResource.path("/processors")
+        String responseMsg = webResource.path("/martservice/processors")
                 .queryParam("mart", "gene")
                 .queryParam("processorgroup", "Tabular")
                 .accept("application/json")
@@ -276,11 +279,11 @@ public class RestApplicationTest extends JerseyTest {
 //    public void testResults() {
 //
 //        String xml = "<!DOCTYPE Query><Query client=\"test\" processor=\"TSV\" limit=\"10\" header=\"1\">"
-//                + "<Dataset name=\"homo_sapiens_core_60_37e\" config=\"gene_config\">"
+//                + "<Dataset name=\"homo_sapiens_core_60_37e\" config=\"gene\">"
 //                + "<Attribute name=\"gene_gene_id_1029\"/></Dataset></Query>";
 //
 //        WebResource webResource = resource();
-//        String responseMsg = webResource.path("/results")
+//        String responseMsg = webResource.path("/martservice/results")
 //                .queryParam("query", xml)
 //                .accept("text/plain")
 //                .get(String.class);

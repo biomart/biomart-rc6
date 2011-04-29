@@ -39,6 +39,8 @@
 
 #biomart-summary li .ui-icon {
     cursor: pointer;
-    float: right;
-    position: static;
 }
+#biomart-summary li .ui-icon-circle-arrow-w {
+    right: 15px;
+}
+

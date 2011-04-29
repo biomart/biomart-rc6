@@ -15,8 +15,8 @@ import org.jdom.input.SAXBuilder;
 
 public class Diff {
 	public static void main(String args[]){
-		String oldMartServiceURL = "http://localhost:8888/rest/";
-		String newMartSericeURL = "http://localhost:8888/rest/";
+		String oldMartServiceURL = "http://localhost:8888/martservice/";
+		String newMartSericeURL = "http://localhost:8888/martservice/";
 		
 		HashSet<String> oldAttributes = new HashSet<String>();
 		HashSet<String> oldFilters = new HashSet<String>();

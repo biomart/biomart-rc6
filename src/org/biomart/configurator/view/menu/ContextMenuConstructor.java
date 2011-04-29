@@ -839,6 +839,7 @@ public class ContextMenuConstructor implements ActionListener {
 			if(owner instanceof GuiContainerPanel){
 				GuiContainerPanel gcp = (GuiContainerPanel)owner;
 				gcp.regenerateRDF();
+				MartController.getInstance().setChanged(true);
 			}
 		}
 	}

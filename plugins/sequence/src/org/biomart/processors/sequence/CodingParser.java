@@ -149,39 +149,44 @@ public class CodingParser extends SequenceParser {
 	protected final boolean printCoding(String header, String chr,
 			TreeMap<Integer, Integer> start, TreeMap<Integer, Integer> end, int codingStartOffset,
 			int codingEndOffset, int startExonRank, int endExonRank, String strand, int startPhase, String codonTableID ,HashSet<String> seqEdit,boolean isProtein) throws IOException {
-		StringBuilder sequence = new StringBuilder();
-		if (!chr.equals("")){
-			if (strand.equals("-1")){
-				if (startExonRank == endExonRank){
-					sequence.append(reverseComplement(getSequence(chr,end.get(startExonRank)-codingEndOffset+1-downstreamFlank,end.get(startExonRank)-codingStartOffset+1+upstreamFlank)));
-				} else {
-					sequence.append(reverseComplement(getSequence(chr,start.get(startExonRank),end.get(startExonRank)-codingStartOffset+1+upstreamFlank)));
-					for (int i = startExonRank+1; i < endExonRank; i++){
-						sequence.append(reverseComplement(getSequence(chr, start.get(i), end.get(i))));
-					}
-					sequence.append(reverseComplement(getSequence(chr,end.get(endExonRank)-codingEndOffset+1-downstreamFlank,end.get(endExonRank))));
-				}
-			} else {
-				if (startExonRank == endExonRank){
-					sequence.append(getSequence(chr,start.get(startExonRank)+codingStartOffset-1-upstreamFlank,start.get(startExonRank)+codingEndOffset-1+downstreamFlank));
-				} else {
-					sequence.append(getSequence(chr,start.get(startExonRank)+codingStartOffset-1-upstreamFlank,end.get(startExonRank)));
-					for (int i = startExonRank+1; i < endExonRank; i++){
-						sequence.append((getSequence(chr, start.get(i), end.get(i))));
-					}
-					sequence.append(getSequence(chr,start.get(endExonRank),start.get(endExonRank)+codingEndOffset-1+downstreamFlank));
-				}
-			}
-		}
-		if (sequence.length()>0){
-			for(int i = startPhase; i > 0; --i){
-				sequence.insert(0, 'N');
-			}
-		}
-		if(isProtein){
-			return printFASTA(SequenceTranslator.translateSequence(sequence.toString(), seqEdit, codonTableID), header);
-		} else {
-			return  printFASTA(sequence.toString(), header);
-		}
+        try {
+            StringBuilder sequence = new StringBuilder();
+            if (!chr.equals("")){
+                if (strand.equals("-1")){
+                    if (startExonRank == endExonRank){
+                        sequence.append(reverseComplement(getSequence(chr,end.get(startExonRank)-codingEndOffset+1-downstreamFlank,end.get(startExonRank)-codingStartOffset+1+upstreamFlank)));
+                    } else {
+                        sequence.append(reverseComplement(getSequence(chr,start.get(startExonRank),end.get(startExonRank)-codingStartOffset+1+upstreamFlank)));
+                        for (int i = startExonRank+1; i < endExonRank; i++){
+                            sequence.append(reverseComplement(getSequence(chr, start.get(i), end.get(i))));
+                        }
+                        sequence.append(reverseComplement(getSequence(chr,end.get(endExonRank)-codingEndOffset+1-downstreamFlank,end.get(endExonRank))));
+                    }
+                } else {
+                    if (startExonRank == endExonRank){
+                        sequence.append(getSequence(chr,start.get(startExonRank)+codingStartOffset-1-upstreamFlank,start.get(startExonRank)+codingEndOffset-1+downstreamFlank));
+                    } else {
+                        sequence.append(getSequence(chr,start.get(startExonRank)+codingStartOffset-1-upstreamFlank,end.get(startExonRank)));
+                        for (int i = startExonRank+1; i < endExonRank; i++){
+                            sequence.append((getSequence(chr, start.get(i), end.get(i))));
+                        }
+                        sequence.append(getSequence(chr,start.get(endExonRank),start.get(endExonRank)+codingEndOffset-1+downstreamFlank));
+                    }
+                }
+            }
+            if (sequence.length()>0){
+                for(int i = startPhase; i > 0; --i){
+                    sequence.insert(0, 'N');
+                }
+            }
+            if(isProtein){
+                return printFASTA(SequenceTranslator.translateSequence(sequence.toString(), seqEdit, codonTableID), header);
+            } else {
+                return  printFASTA(sequence.toString(), header);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return printFASTA(SEQUENCE_UNAVAILABLE, header);
+        }
 	}
 }

@@ -127,6 +127,8 @@ public class McViewSourceGroup extends McView {
 	
 	
 	public void clean() {
+		this.scs = null;
+		this.lastpoint = null;
 		this.getMainPanel().removeAll();
 		this.getMainPanel().repaint();
 	}

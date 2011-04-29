@@ -176,7 +176,7 @@ $.namespace('biomart.query', function(self) {
             filters = mart.filters,
             attributes = mart.attributes;
 
-        if (params) {
+        if (params && params.length) {
             arr.push('<Processor>');
             for (i=0, item; item=params[i]; i++) {
                 arr.push([
@@ -226,6 +226,13 @@ $.namespace('biomart.query', function(self) {
         return arr.join('');
     }
 
+    function site2reference(siteURL) {
+        refURL = siteURL.replace(/^https:/, 'biomart:');
+        refURL = refURL.replace(/^http:/, 'biomart:');
+
+        return refURL;
+    }
+
     function mart2sparql(mart) {
         var arr = [ ],
             config = mart.config,
@@ -233,8 +240,14 @@ $.namespace('biomart.query', function(self) {
             filters = mart.filters,
             attributes = mart.attributes;
 
-        arr.push('PREFIX datasets: <' + BIOMART_CONFIG.siteURL + 'semantic/' + config + '/ontology/datasets#>\n');
-        arr.push('PREFIX objects: <' + BIOMART_CONFIG.siteURL + 'semantic/' + config + '/ontology/objects#>\n');
+        arr.push('PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n');
+        arr.push('PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n');
+        arr.push('PREFIX owl: <http://www.w3.org/2002/07/owl#>\n');
+        arr.push('\n');
+        arr.push('PREFIX config: <' + BIOMART_CONFIG.siteURL + 'martsemantics/' + config + '/ontology#>\n');
+        arr.push('PREFIX class: <' + site2reference(BIOMART_CONFIG.siteURL) + 'martsemantics/' + config + '/ontology/class#>\n');
+        arr.push('PREFIX dataset: <' + site2reference(BIOMART_CONFIG.siteURL) + 'martsemantics/' + config + '/ontology/dataset#>\n');
+        arr.push('PREFIX attribute: <' + site2reference(BIOMART_CONFIG.siteURL) + 'martsemantics/' + config + '/ontology/attribute#>\n\n');
 
         arr.push('SELECT ');
         for (var i = 0; i < attributes.length; i++) {
@@ -242,17 +255,18 @@ $.namespace('biomart.query', function(self) {
         }
         arr.push('\n');
         for (i = 0; i< datasets.length; i++) {
-            arr.push('FROM datasets:' + datasets[i] + '\n');
+            arr.push('FROM dataset:' + datasets[i] + '\n');
         }
         arr.push('WHERE {\n');
 
         for (i = 0; i < filters.length; i++) {
             var name = filters[i].name;
 
-            if (!name.match(/^[a-zA-Z].*/))
+            // This regexp has to be identical to the regexp in ObjectController.createDefaultRDF
+            if (!name.match(/^[a-zA-Z_].*/))
                 name = '_' + name;
 
-            arr.push('  ?mart objects:' + name + ' \"' + filters[i].value + '\" .\n');
+            arr.push('  ?mart attribute:' + name + ' \"' + filters[i].value + '\" .\n');
         }
 
         for (i = 0; i < attributes.length; i++) {
@@ -261,7 +275,7 @@ $.namespace('biomart.query', function(self) {
             if (!name.match(/^[a-zA-Z].*/))
                 name = '_' + name;
 
-            arr.push('  ?mart objects:' + name + ' ?a' + i);
+            arr.push('  ?mart attribute:' + name + ' ?a' + i);
             if (i + 1 < attributes.length) arr.push(' .\n'); else arr.push('\n');
         }
 

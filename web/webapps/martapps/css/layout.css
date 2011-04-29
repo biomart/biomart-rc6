@@ -54,12 +54,8 @@
     font-variant: small-caps;
     padding: 5px;
     margin: 0 0 5px 0;
-    text-shadow: 0 0 2px #fff;
     text-transform: capitalize;
     z-index: 101;
-    border-color: #ccc;
-    background-position: 0 0;
-    color: #897048;
     -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px;
 }
 #biomart-wrapper h4 {

@@ -92,13 +92,18 @@ public class TranscriptExonIntronParser extends SequenceParser {
 	 */
 	protected final boolean printTranscriptExonIntron(String header,
 			String chr, int start, int end, String strand) throws IOException {
-		String sequence;
-		// Take the reverse complement if necessary
-		if (strand.equals("-1")){
-			sequence = reverseComplement(getSequence(chr, start-downstreamFlank, end+upstreamFlank));
-		} else {
-			sequence = getSequence(chr, start-upstreamFlank, end+downstreamFlank);
-		}
-		return printFASTA(sequence, header);
+        try {
+            String sequence;
+            // Take the reverse complement if necessary
+            if (strand.equals("-1")){
+                sequence = reverseComplement(getSequence(chr, start-downstreamFlank, end+upstreamFlank));
+            } else {
+                sequence = getSequence(chr, start-upstreamFlank, end+downstreamFlank);
+            }
+            return printFASTA(sequence, header);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return printFASTA(SEQUENCE_UNAVAILABLE, header);
+        }
 	}
 }

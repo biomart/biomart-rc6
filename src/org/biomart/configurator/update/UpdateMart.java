@@ -42,6 +42,9 @@ public class UpdateMart {
 			this.progressMonitor.setStatus("updating dataset: "+ds.getDisplayName());
 			this.updateModel.updateDataset(ds, updateOption);
 		}
+		Mart mart = dslist.get(0).getParentMart();
+		if(updateOption)
+			this.updateModel.updateOptions(mart, dslist);
 		return true;
 	}
 	

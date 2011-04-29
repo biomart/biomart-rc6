@@ -24,6 +24,8 @@ import org.biomart.common.utils2.MyUtils;
  */
 public abstract class SequenceParser implements SequenceConstants {
 
+    protected static boolean isDebug = Boolean.getBoolean("biomart.debug");
+
 	private static Connection databaseConnection = null;
     private OutputStream out;
     private List<List<String>> headerInfo;
@@ -165,7 +167,7 @@ public abstract class SequenceParser implements SequenceConstants {
 	 * @param lineLength The length of each sequence line (optional; default 60).
 	 * @param isProtein If true, translate the DNA sequence to protein sequence (optional, default false).
 	 */
-	protected final boolean printFASTA(String sequence, String header, int lineLength) throws IOException {
+	protected final boolean printFASTA(String sequence, String header, int lineLength) {
 		if (sequence == null || sequence.equals("") || sequence.equals("null")){
 			sequence = SEQUENCE_UNAVAILABLE;
 		}
@@ -178,21 +180,19 @@ public abstract class SequenceParser implements SequenceConstants {
             for(int i = 0; i < sequenceLength; i+=lineLength){
                 out.write((sequence.substring(i,Math.min(i+lineLength,sequenceLength)) + "\n").getBytes());
             }
-        } catch (Exception e) {
-            if (e instanceof IOException) {
-                throw (IOException)e;
-            }
-            throw new BioMartException("Error occured during sequence printing", e);
+
+            return ++total >= limit;
+        } catch (IOException e) {
+            throw new BioMartException(e);
         }
-        return ++total >= limit;
 	}
-	protected final boolean printFASTA(String sequence, int lineLength) throws IOException {
+	protected final boolean printFASTA(String sequence, int lineLength) {
 		return printFASTA(sequence, "", lineLength);
 	}
-	protected final boolean printFASTA(String sequence, String header) throws IOException {
+	protected final boolean printFASTA(String sequence, String header) {
 		return printFASTA(sequence, header, 60);
 	}
-	protected final boolean printFASTA(String sequence) throws IOException {
+	protected final boolean printFASTA(String sequence) {
 		return printFASTA(sequence, "", 60);
 	}
 

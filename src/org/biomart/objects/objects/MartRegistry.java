@@ -81,18 +81,19 @@ public class MartRegistry extends MartConfiguratorObject implements Serializable
 	public void removeMart(Mart mart) {
 		//before remove mart also clear all links that related to the mart
 		Config masterConfig = mart.getMasterConfig();
-		for(Link l : masterConfig.getLinkList()){
-			if(l.getPointedMart() != null){
-				List<Config> pconfigs = l.getPointedMart().getConfigList();
-				for(Config c : pconfigs){
-					Link link = McUtils.getOtherLink(l);//McUtils.getLink(c,currentLink.getParentConfig());
-					
-		    		if(null!=link){
-		    			c.removeLink(link);
-		    		}			
+		if(masterConfig!=null)
+			for(Link l : masterConfig.getLinkList()){
+				if(l.getPointedMart() != null){
+					List<Config> pconfigs = l.getPointedMart().getConfigList();
+					for(Config c : pconfigs){
+						Link link = McUtils.getOtherLink(l);//McUtils.getLink(c,currentLink.getParentConfig());
+						
+			    		if(null!=link){
+			    			c.removeLink(link);
+			    		}			
+					}
 				}
 			}
-		}
 		
 		
 		if(this.martList.remove(mart)) {

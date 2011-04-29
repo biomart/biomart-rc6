@@ -13,6 +13,7 @@ import org.biomart.common.resources.Log;
 import org.biomart.common.resources.Resources;
 import org.biomart.common.utils.MartConfiguratorUtils;
 import org.biomart.common.utils.XMLElements;
+import org.biomart.configurator.utils.McGuiUtils;
 import org.biomart.configurator.utils.McUtils;
 import org.biomart.configurator.utils.type.ValidationStatus;
 import org.biomart.configurator.utils.type.McNodeType;
@@ -631,9 +632,6 @@ public class Attribute extends Element implements Comparable<Attribute> {
 	 */
 	@Override
 	public boolean isValid() {
-		//ignore validation if is hidden
-		/*if(this.isHidden())
-			return true;*/
 		//check for existence in source first
 		if(!this.getParentConfig().isMasterConfig() &&
 				this.getParentConfig().getMart().getMasterConfig().getAttributeByName(this.getName(), null) == null) {
@@ -654,7 +652,11 @@ public class Attribute extends Element implements Comparable<Attribute> {
 				this.setProperty(XMLElements.ERROR, ErrorMessage.get("10004"));
 				return false;
 			}
-			
+			if(!McUtils.hasLink(getParentConfig(), getPointedConfing())) {
+				this.setObjectStatus(ValidationStatus.INVALID);
+				this.setProperty(XMLElements.ERROR, ErrorMessage.get("10004"));
+				return false;
+			}
 /*			if(!McUtils.isStringEmpty(attr.getPropertyValue(XMLElements.COLUMN)) ||
 				(!McUtils.isStringEmpty(attr.getPropertyValue(XMLElements.TABLE)))) {
 				result = ValidationStatus.INVALID;
@@ -687,6 +689,18 @@ public class Attribute extends Element implements Comparable<Attribute> {
 			}
 		}
 		
+		//check for link out url attributes validity
+		if(!this.getLinkOutUrl().isEmpty()) {
+			String linkOutURL = this.getLinkOutUrl(); 
+			List<Attribute> refAtts = McGuiUtils.INSTANCE.getAttributesFromLinkOutUrl(linkOutURL, this.getParentConfig());
+			for(Attribute refAtt : refAtts) {
+				if(!this.getParentConfig().containAttributebyName(refAtt)){
+					this.setObjectStatus(ValidationStatus.INVALID);
+					this.setProperty(XMLElements.ERROR, ErrorMessage.get("10013"));
+					return false;
+				}
+			}
+		}
 		this.setObjectStatus(ValidationStatus.VALID);
 		this.setProperty(XMLElements.ERROR, "");
 		return true;

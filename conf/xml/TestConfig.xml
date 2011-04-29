@@ -44,7 +44,7 @@
 		<usergroup>anonymous</usergroup>
 		<connection type="Source Schema">
 			<db type="oracle" jdbcurl="jdbc:oracle:thin:@//biomartdb-dev.res.oicr.on.ca:1521/" username="martadmin" password="Bi0M4rt" 
-				database="vega58hsap" schema="MARTADMIN" tables="GENE,TRANSCRIPT,TRANSLATION"/>
+				database="vega58hs" schema="MARTADMIN" tables="G,CC,CQ"/>
 		</connection>
 		<sourcexml>source_oracle.xml</sourcexml>
 	</testcase>
@@ -141,7 +141,7 @@
 	<usergroup>anonymous</usergroup>
 		<connection type="Source Schema">
 			<db type="oracle" jdbcurl="jdbc:oracle:thin:@//biomartdb-dev.res.oicr.on.ca:1521/" username="martadmin" password="Bi0M4rt" 
-				database="vega58hsap" schema="MARTADMIN" tables="GENE,TRANSCRIPT,TRANSLATION"/>
+				database="vega58hs" schema="MARTADMIN" tables="G,CC,CQ"/>
 		</connection>
 		<sourcesql>mart_materialize_oracle.sql</sourcesql>
 	</testcase>
@@ -196,11 +196,11 @@
 		<usergroup>anonymous</usergroup>
 		<connection type="Source Schema">
 			<db type="oracle" jdbcurl="jdbc:oracle:thin:@//biomartdb-dev.res.oicr.on.ca:1521/" username="martadmin" password="Bi0M4rt" 
-				database="vega58hsap" schema="MARTADMIN" tables="GENE"/>
+				database="vega58hs" schema="MARTADMIN" tables="G"/>
 		</connection>
 		<sourcexml>query_oracle.xml</sourcexml>
 		<sourcequery>query_oracle.txt</sourcequery>
-		<Query client="biomartclient" processor="TSV" limit="-1" header="1"><Dataset name="MARTADMIN" config="GENE_config"><Filter name="GENE__GENE_ID_1021" value="34336"/><Attribute name="GENE__GENE_ID_1021"/></Dataset></Query>
+		<Query client="biomartclient" processor="TSV" limit="-1" header="1"><Dataset name="MARTADMIN" config="G_config"><Attribute name="G__CC__AC_AD_id_1024"/></Dataset></Query>
 	</testcase>
 	
 	<!-- URL mart link test -->
@@ -279,8 +279,24 @@
 	<!-- update mart test -->
 	<testcase name="mart_update" category="TestUpdate" ignore="false">
 		<usergroup>anonymous</usergroup>
+		<connection type="Relational Mart">
+			<db type="mysql" jdbcurl="jdbc:mysql://biomartdb-dev.res.oicr.on.ca:3306/" username="martadmin" password="Bi0M4rt" 
+				database="vega_mart_60" schema="vega_mart_60" tables="meta_conf__dataset__main, meta_conf__interface__dm, meta_conf__user__dm, meta_conf__xml__dm, meta_template__template__main, meta_template__xml__dm, meta_version__version__main" naive="false"/>
+		</connection>
+		<updatedatabase database="vega_mart_60" schema="vega_mart_60"></updatedatabase>
 		<sourcexml>mart_update.xml</sourcexml>
 	</testcase>
+	
+	<testcase name="mart_update_delete" category="TestUpdate" ignore="false">
+		<usergroup>anonymous</usergroup>
+		<connection type="Relational Mart">
+			<db type="mysql" jdbcurl="jdbc:mysql://biomartdb-dev.res.oicr.on.ca:3306/" username="martadmin" password="Bi0M4rt" 
+				database="vega_mart_60_test" schema="vega_mart_60_test" tables="meta_conf__dataset__main, meta_conf__interface__dm, meta_conf__user__dm, meta_conf__xml__dm, meta_template__template__main, meta_template__xml__dm, meta_version__version__main" naive="false"/>
+		</connection>
+		<updatedatabase database="vega_mart_60_test" schema="vega_mart_60_test"></updatedatabase>
+		<sourcexml>mart_update_delete.xml</sourcexml>
+	</testcase>
+	
 	
 	<!-- rename attribute displayname from master -->
 	<testcase name="syn_master_displayname_change" category="TestSynchronize" ignore="false">
@@ -379,4 +395,5 @@
 		<create config="gene_vega_config" type="container" name="testContainer2" parent="root"></create>
 		<sourcexml>syn_master_container.xml</sourcexml>		
 	</testcase>
+
 </config>

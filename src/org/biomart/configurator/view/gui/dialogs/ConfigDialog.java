@@ -187,6 +187,7 @@ public class ConfigDialog extends JDialog {
     		McEventBus.getInstance().removeListener(McEventProperty.REFRESH_TARGETTABLE.toString(), this);
     		McEventBus.getInstance().removeListener(McEventProperty.REFRESH_OTHERTREE.toString(), this);
     		McEventBus.getInstance().removeListener(McEventProperty.REFRESH_OTHERTABLE.toString(), this);
+    		ConfigDialog.this.dispose();
           }
         });
 

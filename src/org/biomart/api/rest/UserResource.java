@@ -115,7 +115,7 @@ public class UserResource {
                 siteUrl = System.getProperty("http.url");
             }
 
-            String returnToUrl = siteUrl + "rest/user/verify";
+            String returnToUrl = siteUrl + "martservice/user/verify";
 
             StringBuilder html = new StringBuilder();
 

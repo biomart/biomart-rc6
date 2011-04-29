@@ -25,6 +25,7 @@
             self._end = 0;
             self._limit = Infinity;
             self._onDone;
+            self._hasError = false;
             //self._highlight;
             self._buffer = [];
 
@@ -68,7 +69,10 @@
             } else {
                 // normal data
                 var self = this;
-                if (biomart.errorRegex.test(s)) return;
+                if (biomart.errorRegex.test(s)) {
+                    self.error(s);
+                    return;
+                }
                 if (s) {
                     if (typeof s == 'string') s = s.split('\t');
                     self._writee.data('results_cache').push(s);
@@ -89,6 +93,10 @@
         error: function(reason) {
             this._hasError = true;
             this._renderer.error.apply(this._renderer, [this._writee, reason]);
+        },
+
+        hasError: function() {
+            return this._hasError;
         },
 
         write: function(s) {
@@ -244,22 +252,19 @@
                 self._uuid = self._iframe.attr('name');
                 biomart.datasource.streamers[self._uuid] = self;
 
+                self._iframe.one('load', function() {
+                    self.complete();
+                });
+
                 data = $.extend({stream: true, iframe: true, uuid: self._uuid, scope: 'biomart.datasource'}, options.data);
 
-                if (options.method == 'POST') {
-                    self._form = $(['<form class="streaming" method="POST" action="', url, '" target="', self._uuid, '"/>'].join('')).appendTo(document.body);
-                    for (var k in data) {
-                        $(['<input type="hidden" name="', k, '" />'].join('')).val(data[k]).appendTo(self._form);
-                    }
-                    self._form.submit();
-                } else {
-                    url = [url, '?', $.param(data)].join('');
-                    if ($.browser.msie) {
-                        self._iframe.contents()[0].location.replace(url);
-                    } else {
-                        self._iframe[0].contentWindow.location.replace(url);
-                    }
+                self._form = $(['<form class="streaming" method="POST" action="', url, '" target="', self._uuid, '"/>'].join('')).appendTo(document.body);
+
+                for (var k in data) {
+                    $(['<input type="hidden" name="', k, '" />'].join('')).val(data[k]).appendTo(self._form);
                 }
+
+                self._form.submit();
             },
 
             local: function() {
@@ -301,9 +306,9 @@
         exports.write = function(uuid, s) {
             exports.streamers[uuid].success(s);
         };
-        exports.done = function(uuid) {
-            exports.streamers[uuid].complete();
-        }
+        // exports.done = function(uuid) {
+        //     exports.streamers[uuid].complete();
+        // }
     });
 
 })(jQuery);

@@ -15,6 +15,7 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -65,10 +66,7 @@ public final class QueryRunnerThread implements Callable {
         this.name = key;
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public Boolean call() {
         Log.debug("Launching Thread run() method: " + this.name);
 		try {
@@ -126,9 +124,9 @@ public final class QueryRunnerThread implements Callable {
                     //imp_name = imp
                     String exporting_ds = imp.getLinkDataset().getName();
                     String importing_ds = sqObj.getDataset().getName();
-                    
+
                     Log.debug("importing dataset: "+importing_ds);
-                    
+
                     // FIRSTLY lets first find the importable only subqueries eg. bands etc
                     ArrayList<SubQuery> impOnly_sqObjs = sqObj.getImportableOnlySubQueries();
                     Iterator it_impOnly_sqObjs = impOnly_sqObjs.iterator();
@@ -264,7 +262,7 @@ public final class QueryRunnerThread implements Callable {
                 // lets create a look up table for the tempRT
                 // two separate hashes for fastest response since HASHSET is faster lookup only
                 HashMap <String, List<Integer>> tempRTLookUps = new HashMap<String, List<Integer>>();
-                HashSet alreadySeen = new HashSet();
+                Set<String> alreadySeen = new HashSet<String>();
                 for(int j = 0; j <= temp_size ; j++) {
                     String imp_value = tempRT.get(j).get(imp_position);
                     if(imp_value != null) {
@@ -439,7 +437,7 @@ public final class QueryRunnerThread implements Callable {
         }
         return null;
     }
-    
+
     /**
      *
      * @param dsName

@@ -24,16 +24,20 @@ import org.biomart.objects.objects.Mart;
 
 public class MartSelectionDialog extends JDialog implements ActionListener{
 	
-	private List<Mart> _marts;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private List<String> _marts;
 	private LeafCheckBoxList martList = new LeafCheckBoxList();
 	private JCheckBox importPortalCB;
-	private List<Mart> results = new ArrayList<Mart>();
+	private List<String> results = new ArrayList<String>();
 
-	public List<Mart> getResults() {
+	public List<String> getResults() {
 		return results;
 	}
 
-	public MartSelectionDialog(JDialog parent, List<Mart> marts){
+	public MartSelectionDialog(JDialog parent, List<String> marts){
 		super(parent);
 		this._marts = marts;
 		this.init();
@@ -44,9 +48,9 @@ public class MartSelectionDialog extends JDialog implements ActionListener{
 	}
 	
 	private void init(){
-		for(Mart mart : _marts){
+		for(String mart : _marts){
 			CheckBoxListModel  model = (CheckBoxListModel)martList.getModel();
-			LeafCheckBoxNode node = new LeafCheckBoxNode(mart.getName(), false);
+			LeafCheckBoxNode node = new LeafCheckBoxNode(mart, false);
 			model.addElement(node);
 		}
 		this.setLayout(new GridLayout());

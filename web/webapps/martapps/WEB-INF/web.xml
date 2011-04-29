@@ -95,12 +95,4 @@
     <taglib-uri>/WEB-INF/bmtaglib.tld</taglib-uri>
     <taglib-location>/WEB-INF/bmtaglib.tld</taglib-location>
   </taglib>
-  <error-page>
-    <error-code>404</error-code>
-    <location>/_404.jsp</location>
-  </error-page>
-  <error-page>
-    <error-code>500</error-code>
-    <location>/_500.jsp</location>
-  </error-page>
 </web-app>

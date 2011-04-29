@@ -50,7 +50,7 @@ public class ProcessorRegistry {
         register("TSV", TSV.class);
         register("TSVX", TSVX.class);
         register("RDF", RDF.class);
-        register("CSV", RDF.class);
+        register("CSV", CSV.class);
         register("JSON", JSON.class);
 
         final FileFilter directoryFilter = new FileFilter() {

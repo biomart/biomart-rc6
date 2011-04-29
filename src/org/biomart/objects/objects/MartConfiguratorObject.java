@@ -236,9 +236,9 @@ public abstract class MartConfiguratorObject extends AbstractModel {
 		} else
 			mcProperty.setValue(value);
 
-		if(!(this instanceof Dataset)) {
-			MartController.getInstance().setChanged(true);
-		}
+		//if(!(this instanceof Dataset)) {
+			//MartController.getInstance().setChanged(true);
+		//}
 		
 	}
 	//FIXME remove

@@ -15,16 +15,13 @@ import org.biomart.processors.TSV;
 public class TestWebServiceModule extends ServletModule {
     @Override
     protected void configureServlets() {
-        System.setProperty("biomart.registry.file", "./testdata/restapi.xml");
-        System.setProperty("biomart.registry.key.file", "./testdata/.restapi");
-
         install(new XmlMartRegistryModule());
 
         ProcessorRegistry.register("TSV", TSV.class);
 
         serve("/*").with(GuiceContainer.class,
             new ImmutableMap.Builder<String,String>()
-               .put(PackagesResourceConfig.PROPERTY_PACKAGES, "org.biomart.api.rest;org.codehaus.jackson.jaxrs")
+               .put(PackagesResourceConfig.PROPERTY_PACKAGES, "org.biomart.api;org.codehaus.jackson.jaxrs")
                .build());
     }
 }

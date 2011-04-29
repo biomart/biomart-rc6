@@ -180,6 +180,39 @@ public class QueryApiTest {
     }
 
 
+    /*
+     * Default processor should be TSV if not specified
+     */
+    @Test
+    public void testDefaultProcessorResults() {
+        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+                + "<!DOCTYPE Query><Query client=\"test\" limit=\"10\" header=\"1\">"
+                + "<Dataset name=\"hsapiens_gene_ensembl\" config=\"hsapiens_gene_ensembl_config\">"
+                + "<Filter name=\"chromosome_name\" value=\"1\" />"
+                + "<Attribute name=\"ensembl_gene_id\" />"
+                + "</Dataset></Query>";
+
+        OutputStream out = new ByteArrayOutputStream();
+        _portal.executeQuery(xml, out);
+
+        String expected = "Ensembl Gene ID\n"
+                + "ENSG00000249935\n"
+                + "ENSG00000248149\n"
+                + "ENSG00000245123\n"
+                + "ENSG00000251327\n"
+                + "ENSG00000248957\n"
+                + "ENSG00000215059\n"
+                + "ENSG00000250449\n"
+                + "ENSG00000250797\n"
+                + "ENSG00000245549\n"
+                + "ENSG00000249753\n";
+
+        String results = out.toString();
+
+        assertEquals(expected, results);
+    }
+
+
     @Test
     public void testAuthenticatedQuery() {
         Query query = new Query(_portal2)

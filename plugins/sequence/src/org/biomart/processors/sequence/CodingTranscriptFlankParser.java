@@ -100,24 +100,29 @@ public class CodingTranscriptFlankParser extends SequenceParser {
 	 */
 	protected final boolean printCodingTranscriptFlank(String header,
             String chr, int start, int end, int codingOffset,String strand) throws IOException {
-		String sequence;
-		// Check whether we're dealing with the 5' flank or the 3', and handle accordingly
-		if (chr.equals("")){
-			sequence = null;
-		} else if (upstreamFlank>0){
-			if (strand.equals("-1")){
-				sequence = reverseComplement(getSequence(chr, end+2-codingOffset, end+upstreamFlank-codingOffset+1));
-			} else {
-				sequence = (getSequence(chr, start-upstreamFlank+codingOffset-1, start-2+codingOffset));
-			}
-		} else {
-			if (strand.equals("-1")){
-				sequence = reverseComplement(getSequence(chr, end+1-codingOffset-downstreamFlank, end-codingOffset));
-			} else {
-				sequence = (getSequence(chr, start+codingOffset, start-1+codingOffset+downstreamFlank));
-			}
-		}
-		return printFASTA(sequence, header);
+        try {
+            String sequence;
+            // Check whether we're dealing with the 5' flank or the 3', and handle accordingly
+            if (chr.equals("")){
+                sequence = null;
+            } else if (upstreamFlank>0){
+                if (strand.equals("-1")){
+                    sequence = reverseComplement(getSequence(chr, end+2-codingOffset, end+upstreamFlank-codingOffset+1));
+                } else {
+                    sequence = (getSequence(chr, start-upstreamFlank+codingOffset-1, start-2+codingOffset));
+                }
+            } else {
+                if (strand.equals("-1")){
+                    sequence = reverseComplement(getSequence(chr, end+1-codingOffset-downstreamFlank, end-codingOffset));
+                } else {
+                    sequence = (getSequence(chr, start+codingOffset, start-1+codingOffset+downstreamFlank));
+                }
+            }
+            return printFASTA(sequence, header);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return printFASTA(SEQUENCE_UNAVAILABLE, header);
+        }
 	}
 
 }

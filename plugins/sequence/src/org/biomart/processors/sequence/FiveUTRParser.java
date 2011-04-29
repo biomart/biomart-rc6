@@ -102,27 +102,32 @@ public class FiveUTRParser extends SequenceParser {
 	protected final boolean print5UTR(String header, String chr,
             TreeMap<Integer, Integer> start, TreeMap<Integer, Integer> end,
             int codingOffset,int terminalExonRank, String strand) throws IOException {
-		StringBuilder sequence = new StringBuilder();
-		if (!chr.equals("")){
-			if (strand.equals("-1")){
-				if(!(getSequence(chr,end.get(terminalExonRank)-codingOffset+2,end.get(terminalExonRank)).equals(""))){
-					sequence.append(reverseComplement(getSequence(chr,end.get(0)+1,end.get(0)+upstreamFlank)));
-					for (int i = 0; i < terminalExonRank; i++){
-						sequence.append(reverseComplement(getSequence(chr, start.get(i), end.get(i))));
-					}
-					sequence.append(reverseComplement(getSequence(chr,end.get(terminalExonRank)-codingOffset+2-downstreamFlank,end.get(terminalExonRank))));
-				}
-			} else {
-				if(!(getSequence(chr,start.get(terminalExonRank),start.get(terminalExonRank)+codingOffset-2).equals(""))){
-					sequence.append(getSequence(chr,start.get(0)-upstreamFlank,start.get(0)-1));
-					for (int i = 0; i < terminalExonRank; i++){
-						sequence.append((getSequence(chr, start.get(i), end.get(i))));
-					}
-					sequence.append(getSequence(chr,start.get(terminalExonRank),start.get(terminalExonRank)+codingOffset-2+downstreamFlank));
-				}
-			}
-		}
-		return printFASTA(sequence.toString(), header);
+        try {
+            StringBuilder sequence = new StringBuilder();
+            if (!chr.equals("")){
+                if (strand.equals("-1")){
+                    if(!(getSequence(chr,end.get(terminalExonRank)-codingOffset+2,end.get(terminalExonRank)).equals(""))){
+                        sequence.append(reverseComplement(getSequence(chr,end.get(0)+1,end.get(0)+upstreamFlank)));
+                        for (int i = 0; i < terminalExonRank; i++){
+                            sequence.append(reverseComplement(getSequence(chr, start.get(i), end.get(i))));
+                        }
+                        sequence.append(reverseComplement(getSequence(chr,end.get(terminalExonRank)-codingOffset+2-downstreamFlank,end.get(terminalExonRank))));
+                    }
+                } else {
+                    if(!(getSequence(chr,start.get(terminalExonRank),start.get(terminalExonRank)+codingOffset-2).equals(""))){
+                        sequence.append(getSequence(chr,start.get(0)-upstreamFlank,start.get(0)-1));
+                        for (int i = 0; i < terminalExonRank; i++){
+                            sequence.append((getSequence(chr, start.get(i), end.get(i))));
+                        }
+                        sequence.append(getSequence(chr,start.get(terminalExonRank),start.get(terminalExonRank)+codingOffset-2+downstreamFlank));
+                    }
+                }
+            }
+            return printFASTA(sequence.toString(), header);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return printFASTA(SEQUENCE_UNAVAILABLE, header);
+        }
 	}
 
 }

@@ -312,6 +312,9 @@ public class Mart extends LiteMartConfiguratorObject implements Serializable {
 			if(!attribute.inUser(this.currentUser.getName(),datasetNames)) {
 				continue;
 			}
+			if(!attribute.isValid()) {
+				continue;
+			}
 			//create multiple one if it is partitioned
 			if(McUtils.hasPartitionBinding(attribute.getName())) {
 				List<String> ptRefList = McUtils.extractPartitionReferences(attribute.getName());
@@ -406,6 +409,8 @@ public class Mart extends LiteMartConfiguratorObject implements Serializable {
 				containerMap.put(containerObj.getName(), liteContainer);
 			}
 			if(!filter.inUser(this.currentUser.getName(),datasetNames))
+				continue;
+			if(!filter.isValid())
 				continue;
 			//create multiple one if it is partitioned
 			if(McUtils.hasPartitionBinding(filter.getName())) {

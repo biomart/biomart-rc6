@@ -738,4 +738,17 @@ public enum McGuiUtils {
 			}
 		}
 	}
+	
+	public List<Attribute> getAttributesFromLinkOutUrl(String linkOutURL, Config config) {
+		List<Attribute> attributes = new ArrayList<Attribute>();
+		Config masterConfig = config.getMart().getMasterConfig();
+		String[] parts = linkOutURL.split("%");
+		for(String name : parts){			
+			Attribute att = masterConfig.getAttributeByName(name, null);
+			if(att != null && name != "s"){
+				attributes.add(att);
+			}
+		}
+		return attributes;
+	}
 }

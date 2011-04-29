@@ -130,10 +130,6 @@ body {
     margin-top: .5em;
 }
 
-.biomart .data li.even {
-    background-color: #fff;
-}
-
 .biomart .data li.primary.even {
     background-color: transparent;
 }

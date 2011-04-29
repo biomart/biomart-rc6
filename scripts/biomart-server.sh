@@ -261,7 +261,7 @@ case "$ACTION" in
         exec $RUN_CMD
         ;;
 
-  check)
+  check|status)
         echo "Checking arguments to BioMart: "
         echo "BIOMART_HOME     =  $BIOMART_HOME"
         echo "BIOMART_RUN      =  $BIOMART_RUN"

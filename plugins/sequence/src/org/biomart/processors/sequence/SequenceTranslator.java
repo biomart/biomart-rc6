@@ -3,6 +3,7 @@ package org.biomart.processors.sequence;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import org.biomart.common.resources.Log;
 import org.biomart.processors.JGUtils;
 
 /**
@@ -10,6 +11,48 @@ import org.biomart.processors.JGUtils;
  * @author jhsu, jguberman
  */
 public class SequenceTranslator {
+    private static final String[] aaTables =
+    {"FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG", // 0: Standard
+            "FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIMMTTTTNNKKSS**VVVVAAAADDEEGGGG", // 1: Vertebrate mitochondrial
+            "FFLLSSSSYY**CCWWTTTTPPPPHHQQRRRRIIMMTTTTNNKKSSRRVVVVAAAADDEEGGGG", // 2: Yeast Mitochondrial
+            "FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG", // 3: Mold, Protozoan, and CoelenterateMitochondrial and Mycoplasma/Spiroplasma
+            "FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIMMTTTTNNKKSSSSVVVVAAAADDEEGGGG", //4: Invertebrate Mitochondrial
+            "FFLLSSSSYYQQCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG", //5: Ciliate, Dasycladacean and Hexamita Nuclear
+            "", "",
+            "FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNNKSSSSVVVVAAAADDEEGGGG", // 8: Echinoderm Mitochondrial
+            "FFLLSSSSYY**CCCWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG", // 9: Euplotid Nuclear
+            "FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG", // 10: "Bacterial"
+            "FFLLSSSSYY**CC*WLLLSPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG", // 11: Alternative Yeast Nuclear
+            "FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIMMTTTTNNKKSSGGVVVVAAAADDEEGGGG", // 12: Ascidian Mitochondrial
+            "FFLLSSSSYYY*CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNNKSSSSVVVVAAAADDEEGGGG", // 13: Flatworm Mitochondrial
+            "FFLLSSSSYY*QCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG", // 14: Blepharisma Nuclear
+            "FFLLSSSSYY*LCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG", // 15: Chlorophycean Mitochondrial
+            "", "", "", "",
+            "FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIMMTTTTNNNKSSSSVVVVAAAADDEEGGGG", // 20: Trematode Mitochondrial
+            "FFLLSS*SYY*LCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG", // 21: Scenedesmus obliquus Mitochondrial
+            "FF*LSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG", // 22: Thraustochytrium Mitochondrial
+    };
+
+    private static final HashMap<Character, String[]> nucleotideTable = new HashMap<Character,String[]>() {{
+		put('A', new String[] {"A"});
+		put('C', new String[] {"C"});
+		put('G', new String[] {"G"});
+		put('T', new String[] {"T"});
+		put('U', new String[] {"U"});
+		put('M', new String[] {"A", "C"});
+		put('R', new String[] {"A", "G"});
+		put('W', new String[] {"A", "T"});
+		put('S', new String[] {"C", "G"});
+		put('Y', new String[] {"C", "T"});
+		put('K', new String[] {"G", "T"});
+		put('V', new String[] {"A", "C", "G"});
+		put('H', new String[] {"A", "C", "T"});
+		put('D', new String[] {"A", "G", "T"});
+		put('B', new String[] {"C", "G", "T"});
+		put('X', new String[] {"G", "A", "T", "C"});
+		put('N', new String[] {"G", "A", "T", "C"});
+    }};
+
 	/**
 	 * Translates a DNA sequence to a protein sequence. Currently uses only
 	 * the human translation table.
@@ -18,27 +61,6 @@ public class SequenceTranslator {
 	 */
 	public static String translateSequence(String untranslated, HashSet<String> seqEdit, String codonTableID) {
 		untranslated = untranslated.toUpperCase();
-		final String[] aaTables =
-		{"FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG", // 0: Standard
-				"FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIMMTTTTNNKKSS**VVVVAAAADDEEGGGG", // 1: Vertebrate mitochondrial
-				"FFLLSSSSYY**CCWWTTTTPPPPHHQQRRRRIIMMTTTTNNKKSSRRVVVVAAAADDEEGGGG", // 2: Yeast Mitochondrial
-				"FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG", // 3: Mold, Protozoan, and CoelenterateMitochondrial and Mycoplasma/Spiroplasma
-				"FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIMMTTTTNNKKSSSSVVVVAAAADDEEGGGG", //4: Invertebrate Mitochondrial
-				"FFLLSSSSYYQQCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG", //5: Ciliate, Dasycladacean and Hexamita Nuclear
-				"", "",
-				"FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNNKSSSSVVVVAAAADDEEGGGG", // 8: Echinoderm Mitochondrial
-				"FFLLSSSSYY**CCCWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG", // 9: Euplotid Nuclear
-				"FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG", // 10: "Bacterial"
-				"FFLLSSSSYY**CC*WLLLSPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG", // 11: Alternative Yeast Nuclear
-				"FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIMMTTTTNNKKSSGGVVVVAAAADDEEGGGG", // 12: Ascidian Mitochondrial
-				"FFLLSSSSYYY*CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNNKSSSSVVVVAAAADDEEGGGG", // 13: Flatworm Mitochondrial
-				"FFLLSSSSYY*QCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG", // 14: Blepharisma Nuclear
-				"FFLLSSSSYY*LCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG", // 15: Chlorophycean Mitochondrial
-				"", "", "", "",
-				"FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIMMTTTTNNNKSSSSVVVVAAAADDEEGGGG", // 20: Trematode Mitochondrial
-				"FFLLSS*SYY*LCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG", // 21: Scenedesmus obliquus Mitochondrial
-				"FF*LSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG", // 22: Thraustochytrium Mitochondrial
-		};
 		if(codonTableID.equals("")){
 			codonTableID = "1";
 		}
@@ -61,42 +83,37 @@ public class SequenceTranslator {
 				}
 			}
 		}
-		HashMap<Character, String[]> nucleotideTable = new HashMap<Character,String[]>();
-		nucleotideTable.put('A', new String[] {"A"});
-		nucleotideTable.put('C', new String[] {"C"});
-		nucleotideTable.put('G', new String[] {"G"});
-		nucleotideTable.put('T', new String[] {"T"});
-		nucleotideTable.put('U', new String[] {"U"});
-		nucleotideTable.put('M', new String[] {"A", "C"});
-		nucleotideTable.put('R', new String[] {"A", "G"});
-		nucleotideTable.put('W', new String[] {"A", "T"});
-		nucleotideTable.put('S', new String[] {"C", "G"});
-		nucleotideTable.put('Y', new String[] {"C", "T"});
-		nucleotideTable.put('K', new String[] {"G", "T"});
-		nucleotideTable.put('V', new String[] {"A", "C", "G"});
-		nucleotideTable.put('H', new String[] {"A", "C", "T"});
-		nucleotideTable.put('D', new String[] {"A", "G", "T"});
-		nucleotideTable.put('B', new String[] {"C", "G", "T"});
-		nucleotideTable.put('X', new String[] {"G", "A", "T", "C"});
-		nucleotideTable.put('N', new String[] {"G", "A", "T", "C"});
-
 
 		StringBuilder translated = new StringBuilder();
 		Character nextAA = null;
-		for(int j = 0;j+3 <= untranslated.length();j+=3){
+        int n = untranslated.length();
+		for(int j = 0; j+3 <= n; j += 3){
 			String currentCodon = untranslated.substring(j, j+3);
 			nextAA = codonTable.get(currentCodon);
 			if(nextAA==null){
 				// Ambiguous codon
 				nextAA='X';
 				HashSet<Character> ambiguous = new HashSet<Character>();
-				for(String x : nucleotideTable.get(currentCodon.charAt(0))){
-					for(String y : nucleotideTable.get(currentCodon.charAt(1))){
-						for(String z : nucleotideTable.get(currentCodon.charAt(2))){
-							ambiguous.add(codonTable.get(x+y+z));
-						}
-					}
-				}
+                // Do some checks due to NullPointer problems when doing nucleotide lookup
+                if (nucleotideTable.get(currentCodon.charAt(0)) == null) {
+                    System.err.println(String.format("Could not lookup %s in nucleotide table", currentCodon.charAt(0)));
+                } else {
+                    for(String x : nucleotideTable.get(currentCodon.charAt(0))){
+                        if (nucleotideTable.get(currentCodon.charAt(1)) == null) {
+                            System.err.println(String.format("Could not lookup %s in nucleotide table", currentCodon.charAt(1)));
+                        } else {
+                            for(String y : nucleotideTable.get(currentCodon.charAt(1))){
+                                if (nucleotideTable.get(currentCodon.charAt(2)) == null) {
+                                    System.err.println(String.format("Could not lookup %s in nucleotide table", currentCodon.charAt(2)));
+                                } else {
+                                    for(String z : nucleotideTable.get(currentCodon.charAt(2))){
+                                        ambiguous.add(codonTable.get(x+y+z));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
 				if(ambiguous.size()==1){
 					for(char dummy : ambiguous){
 						nextAA = dummy;

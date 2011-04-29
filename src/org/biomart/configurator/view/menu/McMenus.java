@@ -69,6 +69,7 @@ import org.biomart.objects.objects.Dataset;
 import org.biomart.objects.objects.Mart;
 import org.biomart.objects.objects.MartRegistry;
 import org.biomart.objects.objects.Options;
+import org.biomart.objects.objects.SourceContainer;
 import org.biomart.objects.portal.GuiContainer;
 import org.biomart.objects.portal.MartPointer;
 import org.biomart.objects.portal.Portal;
@@ -284,14 +285,7 @@ public class McMenus implements ActionListener {
 	}
 	
 	private void loadPortal(boolean newPortal, File file) throws MartBuilderException {
-		McGuiUtils.INSTANCE.setRegistry(null);
-		Options.getInstance().setOptions(null);
-		McViewPortal portalView = (McViewPortal)McViews.getInstance().getView(IdwViewType.PORTAL);
-		portalView.clean();
-	   	McViewSourceGroup sourceView = (McViewSourceGroup)McViews.getInstance().getView(IdwViewType.SOURCEGROUP);
-    	sourceView.clean();
-
-    	McUtils.gc();
+		
 		// Open the file chooser.
 		
 		//this.usersCB.removeAllItems();
@@ -303,15 +297,30 @@ public class McMenus implements ActionListener {
 				xmlFileChooser.setCurrentDirectory(currentDir == null ? new File(".")
 						: new File(currentDir));
 				if (xmlFileChooser.showOpenDialog(McViews.getInstance().getView(IdwViewType.PORTAL)) == JFileChooser.APPROVE_OPTION) {
+					Options.getInstance().setOptions(null);
+					McViewPortal portalView = (McViewPortal)McViews.getInstance().getView(IdwViewType.PORTAL);
+					portalView.clean();
+				   	McViewSourceGroup sourceView = (McViewSourceGroup)McViews.getInstance().getView(IdwViewType.SOURCEGROUP);
+			    	sourceView.clean();
+
+			    	McUtils.gc();
 					// Update the load dialog.
 					Settings.setProperty("currentOpenDir", xmlFileChooser
 							.getCurrentDirectory().getPath());
 		
 					loadFile = xmlFileChooser.getSelectedFile();
+				}else{
+					return;
 				}
 			}
 			//choose the key file first
 			if(loadFile!=null) {
+				Options.getInstance().setOptions(null);
+				McViewPortal portalView = (McViewPortal)McViews.getInstance().getView(IdwViewType.PORTAL);
+				portalView.clean();
+			   	McViewSourceGroup sourceView = (McViewSourceGroup)McViews.getInstance().getView(IdwViewType.SOURCEGROUP);
+		    	sourceView.clean();
+		    	McUtils.gc();
 				//find the keyfile
 				String tmpName = loadFile.getName();
 				int index = tmpName.lastIndexOf(".");
@@ -348,29 +357,31 @@ public class McMenus implements ActionListener {
 			//set the mart configurator title to file name after select a configure file
 			setMcTitle(loadFile);
 		}else {
-			//load newregistry.xml
-			MartRegistry registry = new MartRegistry(XMLElements.MARTREGISTRY.toString());
-			McGuiUtils.INSTANCE.setRegistry(registry);
-			File newfile = new File("conf/xml/untitled.xml");
-			Document document = null;
-			try {
-				SAXBuilder saxBuilder = new SAXBuilder("org.apache.xerces.parsers.SAXParser", false);
-				document = saxBuilder.build(newfile);
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-				JOptionPane.showMessageDialog(null, e.getMessage());
-				return;
-			}
-			this.createObjectsAndShowGui(registry, document);
-			Settings.setProperty("currentFile", "");
-			document = null;
-			
-			//set the mart configurator title to file name after select a configure file
+			File newfile = this.loadUntitledXML();
 			setMcTitle(newfile);
 		}
 		MartController.getInstance().setChanged(false);
 		System.setProperty("finishloading", Boolean.toString(true));
+	}
+	
+	private File loadUntitledXML() {
+		MartRegistry registry = new MartRegistry(XMLElements.MARTREGISTRY.toString());
+		McGuiUtils.INSTANCE.setRegistry(registry);
+		File newfile = new File("conf/xml/untitled.xml");
+		Document document = null;
+		try {
+			SAXBuilder saxBuilder = new SAXBuilder("org.apache.xerces.parsers.SAXParser", false);
+			document = saxBuilder.build(newfile);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, e.getMessage());
+			return newfile;
+		}
+		this.createObjectsAndShowGui(registry, document);
+		Settings.setProperty("currentFile", "");
+		document = null;
+		return newfile;
 	}
 
 	/**
@@ -399,7 +410,6 @@ public class McMenus implements ActionListener {
 		try {
 			SAXBuilder saxBuilder = new SAXBuilder("org.apache.xerces.parsers.SAXParser", false);
 			document = saxBuilder.build(file);
-			Settings.setProperty("currentFile", file.getCanonicalPath());
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -414,10 +424,8 @@ public class McMenus implements ActionListener {
 		//clear document
 		document = null;
 		MartController.getInstance().setChanged(false);
-		// Save XML filename in history of accessed files.
 		final Properties history = new Properties();
 		history.setProperty("location", file.getPath());
-		Settings.saveHistoryProperties(McMenus.class, file.getName(), history);		
 	}
 	
 	private void openMcXML(File file, String key) throws MartBuilderException {
@@ -536,55 +544,73 @@ public class McMenus implements ActionListener {
     	}
     }
        
-    public void requestImportObjects(MartRegistry registry, Document document) throws MartBuilderException {
+    private void requestImportObjects(MartRegistry registry, Document document) throws MartBuilderException {
     	//check version
     	if(McGuiUtils.INSTANCE.getMcXMLVersion(document).equals(Resources.BIOMART_VERSION)) {
     		//show mart selection dialog
-    		List<Mart> originalMartList = new ArrayList<Mart>();
-    		originalMartList.addAll(registry.getMartList());
-    		
     		Element registryElement = document.getRootElement();
-    		List<Element> martElementList = registryElement.getChildren(XMLElements.MART.toString());
+    		@SuppressWarnings("unchecked")
+			List<Element> martElementList = registryElement.getChildren(XMLElements.MART.toString());
+    		List<String> martNameList = new ArrayList<String>();
+    		for(Element martElement: martElementList) {
+    			martNameList.add(martElement.getAttributeValue(XMLElements.NAME.toString()));
+    		}  
+    		MartSelectionDialog mds = new MartSelectionDialog(null,martNameList);
+    		if(mds.getResults().isEmpty()) {
+    			mds.dispose();
+    			return;
+    		}
+    		//get selected mart
     		List<Mart> martList = new ArrayList<Mart>();
     		for(Element martElement: martElementList) {
-    			Mart mart = new Mart(martElement);
-    			martList.add(mart);
-    			registry.addMart(mart);
+    			String martName = martElement.getAttributeValue(XMLElements.NAME.toString());
+    			if(mds.getResults().contains(martName)) {
+    				if(registry.getMartByName(martName)!=null) {
+    					JOptionPane.showMessageDialog(null, "mart "+martName+ " already exist");
+    					continue;
+    				}
+    				Mart mart = new Mart(martElement);
+    				martList.add(mart);
+    				registry.addMart(mart);
+    				//check group
+    				String gname = mart.getGroupName();
+    				if(McUtils.isStringEmpty(gname)) 
+    					gname = XMLElements.DEFAULT.toString();
+    				SourceContainer sc = registry.getSourcecontainers().getSourceContainerByName(gname);
+    				if(sc == null) {
+    					sc = new SourceContainer(gname);
+    					registry.getSourcecontainers().addSourceContainer(sc);
+    				}
+    			}
     		}
     		
-    		Element portalElement = registryElement.getChild(XMLElements.PORTAL.toString());
-    		Portal portal = registry.getPortal();
-    		portal.importPortal(portalElement, registry);
+    		//add related portal
+    		if(mds.isImportPortal() && !martList.isEmpty()) {
+    			String newgcName = McGuiUtils.INSTANCE.getNextGuiContainerName("import");
+    			GuiContainer newgc = new GuiContainer(newgcName);
+    			Element portalElement = registryElement.getChild(XMLElements.PORTAL.toString());
+    			Portal tmpPortal = new Portal(portalElement);
+    			for(Mart mart: martList) {
+    				List<MartPointer> mpList = tmpPortal.getRootGuiContainer().getMartPointerListforMartName(mart.getName());
+    				for(MartPointer mp: mpList) {
+    					newgc.addMartPointer(mp);
+    				}
+    			}
+    			registry.getPortal().getRootGuiContainer().addGuiContainer(newgc);
+    		}
+
     		
     		registry.synchronizedFromXML();
     		
-    		MartSelectionDialog mds = new MartSelectionDialog(null,martList);
-    		
-    		for(Mart mart : martList){
-    			if(!mds.getResults().contains(mart) && !originalMartList.contains(mart))
-    				registry.removeMart(mart);
-    		}
-    		if(mds.isImportPortal()){
-    			for(MartPointer mp :registry.getPortal().getRootGuiContainer().getAllMartPointerListResursively()){
-    				if(!registry.getMartList().contains(mp.getConfig().getMart())){
-    					mp.getGuiContainer().removeMartPointer(mp);
-    				}
-    			}
-    		}else{
-    			GuiContainer guiContainer = registry.getPortal().getRootGuiContainer().getGCByNameRecursively("root");
-    			registry.getPortal().getRootGuiContainer().removeGuiContainer(guiContainer);    			
-    		}
-    		
-    		
-    		
-    		MartController.getInstance().requestImportRegistryFromXML(registry,document);
 	    	//update partitiontable? if the schemapartitiontable has only one row
 	    	if("1".equals(Settings.getProperty("updatepartitiontable"))) {
 	    		
 	    	}
+	    	mds.dispose();
     	} else {
     		JOptionPane.showMessageDialog(null, "xml version error", "error", JOptionPane.ERROR_MESSAGE);
     	}
+ 
     }
 
     private void showComponents(MartRegistry rc) {
@@ -623,6 +649,11 @@ public class McMenus implements ActionListener {
 
 			// Find out the file the user chose.
 			final File saveAsFile = xmlFileChooser.getSelectedFile();
+			if(saveAsFile.exists()) {
+	    		int ret = JOptionPane.showConfirmDialog(null, saveAsFile.getName()+" already exists, override?");
+	    		if(ret != JOptionPane.OK_OPTION)
+	    			return -1;
+	    	}
 			this.requestSavePortalToFile(saveAsFile, showProgress);
 	    	//set current saved file name
 	    	try {
@@ -733,6 +764,7 @@ public class McMenus implements ActionListener {
     		FileOutputStream fos = new FileOutputStream(file);
     		outputter.output(doc, fos);
     		fos.close();
+    		MartController.getInstance().setChanged(false);
     	}
     	catch(Exception e) {
     		e.printStackTrace();
@@ -1165,6 +1197,9 @@ public class McMenus implements ActionListener {
 			//clean
 			
 		}else if(e.getActionCommand().equals("exit")){
+			if(MartController.getInstance().isRegistryChanged()){
+				this.requestSaveAsPortal(true);
+			}
 			Runtime.getRuntime().exit(0);
 		}
 			

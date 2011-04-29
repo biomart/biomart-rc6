@@ -379,7 +379,7 @@ public class ObjectController {
 		if(!McUtils.isStringEmpty(conObj.getPort())) {
 			baseStr.append( ":" +conObj.getPort());
 		}
-		baseStr.append("/rest/xml/configs/");
+		baseStr.append("/martservice/xml/configs/");
 		Map<String,Mart> martMap = new HashMap<String,Mart>();
 		List<MartPointer> newMpList = new ArrayList<MartPointer>();
 		for(Map.Entry<String,List<String>> entry: mpList.entrySet()) {
@@ -656,7 +656,7 @@ public class ObjectController {
     }
 
     private static String getDefaultRDFClassname(String name) {
-        return "objects:" + name;
+        return "class:" + name;
 
         // return "objects:" + toCamelCase(name);
     }
@@ -665,6 +665,7 @@ public class ObjectController {
         StringBuilder rdf = new StringBuilder();
 
         // NCName has to start with a letter or an underscore.
+        // This regexp has to be identical to the regexp in query.js
         if (!Pattern.matches("^[a-zA-Z_].*", propertyName))
             propertyName = "_" + propertyName;
 
@@ -677,7 +678,7 @@ public class ObjectController {
 
         rdf.append(getDefaultRDFClassname(configName)); // class-name
         rdf.append(";");
-        rdf.append("objects:");
+        rdf.append("attribute:");
         rdf.append(propertyName); // property-name
         rdf.append(";");
         rdf.append("rdf:PlainLiteral"); // property-class
@@ -785,8 +786,7 @@ public class ObjectController {
     	//get admin user
     	for(Config config: configs) {
     		MartPointer mp = new MartPointer(config,config.getName());
-    		//default the operation is multiselect
-    		mp.setOperation(Operation.MULTISELECT);
+    		mp.setOperation(Operation.SINGLESELECT);
     		mp.setConfig(config);
     		mp.addUser(user);
 
@@ -1149,8 +1149,8 @@ public class ObjectController {
     	Container attrCon = new Container("Attributes");
     	reportCon.addContainer(attrCon);    	
     	newConfig.getRootContainer().addContainer(reportCon);
-    	for(Attribute attr : attributes){    		
-    		attrCon.addAttribute(attr);
+    	for(Attribute attr : attributes){   
+    		attrCon.addAttribute(attr.cloneMyself());
     	}
     	newConfig.setMaster(false);
     	//add link to report config from master
@@ -1273,27 +1273,29 @@ public class ObjectController {
 	public static List<Attribute> getAttributesInMain(Mart mart) {
 		List<Attribute> attributes = new ArrayList<Attribute>();
 		List<DatasetTable> mainTables = mart.getOrderedMainTableList();
-		DatasetTable mainTable = mainTables.get(mainTables.size()-1);
-		for(Column column: mainTable.getColumnList()) {
-			Attribute foundAtt = null;
-			for(Config con: mart.getConfigList()) {
-				boolean foundInConfig = false;
-				for(Attribute att: con.getAllAttributes()) {
-					if( att.getPropertyValue(XMLElements.COLUMN).equals(column.getName()) &&
-							att.getDatasetTable().getType()!=DatasetTableType.DIMENSION) {
-						foundInConfig = true;
-						foundAtt = att;
+		//DatasetTable mainTable = mainTables.get(mainTables.size()-1);
+		for(DatasetTable mainTable : mainTables){
+			for(Column column: mainTable.getColumnList()) {
+				Attribute foundAtt = null;
+				for(Config con: mart.getConfigList()) {
+					boolean foundInConfig = false;
+					for(Attribute att: con.getAllAttributes()) {
+						if( att.getPropertyValue(XMLElements.COLUMN).equals(column.getName()) &&
+								att.getDatasetTable().getType()!=DatasetTableType.DIMENSION) {
+							foundInConfig = true;
+							foundAtt = att;
+							break;
+						}					
+					}
+					if(!foundInConfig) {
+						foundAtt = null;
 						break;
 					}					
 				}
-				if(!foundInConfig) {
-					foundAtt = null;
-					break;
-				}					
+				if(foundAtt!=null && !attributes.contains(foundAtt))
+					attributes.add(foundAtt);
+	
 			}
-			if(foundAtt!=null)
-				attributes.add(foundAtt);
-
 		}
 		return attributes;
 	}
@@ -1339,17 +1341,18 @@ public class ObjectController {
 		List<Attribute> attributes = new ArrayList<Attribute>();
 		Mart mart = config.getMart();
 		List<DatasetTable> mainTables = mart.getOrderedMainTableList();
-		DatasetTable mainTable = mainTables.get(mainTables.size()-1);
-		for(Column column: mainTable.getColumnList()) {
-			for(Attribute att: config.getAllAttributes()) {
-				if(att.getPropertyValue(XMLElements.TABLE).equals(mainTable.getName()) && 
-						att.getPropertyValue(XMLElements.COLUMN).equals(column.getName())) {
-		
-					attributes.add(att);
-					break;
-				}					
-			}
+		//DatasetTable mainTable = mainTables.get(mainTables.size()-1);
+		for(DatasetTable mainTable : mainTables){
+			for(Column column: mainTable.getColumnList()) {
+				for(Attribute att: config.getAllAttributes()) {
+					if(att.getPropertyValue(XMLElements.TABLE).equals(mainTable.getName()) && 
+							att.getPropertyValue(XMLElements.COLUMN).equals(column.getName())) {
 			
+						attributes.add(att);
+						break;
+					}					
+				}
+			}
 		}
 
 		return attributes;

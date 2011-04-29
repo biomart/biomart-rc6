@@ -25,9 +25,6 @@ import org.jdom.Element;
  * @author jhsu
  */
 public class ResponseFormatter {
-    private static final int MAX_AGE =  5 * 60;
-    private static String debug = System.getProperty("biomart.debug", "false");
-
     private static HashMap<String,String> _types = new HashMap<String,String>() {{
             put("json", MediaType.APPLICATION_JSON);
             put("jsonp", MediaType.APPLICATION_JSON);
@@ -65,11 +62,6 @@ public class ResponseFormatter {
         // Change the Content-Type header accordingly
         builder.header("Content-Type", type);
 
-        if (!"true".equals(debug)) {
-            builder.header("Cache-Control", String.format("max-age=%s; must-revalidate", MAX_AGE));
-            builder.header("Vary", "Cookie,Accept-Encoding,User-Agent");
-        }
-        
         return builder.build();
     }
 
@@ -101,9 +93,6 @@ public class ResponseFormatter {
 
         // Change the Content-Type header accordingly
         builder.header("Content-Type", type);
-
-        if (!"true".equals(debug))
-            builder.header("Cache-Control", String.format("max-age=%s; must-revalidate", MAX_AGE));
 
         return builder.build();
     }
@@ -137,9 +126,6 @@ public class ResponseFormatter {
         // Change the Content-Type header accordingly
         builder.header("Content-Type", type);
 
-        if (!"true".equals(debug))
-            builder.header("Cache-Control", String.format("max-age=%s; must-revalidate", MAX_AGE));
-
         return builder.build();
     }
 
@@ -156,7 +142,6 @@ public class ResponseFormatter {
         ResponseBuilder builder;
 
         if (format.startsWith("json")) {
-            Jsoml jsoml = new Jsoml(false, "list");
             ArrayList<Object> array = new ArrayList<Object>();
             ObjectMapper mapper = new ObjectMapper();
 
@@ -188,9 +173,6 @@ public class ResponseFormatter {
 
         // Change the Content-Type header accordingly
         builder.header("Content-Type", type);
-
-        if (!"true".equals(debug))
-            builder.header("Cache-Control", String.format("max-age=%s; must-revalidate", MAX_AGE));
 
         return builder.build();
     }

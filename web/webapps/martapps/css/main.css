@@ -1,8 +1,10 @@
 .biomart {}
-#biomart-content .col-b .ui-widget-header {
-    background-position: 0 0;
-    border-color: #ccc;
-    text-shadow: 1px 1px 6px #555;
+.col-b .ui-widget-header { 
+    border-color: #999;
+    background: -moz-linear-gradient(top, #ccc 0%, #777 100%);
+    background: -webkit-gradient(linear, left top, left bottom, from(#ccc), to(#777));
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr='#ccc', endColorstr='#777');
+    -ms-filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr='#ccc', endColorstr='#777');
 }
 .marts li {
     margin: .3em 0;
@@ -34,14 +36,11 @@
     padding: 5px 0;
 }
 .main #biomart-content h3 {
-    border-color: #8ab0c6;
-    color: #fff;
     text-align: center;
     margin: 0 !important;
     padding: 3px 6px !important;
     height: 27px !important;
     line-height: 27px;
-    background-position: 0 -33px;
     -moz-border-radius: 5px 5px 0 0; -webkit-border-radius: 5px 5px 0 0; border-radius: 5px 5px 0 0;
     border-bottom: none;
 }

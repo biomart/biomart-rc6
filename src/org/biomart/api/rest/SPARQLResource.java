@@ -57,7 +57,7 @@ import org.biomart.common.exceptions.TechnicalException;
  * @author Joachim Baran
  */
 @Singleton
-@Path("/semantic")
+@Path("/martsemantics/")
 public class SPARQLResource {
     @Context HttpServletRequest request;
     @Context UriInfo uriInfo;
@@ -75,6 +75,7 @@ public class SPARQLResource {
     // Error responses:
     static protected final String RDF_MC_PROPERTY_SYNTAX_ERROR = "The property 'rdf' of '%s' is ill-formatted. Sorry.";
     static protected final String RDF_MART_UNKNOWN = "A mart with the name '%s' is not known. Sorry.";
+    static protected final String RDF_SPARQL_PRINCIPAL = "The following principal mart did not return results:\n%s\n";
     static protected final String RDF_SPARQL_GROUP_SIZE_UNSUPPORTED = "Only one group is allowed per query. Sorry.";
     static protected final String RDF_SPARQL_SUBJECT_VARIABLE_UNSUPPORTED = "Variables are not allowed in the subject. Sorry.";
     static protected final String RDF_SPARQL_X_UNSUPPORTED = "This kind of SPARQL-query is not supported. Sorry.";
@@ -211,7 +212,7 @@ public class SPARQLResource {
         ResultSet principalResults = queryExecution.execSelect();
 
         if (!principalResults.hasNext())
-            throw new SPARQLException(RDF_SPARQL_X_UNSUPPORTED);
+            throw new SPARQLException(String.format(RDF_SPARQL_PRINCIPAL, principalMart));
 
         QuerySolution principalSolution = principalResults.next();
 
@@ -314,7 +315,7 @@ public class SPARQLResource {
         
         if(request.isSecure())
             ontologyUrl = System.getProperty("https.url");
-        ontologyUrl = ontologyUrl + "semantic/" + martName + "/ontology";
+        ontologyUrl = ontologyUrl + "martsemantics/" + martName + "/ontology";
 
         return ontologyUrl;
     }
@@ -355,6 +356,11 @@ public class SPARQLResource {
         }).build();
     }
 
+    private static String site2Reference(String ontologyUri) {
+        final String ref = ontologyUri.replaceFirst("^https:", "biomart:");
+        return ref.replaceFirst("^http:", "biomart:");
+    }
+
     public Response metadataGetRequest(
             @QueryParam("callback") @DefaultValue("") String callback,
             @PathParam("format") String format,
@@ -367,20 +373,27 @@ public class SPARQLResource {
         final String ontologyUri = getOntologyUrl(martName);
 
         final StringBuilder rdfOntology = new StringBuilder("<rdf:RDF\n");
-        rdfOntology.append("  xmlns=\"");
-        rdfOntology.append(ontologyUri);
-        rdfOntology.append("#\"\n");
         rdfOntology.append("  xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n");
         rdfOntology.append("  xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\"\n");
         rdfOntology.append("  xmlns:owl=\"http://www.w3.org/2002/07/owl#\"\n");
 
-        rdfOntology.append("  xmlns:datasets=\"");
-        rdfOntology.append(ontologyUri);
-        rdfOntology.append("/datasets#\"\n");
+        rdfOntology.append("\n");
 
-        rdfOntology.append("  xmlns:objects=\"");
+        rdfOntology.append("  xmlns:config=\"");
         rdfOntology.append(ontologyUri);
-        rdfOntology.append("/objects#\">\n\n");
+        rdfOntology.append("#\"\n");
+
+        rdfOntology.append("  xmlns:class=\"");
+        rdfOntology.append(site2Reference(ontologyUri));
+        rdfOntology.append("/class#\"\n");
+
+        rdfOntology.append("  xmlns:dataset=\"");
+        rdfOntology.append(site2Reference(ontologyUri));
+        rdfOntology.append("/dataset#\"\n");
+
+        rdfOntology.append("  xmlns:attribute=\"");
+        rdfOntology.append(site2Reference(ontologyUri));
+        rdfOntology.append("/attribute#\">\n\n");
 
         rdfOntology.append("  <owl:Ontology rdf:about=\"");
         rdfOntology.append(ontologyUri);
@@ -392,7 +405,7 @@ public class SPARQLResource {
 
             Ontology ontology = getOntology(mart, dataset, ontologyUri);
 
-            rdfOntology.append("  <owl:Class rdf:about=\"" + ontologyUri + "/datasets#" + dataset + "\">\n");
+            rdfOntology.append("  <owl:Class rdf:about=\"" + site2Reference(ontologyUri) + "/datasets#" + dataset + "\">\n");
             rdfOntology.append("    <rdfs:label>dataset</rdfs:label>\n");
             rdfOntology.append("    <rdfs:comment>Generic representation of values in the mart.</rdfs:comment>\n");
             rdfOntology.append("  </owl:Class>\n\n");
@@ -400,7 +413,7 @@ public class SPARQLResource {
             for (RDFClass rdfClass : ontology.getRDFClasses()) {
                 rdfOntology.append("  <owl:DatatypeProperty rdf:about=\"http://www.biomart.org/ontology#datasetOf\">\n");
                 rdfOntology.append("    <rdfs:label>" + dataset + "</rdfs:label>\n");
-                rdfOntology.append("    <rdfs:domain rdf:resource=\"" + ontologyUri + "/datasets#" + dataset + "\" />\n");
+                rdfOntology.append("    <rdfs:domain rdf:resource=\"" + site2Reference(ontologyUri) + "/datasets#" + dataset + "\" />\n");
                 rdfOntology.append("    <rdfs:range rdf:resource=\"" + rdfClass.getFullName() + "\" />\n");
                 rdfOntology.append("    <rdfs:comment>Dataset connection</rdfs:comment>\n");
                 rdfOntology.append("  </owl:DatatypeProperty>\n\n");
@@ -488,22 +501,24 @@ public class SPARQLResource {
         final StringBuilder rdfOntology = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rdf:RDF\n");
         rdfOntology.append("  xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n");
         rdfOntology.append("  xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\"\n");
-        rdfOntology.append("  xmlns:datasets=\"" + ontologyUri + "/datasets#\"\n");
-        rdfOntology.append("  xmlns:objects=\"" + ontologyUri + "/objects#\">\n\n");
+        rdfOntology.append("  xmlns:config=\"" + ontologyUri + "#\"\n");
+        rdfOntology.append("  xmlns:class=\"" + site2Reference(ontologyUri) + "/class#\"\n");
+        rdfOntology.append("  xmlns:dataset=\"" + site2Reference(ontologyUri) + "/dataset#\"\n");
+        rdfOntology.append("  xmlns:attribute=\"" + site2Reference(ontologyUri) + "/attribute#\">\n\n");
 
         for (RDFClass rdfClass : ontology.getRDFClasses()) {
-            rdfOntology.append("  <objects:" + rdfClass.getShortName() + ">\n");
+            rdfOntology.append("  <class:" + rdfClass.getShortName() + ">\n");
 
             for (RDFProperty property : rdfClass.getProperties()) {
                 for (String literal : literals) {
-                    rdfOntology.append("    <objects:" + property.getShortName() + ">");
+                    rdfOntology.append("    <attribute:" + property.getShortName() + ">");
                     rdfOntology.append(literal);
-                    rdfOntology.append("</objects:" + property.getShortName() + ">\n");
+                    rdfOntology.append("</attribute:" + property.getShortName() + ">\n");
                 }
                 
             }
 
-            rdfOntology.append("  </objects:" + rdfClass.getShortName() + ">\n\n");
+            rdfOntology.append("  </class:" + rdfClass.getShortName() + ">\n\n");
         }
 
         rdfOntology.append("</rdf:RDF>\n");
@@ -530,8 +545,10 @@ public class SPARQLResource {
         ontology.addNamespace("rdf:", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
         ontology.addNamespace("rdfs:", "http://www.w3.org/2000/01/rdf-schema#");
 
-        ontology.addNamespace("datasets:", ontologyUri + "/datasets#");
-        ontology.addNamespace("objects:", ontologyUri + "/objects#");
+        ontology.addNamespace("config:", ontologyUri + "#");
+        ontology.addNamespace("class:", site2Reference(ontologyUri) + "/class#");
+        ontology.addNamespace("dataset:", site2Reference(ontologyUri) + "/dataset#");
+        ontology.addNamespace("attribute:", site2Reference(ontologyUri) + "/attribute#");
 
         for (org.biomart.objects.objects.RDFClass rdfClass : mart.getRDFClasses())
             ontology.addClass(rdfClass.getName(), rdfClass.getUID().split(","));

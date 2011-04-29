@@ -339,7 +339,7 @@ public class QueryValidator {
 
         Element processorEl = root.getChild("Processor");
 
-        if (processor == null) {
+        if (processor == null && processorEl != null) {
             processor = processorEl.getAttributeValue("name");
         }
 

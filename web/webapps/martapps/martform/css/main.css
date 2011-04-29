@@ -25,20 +25,12 @@
 #biomart-content section {
     margin-bottom: 1em;
 }
-#biomart-content h3 {
-    font-size: 20px;
-    font-weight: normal;
-    padding: .2em;
-    margin: .3em 0;
-    text-shadow: 0 0 2px #fff;
-}
 .layout1 #biomart-wrapper h4 {
     padding: 5px;
     color: #000;
     font-size: 18px;
     font-variant: small-caps;
     font-weight: normal;
-    text-shadow: 0 0 2px #fff;
     background: transparent none;
     border: none;
 }

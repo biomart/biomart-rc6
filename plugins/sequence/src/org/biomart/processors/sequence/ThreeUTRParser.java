@@ -101,27 +101,31 @@ public class ThreeUTRParser extends SequenceParser {
 	 */
 	protected final boolean print3UTR(String header, String chr,
 			TreeMap<Integer,Integer> start, TreeMap<Integer,Integer> end, int codingOffset,
-			int terminalExonRank, String strand) throws IOException {
-		StringBuilder sequence = new StringBuilder();
-		if (!chr.equals("")) {
-			if (strand.equals("-1")){
-				if(!(getSequence(chr,start.get(terminalExonRank),end.get(terminalExonRank)-codingOffset)).equals("")){
-					sequence.append(reverseComplement(getSequence(chr,start.get(terminalExonRank),end.get(terminalExonRank)-codingOffset+upstreamFlank)));
-					for (int i = terminalExonRank+1; i < start.size(); i++){
-						sequence.append(reverseComplement(getSequence(chr, start.get(i), end.get(i))));
-					}
-					sequence.append(reverseComplement(getSequence(chr, start.get(start.size()-1)-downstreamFlank,start.get(start.size()-1)-1)));
-				}
-			} else {
-				if(!(getSequence(chr,start.get(terminalExonRank)+codingOffset,end.get(terminalExonRank))).equals("")){
-					sequence.append(getSequence(chr,start.get(terminalExonRank)+codingOffset-upstreamFlank,end.get(terminalExonRank)));
-					for (int i = terminalExonRank+1; i < start.size(); i++){
-						sequence.append((getSequence(chr, start.get(i), end.get(i))));
-					}
-					sequence.append((getSequence(chr, end.get(start.size()-1)+1,end.get(start.size()-1)+downstreamFlank)));
-				}
-			}
-		}
-		return printFASTA(sequence.toString(), header);
+			int terminalExonRank, String strand) {
+        try {
+            StringBuilder sequence = new StringBuilder();
+            if (!chr.equals("")) {
+                if (strand.equals("-1")){
+                    if(!(getSequence(chr,start.get(terminalExonRank),end.get(terminalExonRank)-codingOffset)).equals("")){
+                        sequence.append(reverseComplement(getSequence(chr,start.get(terminalExonRank),end.get(terminalExonRank)-codingOffset+upstreamFlank)));
+                        for (int i = terminalExonRank+1; i < start.size(); i++){
+                            sequence.append(reverseComplement(getSequence(chr, start.get(i), end.get(i))));
+                        }
+                        sequence.append(reverseComplement(getSequence(chr, start.get(start.size()-1)-downstreamFlank,start.get(start.size()-1)-1)));
+                    }
+                } else {
+                    if(!(getSequence(chr,start.get(terminalExonRank)+codingOffset,end.get(terminalExonRank))).equals("")){
+                        sequence.append(getSequence(chr,start.get(terminalExonRank)+codingOffset-upstreamFlank,end.get(terminalExonRank)));
+                        for (int i = terminalExonRank+1; i < start.size(); i++){
+                            sequence.append((getSequence(chr, start.get(i), end.get(i))));
+                        }
+                        sequence.append((getSequence(chr, end.get(start.size()-1)+1,end.get(start.size()-1)+downstreamFlank)));
+                    }
+                }
+            }
+            return printFASTA(sequence.toString(), header);
+        } catch (Exception e) {
+            return printFASTA(SEQUENCE_UNAVAILABLE, header);
+        }
 	}
 }

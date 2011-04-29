@@ -905,6 +905,11 @@ public class Filter extends Element	{
 				this.setProperty(XMLElements.ERROR, ErrorMessage.get("10004"));
 				return false;
 			}
+			if(!McUtils.hasLink(getParentConfig(), getPointedConfing())) {
+				this.setObjectStatus(ValidationStatus.INVALID);
+				this.setProperty(XMLElements.ERROR, ErrorMessage.get("10004"));
+				return false;
+			}
 		} else if(this.isFilterList()) {
 			//it is valid if one of the filter in the list is valid
 			boolean b = false;

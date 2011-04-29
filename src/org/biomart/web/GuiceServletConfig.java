@@ -164,7 +164,7 @@ public class GuiceServletConfig extends GuiceServletContextListener {
         if (injector == null) {
             injector = Guice.createInjector(
                     Stage.PRODUCTION,
-                    new RestServiceModule()
+                    new WebServiceModule()
             );
         }
         return injector;

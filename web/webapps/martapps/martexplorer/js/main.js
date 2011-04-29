@@ -944,68 +944,70 @@ $.namespace('biomart.martexplorer', function(self) {
         biomart.resource.load('containers', function(json) {
             var root = biomart.utils.processContainer(json);
 
-            biomart._state.filtersRoot = json;
+            if (root) {
 
-            root.title = biomart._state.mart.displayName,
-            root.attr = {
-                'class': 'mart ' + biomart._state.mart.name, 
-                mart: biomart._state.mart.name
-            };
-            root.state = 'open';
+                biomart._state.filtersRoot = json;
 
-            if (!_elements.filterTree.hasClass('jstree')) {
-                _elements.filterTree
-                    .bind('select_node.jstree', function(ev, data) {
-                        var $node = $(data.rslt.obj),
-                            $martNode = $node.closest('li.mart'),
-                            martName = $martNode.attr('mart'),
-                            name = $node.attr('container'),
-                            container;
-                        updateParam('_fc', name);
-                        container = findContainer(biomart._state.filtersRoot, name);
-                        if ($node.hasClass('jstree-leaf') && !$node.hasClass('mart')) {
-                            drawFilterContainer(_elements.filterContent.empty(), container);
-                        }
-                    })
-                    .bind('beforechange.jstree', function(ev, data) {
-                        var $node = $(data.rslt.obj);
-                        if ($node.hasClass('jstree-leaf') && !$node.hasClass('mart')) {
+                root.title = biomart._state.mart.displayName,
+                root.attr = {
+                    'class': 'mart ' + biomart._state.mart.name, 
+                    mart: biomart._state.mart.name
+                };
+                root.state = 'open';
+
+                if (!_elements.filterTree.hasClass('jstree')) {
+                    _elements.filterTree
+                        .bind('select_node.jstree', function(ev, data) {
+                            var $node = $(data.rslt.obj),
+                                $martNode = $node.closest('li.mart'),
+                                martName = $martNode.attr('mart'),
+                                name = $node.attr('container'),
+                                container;
+                            updateParam('_fc', name);
+                            container = findContainer(biomart._state.filtersRoot, name);
+                            if ($node.hasClass('jstree-leaf') && !$node.hasClass('mart')) {
+                                drawFilterContainer(_elements.filterContent.empty(), container);
+                            }
+                        })
+                        .bind('beforechange.jstree', function(ev, data) {
+                            var $node = $(data.rslt.obj);
+                            if ($node.hasClass('jstree-leaf') && !$node.hasClass('mart')) {
+                                return true;
+                            } else if (!$node.hasClass('loader')) {
+                                $.jstree._focused().open_branch($node);
+                            }
+                            return false;
+                        })
+                        .bind('beforeclose.jstree', function(ev, data) {
+                            var $node = $(data.rslt.obj);
+                            if ($node.find('a.clicked').length) {
+                                 return false;
+                            }
                             return true;
-                        } else if (!$node.hasClass('loader')) {
-                            $.jstree._focused().open_branch($node);
-                        }
-                        return false;
-                    })
-                    .bind('beforeclose.jstree', function(ev, data) {
-                        var $node = $(data.rslt.obj);
-                        if ($node.find('a.clicked').length) {
-                             return false;
-                        }
-                        return true;
-                    })
-                    .jstree({
-                        plugins: ['themes', 'json_data', 'ui'],
-                        json_data: {
-                            data: root.children
-                        },
-                        themes: {
-                            theme: 'default'
-                        }
-                    });
-            }
-
-            // Small hack to use setTimeout because otherwise the proper styles don't get added for some reason
-            // Bug in jstree maybe?
-            setTimeout(function() {
-                var node = _elements.filterTree.find('.jstree-leaf');
-                if (biomart.params._fc) {
-                    node = node.filter('.' + biomart.params._fc);
-                } else {
-                    node = node.eq(0);
+                        })
+                        .jstree({
+                            plugins: ['themes', 'json_data', 'ui'],
+                            json_data: {
+                                data: root.children
+                            },
+                            themes: {
+                                theme: 'default'
+                            }
+                        });
                 }
-                node.children('a').click();
-            }, 100);
 
+                // Small hack to use setTimeout because otherwise the proper styles don't get added for some reason
+                // Bug in jstree maybe?
+                setTimeout(function() {
+                    var node = _elements.filterTree.find('.jstree-leaf');
+                    if (biomart.params._fc) {
+                        node = node.filter('.' + biomart.params._fc);
+                    } else {
+                        node = node.eq(0);
+                    }
+                    node.children('a').click();
+                }, 100);
+            }
             if (callback) callback();
             $.publish('biomart.loaded');
         }, params);
@@ -1035,67 +1037,70 @@ $.namespace('biomart.martexplorer', function(self) {
         biomart.resource.load('containers', function(json) {
             var root = biomart.utils.processContainer(json);
 
-            biomart._state.attributesRoot = json;
+            if (root) {
 
-            root.title = biomart._state.mart.displayName,
-            root.attr = {
-                'class': 'mart ' + biomart._state.mart.name, 
-                mart: biomart._state.mart.name
-            };
-            root.state = 'open';
+                biomart._state.attributesRoot = json;
 
-            if (!_elements.attributeTree.hasClass('jstree')) {
-                _elements.attributeTree
-                    .bind('select_node.jstree', function(ev, data) {
-                        var $node = $(data.rslt.obj),
-                            $martNode = $node.closest('li.mart'),
-                            martName = $martNode.attr('mart'),
-                            name = $node.attr('container'),
-                            container;
-                        updateParam('_ac', name);
-                        container = findContainer(biomart._state.attributesRoot, name);
-                        if ($node.hasClass('jstree-leaf') && !$node.hasClass('mart')) {
-                            drawAttributeContainer(_elements.attributeContent.empty(), container);
-                        }
-                    })
-                    .bind('beforechange.jstree', function(ev, data) {
-                        var $node = $(data.rslt.obj);
-                        if ($node.hasClass('jstree-leaf') && !$node.hasClass('mart')) {
+                root.title = biomart._state.mart.displayName,
+                root.attr = {
+                    'class': 'mart ' + biomart._state.mart.name, 
+                    mart: biomart._state.mart.name
+                };
+                root.state = 'open';
+
+                if (!_elements.attributeTree.hasClass('jstree')) {
+                    _elements.attributeTree
+                        .bind('select_node.jstree', function(ev, data) {
+                            var $node = $(data.rslt.obj),
+                                $martNode = $node.closest('li.mart'),
+                                martName = $martNode.attr('mart'),
+                                name = $node.attr('container'),
+                                container;
+                            updateParam('_ac', name);
+                            container = findContainer(biomart._state.attributesRoot, name);
+                            if ($node.hasClass('jstree-leaf') && !$node.hasClass('mart')) {
+                                drawAttributeContainer(_elements.attributeContent.empty(), container);
+                            }
+                        })
+                        .bind('beforechange.jstree', function(ev, data) {
+                            var $node = $(data.rslt.obj);
+                            if ($node.hasClass('jstree-leaf') && !$node.hasClass('mart')) {
+                                return true;
+                            } else if (!$node.hasClass('loader')) {
+                                $.jstree._focused().open_branch($node);
+                            }
+                            return false;
+                        })
+                        .bind('beforeclose.jstree', function(ev, data) {
+                            var $node = $(data.rslt.obj);
+                            if ($node.find('a.clicked').length) {
+                                 return false;
+                            }
                             return true;
-                        } else if (!$node.hasClass('loader')) {
-                            $.jstree._focused().open_branch($node);
-                        }
-                        return false;
-                    })
-                    .bind('beforeclose.jstree', function(ev, data) {
-                        var $node = $(data.rslt.obj);
-                        if ($node.find('a.clicked').length) {
-                             return false;
-                        }
-                        return true;
-                    })
-                    .jstree({
-                        plugins: ['themes', 'json_data', 'ui'],
-                        json_data: {
-                            data: root.children
-                        },
-                        themes: {
-                            theme: 'default'
-                        }
-                    });
-                }
-                      
-            // Small hack to use setTimeout because otherwise the proper styles don't get added for some reason
-            // Bug in jstree maybe?
-            setTimeout(function() {
-                var node = _elements.attributeTree.find('.jstree-leaf');
-                if (biomart.params._ac) {
-                    node = node.filter('.' + biomart.params._ac);
-                } else {
-                    node = node.eq(0);
-                }
-                node.children('a').click();
-            }, 100);
+                        })
+                        .jstree({
+                            plugins: ['themes', 'json_data', 'ui'],
+                            json_data: {
+                                data: root.children
+                            },
+                            themes: {
+                                theme: 'default'
+                            }
+                        });
+                    }
+                          
+                // Small hack to use setTimeout because otherwise the proper styles don't get added for some reason
+                // Bug in jstree maybe?
+                setTimeout(function() {
+                    var node = _elements.attributeTree.find('.jstree-leaf');
+                    if (biomart.params._ac) {
+                        node = node.filter('.' + biomart.params._ac);
+                    } else {
+                        node = node.eq(0);
+                    }
+                    node.children('a').click();
+                }, 100);
+            }
 
             $.publish('biomart.loaded');
         }, params);

@@ -39,6 +39,7 @@ import org.biomart.api.lite.GuiContainer;
 import org.biomart.api.lite.Mart;
 import org.biomart.api.lite.Processor;
 import org.biomart.api.lite.ProcessorGroup;
+import org.biomart.api.rest.annotations.Cache;
 import org.biomart.common.exceptions.FunctionalException;
 import org.biomart.common.exceptions.TechnicalException;
 import org.biomart.common.resources.Log;
@@ -50,6 +51,8 @@ import org.biomart.common.resources.Log;
 @Singleton
 @Path("/martservice")
 public class PortalResource implements PortalService {
+    private static final int MAX_AGE = 3600;
+
     private MartRegistryFactory factory;
 
     @Context HttpServletRequest servletRequest;
@@ -63,6 +66,7 @@ public class PortalResource implements PortalService {
     @Path("portal")
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Cache(maxAge = MAX_AGE)
     @Override
     public GuiContainer getRootGuiContainer(@QueryParam("guitype") String guitype) {
         return getPortal().getRootGuiContainer(guitype);
@@ -71,6 +75,7 @@ public class PortalResource implements PortalService {
     @Path("gui")
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Cache(maxAge = MAX_AGE)
     public GuiContainer getGuiContainer(@QueryParam("name") String name) {
         return getPortal().getGuiContainer(name);
     }
@@ -79,6 +84,7 @@ public class PortalResource implements PortalService {
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Override
+    @Cache(maxAge = MAX_AGE)
     public List<Mart> getMarts( @QueryParam("guicontainer") String guiContainerName) {
         return getPortal().getMarts(guiContainerName);
     }
@@ -86,6 +92,7 @@ public class PortalResource implements PortalService {
     @Path("datasets")
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Cache(maxAge = MAX_AGE)
     @Override
     public List<Dataset> getDatasets(@QueryParam("mart") String martName) {
         return getPortal().getDatasets(martName);
@@ -94,6 +101,7 @@ public class PortalResource implements PortalService {
     @Path("filters")
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Cache(maxAge = MAX_AGE)
     @Override
     public List<Filter> getFilters(
             @QueryParam("datasets") String datasets,
@@ -107,6 +115,7 @@ public class PortalResource implements PortalService {
     @Path("attributes")
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Cache(maxAge = MAX_AGE)
     @Override
     public List<Attribute> getAttributes(
             @QueryParam("datasets") String datasets,
@@ -119,6 +128,7 @@ public class PortalResource implements PortalService {
     @Path("containers")
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Cache(maxAge = MAX_AGE)
     @Override
     public Container getContainers(
             @QueryParam("datasets") String datasets,
@@ -131,6 +141,7 @@ public class PortalResource implements PortalService {
     @Path("linkables")
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Cache(maxAge = MAX_AGE)
     @Override
     public List<Dataset> getLinkables(@QueryParam("datasets") String datasets) {
         return getPortal().getLinkables(datasets);
@@ -140,6 +151,7 @@ public class PortalResource implements PortalService {
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Override
+    @Cache(maxAge = MAX_AGE)
     public List<ProcessorGroup> getProcessorGroups(@QueryParam("mart") String mart) {
         return getPortal().getProcessorGroups(mart);
     }
@@ -147,6 +159,7 @@ public class PortalResource implements PortalService {
     @Path("processors")
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Cache(maxAge = MAX_AGE)
     @Override
     public List<Processor> getProcessors(@QueryParam("mart") String mart,
             @QueryParam("processorgroup") String group) {
@@ -156,14 +169,27 @@ public class PortalResource implements PortalService {
     // Special requests
     @Path("datasets/mapped")
     @GET
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Map<String,List<Dataset>> getMappedDatasets(@QueryParam("mart") String martNames) {
+    @Produces(MediaType.APPLICATION_JSON)
+    @Cache(maxAge = MAX_AGE)
+    public Map<String,List<Dataset>> getMappedDatasetsAsJson(@QueryParam("mart") String martNames) {
         return getPortal().getDatasetMapByMarts(martNames);
+    }
+
+    @Path("datasets/mapped")
+    @GET
+    @Produces(MediaType.APPLICATION_XML)
+    @Cache(maxAge = MAX_AGE)
+    public Response getMappedDatasetsAsXml(@QueryParam("mart") String martNames) {
+        try {
+            Map map = getPortal().getDatasetMapByMarts(martNames);
+            return ResponseFormatter.prepare("xml", map, "");
+        } catch (Exception e) { throw new BioMartApiException(e); }
     }
 
     @Path("attributes/mapped")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @Cache(maxAge = MAX_AGE)
     public Response getAttributeMapByDatasetAsJson(@QueryParam("datasets") String datasets,
             @QueryParam("config") String config, @QueryParam("container") String container) {
         try {
@@ -174,6 +200,7 @@ public class PortalResource implements PortalService {
     @Path("filters/mapped")
     @GET
     @Produces(MediaType.APPLICATION_XML)
+    @Cache(maxAge = MAX_AGE)
     public Response getFilterMapByDatasetAsJson(@QueryParam("datasets") String datasets,
             @QueryParam("config") String config, @QueryParam("container") String container) {
         try {
@@ -184,15 +211,18 @@ public class PortalResource implements PortalService {
     @Path("attributes/mapped")
     @GET
     @Produces(MediaType.APPLICATION_XML)
+    @Cache(maxAge = MAX_AGE)
     public Response getAttributeMapByDatasetAsXml(@QueryParam("datasets") String datasets,
             @QueryParam("config") String config, @QueryParam("container") String container) {
         try {
             return ResponseFormatter.prepare("xml", getPortal().getAttributeMapByDataset(datasets, config, container), "");
         } catch (Exception e) { throw new BioMartApiException(e); }
     }
+
     @Path("filters/mapped")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @Cache(maxAge = MAX_AGE)
     public Response getFilterMapByDatasetAsXml(@QueryParam("datasets") String datasets,
             @QueryParam("config") String config, @QueryParam("container") String container) {
         try {
@@ -204,6 +234,7 @@ public class PortalResource implements PortalService {
     @Path("xml/configs/{mart}")
     @GET
     @Produces(MediaType.APPLICATION_XML)
+    @Cache(maxAge = MAX_AGE)
     public Response getConfigsForMart(
             @QueryParam("callback") @DefaultValue("") String callback,
             @PathParam("mart") String martName)
@@ -221,6 +252,7 @@ public class PortalResource implements PortalService {
     @Path("filter_values")
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Cache(maxAge = MAX_AGE)
     @Override
     public List<FilterData> getFilterValues(
             @QueryParam("filter") String filterName,
@@ -262,7 +294,7 @@ public class PortalResource implements PortalService {
         return out.toString();
     }
 
-    private Response handleResults(final String query, final boolean download,
+    protected Response handleResults(final String query, final boolean download,
             final boolean iframe, final String uuid, final String scope) throws BioMartApiException {
 
         final Portal portal = getPortal();

@@ -49,7 +49,7 @@
         </c:choose>
       </span> (
       <a class="action sign-in" href="#" <c:if test="${loggedIn}">style="display: none"</c:if>><bm:message code="login" capitalize="true"/></a>
-      <a class="action sign-out" href="/rest/user/logout" <c:if test="${not loggedIn}">style="display: none"</c:if>><bm:message code="logout" capitalize="true"/></a>
+      <a class="action sign-out" href="${service.url}user/logout" <c:if test="${not loggedIn}">style="display: none"</c:if>><bm:message code="logout" capitalize="true"/></a>
       )
       <div id="biomart-auth-info" class="gradient-grey-reverse" style="display: none">
         <span class="ui-icon ui-icon-close" title="Close"></span>

@@ -48,6 +48,7 @@ import org.biomart.configurator.controller.ObjectController;
 import org.biomart.configurator.utils.McGuiUtils;
 import org.biomart.configurator.utils.McUtils;
 import org.biomart.configurator.utils.type.IdwViewType;
+import org.biomart.configurator.utils.type.McEventProperty;
 import org.biomart.configurator.view.component.ConfigComponent;
 import org.biomart.configurator.view.dnd.ConfigDropTargetListener;
 import org.biomart.configurator.view.dnd.ConfigDnDTransferHandler;
@@ -69,10 +70,12 @@ import org.biomart.objects.portal.UserGroup;
 
 import javax.swing.table.*;
 import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import e.gui.ETable;
 
-public class GuiContainerPanel extends JPanel implements MouseListener,ClipboardOwner {
+public class GuiContainerPanel extends JPanel implements MouseListener,ClipboardOwner, PropertyChangeListener {
 
 	/**
 	 * 
@@ -100,6 +103,7 @@ public class GuiContainerPanel extends JPanel implements MouseListener,Clipboard
 	public GuiContainerPanel(GuiContainer gc) {
 		this.gc = gc;
 		init();
+		this.addPropertyChangeListener(this);
 		//this.setTransferHandler(new ConfigDnDTransferHandler());
 		this.setDropTarget(new DropTarget(GuiContainerPanel.this, new ConfigDropTargetListener(GuiContainerPanel.this)));
 	}
@@ -710,4 +714,14 @@ public class GuiContainerPanel extends JPanel implements MouseListener,Clipboard
         map.put(ConfigTableTransferHandler.getPasteAction().getValue(Action.NAME),
         		ConfigTableTransferHandler.getPasteAction());
     }
+
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		if(evt.getPropertyName().equals(McEventProperty.USER.toString())) {
+			this.configList.repaint();
+			this.configTable.repaint();
+		}
+		//UserGroup ug = (UserGroup)evt.getNewValue();
+		
+	}
 }

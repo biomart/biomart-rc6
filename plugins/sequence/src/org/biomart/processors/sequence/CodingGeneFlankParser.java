@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.biomart.common.exceptions.TechnicalException;
 import org.biomart.common.exceptions.ValidationException;
 import org.biomart.common.resources.Log;
@@ -78,12 +79,16 @@ public class CodingGeneFlankParser extends SequenceParser {
 		}
 
 		for(String geneID : geneMap.keySet()) {
+			
+			
+			if (isDebug) System.out.println(geneID);
+
             List<List<String>> lines = geneMap.get(geneID);
 			String transcriptID = null;
 			String terminalExonID = null;
 			String chr = "";
-			Integer start = Integer.MAX_VALUE;
-			Integer end = Integer.MIN_VALUE;
+			Integer start = null;
+			Integer end = null;
 			String strand = null;
 			int codingOffset = 0;
 			String exonID = null;
@@ -101,14 +106,37 @@ public class CodingGeneFlankParser extends SequenceParser {
 
                 if (terminalExonID.equals(exonID)){
 					codingOffset = Integer.parseInt(line.get(codingOffsetField));
-
-                    start = Math.min(start, Integer.parseInt(line.get(startField)) + codingOffset);
-                    end = Math.max(end, Integer.parseInt(line.get(endField)) - codingOffset);
+					
+					int startTmp, endTmp;
+					if (strand.equals("-1")) {
+	                    startTmp = Integer.parseInt(line.get(startField));
+						int startTmp2 = startTmp + codingOffset;
+						start = start!=null ? Math.max(start, startTmp2) : startTmp2;
+	                    endTmp = Integer.parseInt(line.get(endField));
+						int endTmp2 = endTmp - codingOffset;
+						end = end!=null ? Math.min(end, endTmp2) : endTmp2;
+					} else {
+						startTmp = Integer.parseInt(line.get(startField));
+						int startTmp2 = startTmp + codingOffset;
+						start = start!=null ? Math.min(start, startTmp2) : startTmp2;
+	                    endTmp = Integer.parseInt(line.get(endField));
+						int endTmp2 = endTmp - codingOffset;
+						end = end!=null ? Math.max(end, endTmp2) : endTmp2;
+					}
+					if (isDebug) System.out.println(startTmp + ", " + endTmp + ", " + (endTmp-startTmp) + ", " + exonID + ", " + codingOffset);
 
 					chr = line.get(chrField);
 				}
 			}
-
+			
+			if (isDebug) System.out.println(">" + start + ", " + end + ", " + strand);
+			
+			// undefined
+			if (null==start && null==end) {
+				start = Integer.MIN_VALUE;
+				end = Integer.MAX_VALUE;
+			}
+			
             done = printCodingGeneFlank(getHeader(), chr, start, end, strand);
 
             clearHeader();
@@ -118,36 +146,42 @@ public class CodingGeneFlankParser extends SequenceParser {
             }
 		}
 	}
-
 	protected final boolean printCodingGeneFlank(String header, String chr, int start,
             int end, String strand) throws IOException {
-		String sequence;
-
-        Log.info(String.format("start = %s, end = %s", start, end));
-
-        if (upstreamFlank > 0) {
-            if (strand.equals("-1")) {
-                start = end + 2;
-                end = end + upstreamFlank + 1;
-            } else {
-                end = start - 2;
-                start = start - upstreamFlank - 1;
-            }
-        } else {
-            if (strand.equals("-1")) {
-                start = end - downstreamFlank;
-                end = end - 1;
-            } else {
-                end = start - 1 + downstreamFlank;
-            }
-        }
-
-		// Take the reverse complement if necessary
-		if (strand.equals("-1")){
-			sequence = reverseComplement(getSequence(chr, start, end));
-		} else {
-			sequence = getSequence(chr, start, end);
+		try {
+			String sequence;
+	
+	        Log.info(String.format("start = %s, end = %s", start, end));
+	
+	        if (upstreamFlank > 0) {
+	            if (strand.equals("-1")) {
+	                start = end + 2;
+	                end = end + upstreamFlank + 1;
+	            } else {
+	                end = start - 2;
+	                start = start - upstreamFlank - 1;
+	            }
+	        } else {
+	            if (strand.equals("-1")) {
+	            	start = end - downstreamFlank + 1;
+	            } else {
+	            	end = start + downstreamFlank - 1;
+	            }
+	        }
+	
+	        if (isDebug) System.out.println(">>" + start + ", " + end + ", " + (end-start));
+			
+			// Take the reverse complement if necessary
+			if (strand.equals("-1")){
+				sequence = reverseComplement(getSequence(chr, start, end));
+			} else {
+				sequence = getSequence(chr, start, end);
+			}
+			return printFASTA(sequence, header);
+		} catch (Exception e) {
+		    e.printStackTrace();
+		    return printFASTA(SEQUENCE_UNAVAILABLE, header);
 		}
-		return printFASTA(sequence, header);
 	}
 }
+

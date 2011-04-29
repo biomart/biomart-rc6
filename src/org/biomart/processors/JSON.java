@@ -5,6 +5,7 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import org.biomart.processors.annotations.DefaultValue;
 import org.biomart.processors.annotations.Required;
 import org.biomart.processors.annotations.UserDefined;
 import org.biomart.processors.fields.BooleanField;
+import org.biomart.processors.fields.StringField;
 import org.biomart.queryEngine.Query;
 import org.biomart.queryEngine.QueryElement;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -36,11 +38,17 @@ public class JSON extends ProcessorImpl {
     @Required
     private BooleanField streaming = new BooleanField("Stream results");
 
+    @UserDefined
+    @DefaultValue("")
+    private StringField callback = new StringField("Name of callback function");
+
     private final List<String> header = new ArrayList<String>();
 
     // For non-streaming requests
     private OutputStream originalOut;
     private OutputStream dataOut;
+
+    private boolean isJsonp;
 
     private class JsonOutputStream extends FilterOutputStream implements OutputConstants {
         private static final int BUFFER_SIZE = 8000;
@@ -84,16 +92,22 @@ public class JSON extends ProcessorImpl {
             }
 
             String[] columns = row.split(DELIMITER);
-            Map<String,Object> map = new LinkedHashMap<String,Object>();
+            Object value = new LinkedHashMap<String,Object>();
             int i = 0;
 
             for (String curr : columns) {
-                map.put(header.get(i), curr);
+                ((Map)value).put(header.get(i), curr);
                 i++;
             }
 
+            if (streaming.value) {
+                Map map = new HashMap();
+                map.put("data", value);
+                value = map;
+            }
+
             ObjectMapper mapper = new ObjectMapper();
-            String jsonRow = mapper.writeValueAsString(map);
+            String jsonRow = mapper.writeValueAsString(value);
 
             out.write(jsonRow.getBytes());
 
@@ -119,7 +133,10 @@ public class JSON extends ProcessorImpl {
     @Override
     public void preprocess(Document queryXML) {
         // No need to print header
-        queryXML.getRootElement().setAttribute("header", "0");
+        queryXML.getRootElement().setAttribute("header", "false");
+
+        // If is JSONP, then we need to wrap results in callback function at the end
+        isJsonp = !streaming.value && !"".equals(callback.value);
     }
 
     @Override
@@ -155,6 +172,10 @@ public class JSON extends ProcessorImpl {
             out.flush();
             out.close();
 
+            if (isJsonp) {
+                originalOut.write((callback.value + "(").getBytes());
+            }
+
             // Write header
             originalOut.write(("{\"total\":" + total + ",\"data\":[").getBytes());
 
@@ -163,6 +184,11 @@ public class JSON extends ProcessorImpl {
 
             // End
             originalOut.write("]}".getBytes());
+
+            if (isJsonp) {
+                originalOut.write(");".getBytes());
+            }
+
         } catch(IOException e) {
             throw new BioMartException("Error occurred during JSON output", e);
         }

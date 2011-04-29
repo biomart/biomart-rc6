@@ -266,7 +266,7 @@ public class UpdateCLI {
 		String savedFile = prefix + "-"+ McUtils.getCurrentTimeString()+".xml";
 		File file = new File(savedFile);
 		McMenus.getInstance().requestSavePortalToFile(file, false);
-		return savedFile;
+		return file.getAbsolutePath();
 	}
 
 	private void saveOAuth(String fileName, String value) {

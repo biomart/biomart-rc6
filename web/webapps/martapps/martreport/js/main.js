@@ -20,7 +20,7 @@ $.namespace('biomart.martreport', function(self) {
         delay = 500, // delay in processing subsequent requests
 
         QUERY_RESULTS_OPTIONS = {
-            timeout: 30000,
+            timeout: 60000,
             showProgress: false,
             animationTime: animationTime,
             iframe: false,
@@ -114,10 +114,6 @@ $.namespace('biomart.martreport', function(self) {
                 getContainersFromMart(selectedMart, drawContainers);
             }, {mart: selectedMart.name});
         }, {name: reportName});
-
-        $(window).bind('scroll.lazy', self.lazyLoad);
-
-        $containers.bind('hide', self.lazyLoad);
 
         $sidenav
             .hoverIntent({
@@ -220,25 +216,18 @@ $.namespace('biomart.martreport', function(self) {
 
         $('div.container').show();
 
-        self.lazyLoad();
+        self.load();
     };
 
-    /*
-     * =lazyLoad
-     */
-    self.lazyLoad = function() {
+    self.load = function() {
         if (self._loadInProgress) return;
 
         var queue = new biomart.Queue($content, 'lazy', true),
             $children = $containers.children('.container'),
-            cancelled = false,
             total = 0,
             numLoaded = 0;
 
         self.lock();
-
-        $content.one('queue.done.lazy', function() {
-        });
 
         for (var i=0, c; i<$children.length; i++) {
             c = $children.eq(i);
@@ -249,7 +238,7 @@ $.namespace('biomart.martreport', function(self) {
             }
 
             queue.queue(function(c, i) {
-                if (!cancelled && !c.data('loaded') && c.inView(100)) {
+                if (!c.data('loaded')) {
                     if (i==0) $loading.slideDown();
                     c.children('h3,h4').minimizer('show');
                     loadContainer(c, function() { 
@@ -260,7 +249,6 @@ $.namespace('biomart.martreport', function(self) {
                         queue.dequeue();
                     });
                 } else {
-                    cancelled = true;
                     if (--total == 0) {
                         $content.trigger('loaded.container');
                         self.unlock();

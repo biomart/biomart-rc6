@@ -59,8 +59,8 @@ public class Container extends LiteMartConfiguratorObject implements Serializabl
 			return;
 		if(includeAttributes) {
 			for(org.biomart.objects.objects.Attribute attribute: container.getAttributeList()) {
-				if(attribute.getName().equals("vega_gene_id")) 
-					System.out.println();
+				if(!attribute.isValid())
+					continue;
 				if(!attribute.isHidden() && attribute.inPartition(datasetList) && attribute.inUser(this.currentUser.getName(),datasetList)) {		
 					//create multiple one if it is partitioned
 					if(McUtils.hasPartitionBinding(attribute.getName())) {
@@ -100,6 +100,8 @@ public class Container extends LiteMartConfiguratorObject implements Serializabl
 		
 		if(includeFilters) {
 			for(org.biomart.objects.objects.Filter filter: container.getFilterList()) {
+				if(!filter.isValid())
+					continue;
 				if(!filter.isHidden() && filter.inPartition(datasetList) && filter.inUser(this.currentUser.getName(),datasetList)) {
 					//create multiple one if it is partitioned
 					if(McUtils.hasPartitionBinding(filter.getName())) {

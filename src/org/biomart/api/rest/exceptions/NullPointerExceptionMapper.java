@@ -10,7 +10,7 @@ import javax.ws.rs.ext.Provider;
 public class NullPointerExceptionMapper implements ExceptionMapper<NullPointerException> {
     @Override
     public Response toResponse(NullPointerException ex) {
-        return Response.status(Status.BAD_REQUEST)
+        return Response.status(Status.NOT_FOUND)
                 .entity(ex.getMessage())
                 .type(MediaType.TEXT_PLAIN)
                 .build();

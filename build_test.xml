@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
-<project name="BioMart" basedir="." default="test_development">
+<project name="BioMart" basedir="." default="test">
   <target name="-load.properties" description="Load">
     <property file="ant.properties"/>
     <path id="project.test.classpath">
@@ -75,6 +75,7 @@
       <test name="org.biomart.api.PortalApiTest" outfile="${testoutput.dir}/TEST-PortalApiTest"/>
       <test name="org.biomart.api.QueryApiTest" outfile="${testoutput.dir}/TEST-QueryApiTest"/>
       <test name="org.biomart.api.rest.RestApplicationTest" outfile="${testoutput.dir}/TEST-RestApplicationTest"/>
+      <!--<test name="org.biomart.api.rest.RestApplicationSPARQLTest" outfile="${testoutput.dir}/TEST-RestApplicationSPARQLTest"/>-->
     </junit>
   </target>
   <target name="showreport" depends="-init">
@@ -109,44 +110,6 @@
       </classpath>
       <formatter type="xml"/>
       <test name="org.biomart.configurator.test.McTestDevelopment" outfile="${testoutput.dir}/TEST-McUnitTest"/>
-    </junit>
-    <junitreport todir="${testreport.dir}">
-      <fileset dir="${testoutput.dir}">
-        <include name="TEST-*.xml"/>
-      </fileset>
-      <report format="frames" todir="${testreport.dir}"/>
-    </junitreport>
-    <antcall target="report"/>
-  </target>
-  <target name="test_fast" depends="dist.test">
-    <junit showoutput="true">
-      <classpath>
-        <path refid="project.test.classpath"/>
-        <fileset dir="${dist.dir}/lib">
-          <include name="zzNetBox*.jar"/>
-        </fileset>
-      </classpath>
-      <formatter type="xml"/>
-      <test name="org.biomart.configurator.test.McTestFast" outfile="${testoutput.dir}/TEST-McUnitTest"/>
-    </junit>
-    <junitreport todir="${testreport.dir}">
-      <fileset dir="${testoutput.dir}">
-        <include name="TEST-*.xml"/>
-      </fileset>
-      <report format="frames" todir="${testreport.dir}"/>
-    </junitreport>
-    <antcall target="report"/>
-  </target>
-  <target name="test_slow" depends="dist.test">
-    <junit showoutput="true">
-      <classpath>
-        <path refid="project.test.classpath"/>
-        <fileset dir="${dist.dir}/lib">
-          <include name="zzNetBox*.jar"/>
-        </fileset>
-      </classpath>
-      <formatter type="xml"/>
-      <test name="org.biomart.configurator.test.McTestSlow" outfile="${testoutput.dir}/TEST-McUnitTest"/>
     </junit>
     <junitreport todir="${testreport.dir}">
       <fileset dir="${testoutput.dir}">

@@ -94,21 +94,26 @@ public class TranscriptFlankParser extends SequenceParser {
 	 */
 	protected final boolean printTranscriptFlank(String header, String chr,
 			int start, int end, String strand) throws IOException {
-		String sequence;
-		// Check whether we're dealing with the 5' flank or the 3', and handle accordingly
-		if (upstreamFlank > 0){
-			if (strand.equals("-1")){
-				sequence = reverseComplement(getSequence(chr, end+1, end+upstreamFlank));
-			} else {
-				sequence = (getSequence(chr, Math.max(start-upstreamFlank,0), start-1));
-			}
-		} else {
-			if (strand.equals("-1")){
-				sequence = reverseComplement(getSequence(chr, Math.max(start-downstreamFlank,0), start-1));
-			} else {
-				sequence = (getSequence(chr, end+1, end+downstreamFlank));
-			}
-		}
-		return printFASTA(sequence, header);
+        try {
+            String sequence;
+            // Check whether we're dealing with the 5' flank or the 3', and handle accordingly
+            if (upstreamFlank > 0){
+                if (strand.equals("-1")){
+                    sequence = reverseComplement(getSequence(chr, end+1, end+upstreamFlank));
+                } else {
+                    sequence = (getSequence(chr, Math.max(start-upstreamFlank,0), start-1));
+                }
+            } else {
+                if (strand.equals("-1")){
+                    sequence = reverseComplement(getSequence(chr, Math.max(start-downstreamFlank,0), start-1));
+                } else {
+                    sequence = (getSequence(chr, end+1, end+downstreamFlank));
+                }
+            }
+            return printFASTA(sequence, header);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return printFASTA(SEQUENCE_UNAVAILABLE, header);
+        }
 	}
 }

@@ -195,7 +195,7 @@ public final class Portal {
         return _registry.getMartByName(martName).getProcessors(processorGroupName);
     }
 
-    public List<Dataset> getLinkables(@Nonnull String datasets){
+    public List<Dataset> getLinkables(@Nonnull String datasets) {
         enforceNonnullAndNonEmpty(datasets);
         List<String> from = Lists.newArrayList(datasets.split(","));
         List<Dataset> list = _registry.getMartByDatasets(from).getLinkableDatasets(from);

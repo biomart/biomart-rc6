@@ -116,9 +116,6 @@ public class QueryMetaData {
         if (variableType == null && ontology != null) {
             for (RDFClass rdfClass : ontology.getRDFClasses())
                 for (RDFProperty rdfProperty : rdfClass.getProperties()) {
-                    if (rdfProperty.getName().endsWith("ensembl_gene_id")) {
-                        int i = 0;
-                    }
                     if (rdfProperty.getFullName().equals(property.get(variable))) {
                         if (variableType != null)
                             return null; // Ambiguous type.

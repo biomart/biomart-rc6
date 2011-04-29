@@ -27,7 +27,7 @@ iframe.streaming {
     margin: 0 .5em;
     text-shadow: 2px 2px 3px #ccc;
 }
-.biomart .paginator a.active {
+.biomart .paginator a.ui-active {
     font-weight: bold;
     color: #9f0000;
 }
@@ -295,8 +295,8 @@ iframe.streaming {
     float: none;
 }
 .biomart .data li .key {
-    color: #bbb;
-    text-shadow: 1px 1px 1px #ddd;
+    font-weight: bold;
+    color: #333;
     margin-right: 0.5em;
     display: block;
     width: 165px;
@@ -305,6 +305,10 @@ iframe.streaming {
 .biomart .data li .value {
     width: 295px;
     float: left;
+}
+.biomart .data .only-one li {
+    width: auto;
+    float: none;
 }
 .biomart .data .only-one li .value,
 .biomart .data .only-one li .key {
@@ -388,7 +392,7 @@ iframe.streaming {
     margin-top: 10px;
 }
 .biomart .joined.odd {
-     color: #999;
+     color: #000;
 }
 .biomart .hover .joined.odd {
     color: #000;
@@ -400,25 +404,33 @@ iframe.streaming {
     color: #000;
 }
 .biomart .data li.even {
-     background-color: #efefef;
+    clear: left;
 }
-.biomart .data li.hover.even {
-     background-color: #dfdfdf;
+.biomart .data li.odd {
+    float: right;
+    clear: right;
+}
+.biomart .data li.even {
+     background-color: #fff;
 }
 .biomart .data li.primary.even {
     background-color: transparent;
 }
 .biomart .data li.odd {
-     background-color: #fffbef;
+     background-color: #fff /*#fffbef*/;
 }
 .biomart .data .only-one:hover {
      background-color: #efe8d1;
 }
-.biomart .data li.hover.odd {
+.biomart .data li.hover {
      background-color: #efe8d1;
 }
+/*.biomart .data li.hover.odd {
+     background-color: #efe8d1;
+}*/
 .biomart .data li.meta {
     background-color: transparent !important;
+    float: left;
 }
 
 /* Charts */

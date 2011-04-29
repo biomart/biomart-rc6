@@ -719,5 +719,25 @@ public class Container extends MartConfiguratorObject {
 		}
 		return false;
 	}
+	
+	@Override
+	public boolean isValid() {
+
+		for(Container c: this.getContainerList()) {
+			if(!c.isValid())
+				return false;
+		}
+		for(Attribute a: this.getAttributeList()) {
+			if(!a.isValid())
+				return false;
+			
+		}
+		for(Filter f: this.getFilterList()) {
+			if(!f.isValid())
+				return false;
+
+		}
+		return true;
+	}
 }
 

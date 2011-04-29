@@ -164,8 +164,7 @@ public class DefaultTreeTransferHandler extends AbstractTreeTransferHandler {
 				if(tmpNode1.getUserObject() instanceof Attribute || tmpNode1.getUserObject() instanceof Filter ||
 						tmpNode1.getUserObject() instanceof Container)
 					nodeList.add(tmpNode1);
-				else {
-					//JOptionPane.showMessageDialog(null, "cannot move");
+				else {					
 					return false;
 				}
 			}
@@ -455,6 +454,7 @@ public class DefaultTreeTransferHandler extends AbstractTreeTransferHandler {
 				((McTreeModel)target.getModel()).nodeStructureChanged(oldParent);
 			}
 		} else if(sameMart) {
+			Config sourceConfig = (Config)sconfig;
 			//create a copy from master to others
 			for(McTreeNode node: nodeList) {
 				if(node.getUserObject() instanceof Attribute) {
@@ -487,6 +487,23 @@ public class DefaultTreeTransferHandler extends AbstractTreeTransferHandler {
 						}*/
 						((Container)newParentNode.getObject()).addAttribute(newAtt);
 						newAtt.synchronizedFromXML();
+						// copy linkouturl reference attributes as well 
+						if(!newAtt.getLinkOutUrl().isEmpty()){
+							String linkOutUrl = newAtt.getLinkOutUrl();
+							List<Attribute> attributes = McGuiUtils.INSTANCE.getAttributesFromLinkOutUrl(linkOutUrl, sourceConfig);
+							for(Attribute att: attributes) {
+								if(targetConfig.containAttributebyName(att))
+									continue;
+								attElement = att.generateXml();
+								newAtt = new Attribute(attElement);
+								//set new att to have the target config
+								newAtt.setConfig(targetConfig);
+								oc.generateAttributeRDF(newAtt, targetConfig);
+								
+								((Container)newParentNode.getObject()).addAttribute(newAtt);
+								newAtt.synchronizedFromXML();
+							}
+						}
 					} catch (FunctionalException e) {
 						e.printStackTrace();
 					}

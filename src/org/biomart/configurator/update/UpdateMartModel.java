@@ -376,7 +376,7 @@ public class UpdateMartModel {
 		String port = mainPT.getValue(row,PartitionUtils.DATABASE);
 		String userName = mainPT.getValue(row, PartitionUtils.USERNAME);
 		String password = mainPT.getValue(row, PartitionUtils.PASSWORD);
-		String urlStr = fullhost+ (McUtils.isStringEmpty(port)?"":":"+port)+"/rest/xml/configs/"+mpList.get(0).getName();
+		String urlStr = fullhost+ (McUtils.isStringEmpty(port)?"":":"+port)+"/martservice/xml/configs/"+mpList.get(0).getName();
 		Document doc = McUtils.getDocumentFromUrl(urlStr, userName, password);
 		if(doc == null)
 			return;

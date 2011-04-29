@@ -372,6 +372,7 @@ public class McViewPortal extends McView implements ActionListener {
 				ButtonTabComponent btc = new ButtonTabComponent(parent,gc);
 				this.pcs.addPropertyChangeListener(McEventProperty.USER.toString(), btc);
 				this.pcs.addPropertyChangeListener(McEventProperty.ENABLE.toString(),btc);
+				this.pcs.addPropertyChangeListener(McEventProperty.USER.toString(), panel);
 				parent.setTabComponentAt(index, btc);
 			}
 			
@@ -394,6 +395,7 @@ public class McViewPortal extends McView implements ActionListener {
 						ButtonTabComponent btc = new ButtonTabComponent(parent,subGc);
 						this.pcs.addPropertyChangeListener(McEventProperty.USER.toString(), btc);
 						this.pcs.addPropertyChangeListener(McEventProperty.ENABLE.toString(),btc);
+						this.pcs.addPropertyChangeListener(McEventProperty.USER.toString(), panel);
 						parent.setTabComponentAt(index, btc);
 					}
 					

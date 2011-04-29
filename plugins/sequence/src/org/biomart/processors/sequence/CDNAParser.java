@@ -90,22 +90,27 @@ public class CDNAParser extends SequenceParser {
 	 */
 	protected final boolean printCDNA(String header, String chr,
 			Map<Integer,Integer> start, Map<Integer,Integer> end, String strand) throws IOException {
-		StringBuilder sequence = new StringBuilder();
-		if (!chr.equals("")) {
-			if (strand.equals("-1")){
-				sequence.append(reverseComplement(getSequence(chr,end.get(0)+1,end.get(0)+upstreamFlank)));
-				for (int i = 0; i < start.size(); i++){
-					sequence.append(reverseComplement(getSequence(chr, start.get(i), end.get(i))));
-				}
-				sequence.append(reverseComplement(getSequence(chr,start.get(start.size()-1)-downstreamFlank,start.get(start.size()-1)-1)));
-			} else {
-				sequence.append(getSequence(chr,start.get(0)-upstreamFlank,start.get(0)-1));
-				for (int i = 0; i < start.size(); i++){
-					sequence.append((getSequence(chr, start.get(i), end.get(i))));
-				}
-				sequence.append(getSequence(chr,end.get(end.size()-1)+1,end.get(end.size()-1)+downstreamFlank));
-			}
-		}
-		return printFASTA(sequence.toString(), header);
+        try {
+            StringBuilder sequence = new StringBuilder();
+            if (!chr.equals("")) {
+                if (strand.equals("-1")){
+                    sequence.append(reverseComplement(getSequence(chr,end.get(0)+1,end.get(0)+upstreamFlank)));
+                    for (int i = 0; i < start.size(); i++){
+                        sequence.append(reverseComplement(getSequence(chr, start.get(i), end.get(i))));
+                    }
+                    sequence.append(reverseComplement(getSequence(chr,start.get(start.size()-1)-downstreamFlank,start.get(start.size()-1)-1)));
+                } else {
+                    sequence.append(getSequence(chr,start.get(0)-upstreamFlank,start.get(0)-1));
+                    for (int i = 0; i < start.size(); i++){
+                        sequence.append((getSequence(chr, start.get(i), end.get(i))));
+                    }
+                    sequence.append(getSequence(chr,end.get(end.size()-1)+1,end.get(end.size()-1)+downstreamFlank));
+                }
+            }
+            return printFASTA(sequence.toString(), header);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return printFASTA(SEQUENCE_UNAVAILABLE, header);
+        }
 	}
 }
