@@ -1,0 +1,6 @@
+<config>
+	<oauth openid="https://me.yahoo.com/a/IyINRct235wr0Il0NtQMUcKwenvgzIUqbyaA"/>
+	<datasets>
+		<dataset name="tcgaLAML" database="dcc_tcgaLAML4c" dbhost="your.db.host" dbport="3306" dbuser="" password=""/>
+	</datasets>
+</config>
