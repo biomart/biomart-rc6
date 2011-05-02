@@ -476,6 +476,7 @@ iframe.streaming {
     position: relative;
     color: #ef8c08;
     text-transform: uppercase;
+    float: right;
 }
 .biomart .chart-export-dialog {
     font-size: 12px;
