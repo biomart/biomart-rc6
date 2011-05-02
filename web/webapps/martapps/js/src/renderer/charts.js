@@ -51,7 +51,7 @@
         });
 
         div
-            .find('.chart-export-title')
+            .find('.chart-export')
                 .hoverIntent({
                     over: function() {
                         dialog.fadeIn(200);

@@ -456,7 +456,6 @@ iframe.streaming {
     color: #555;
     position: absolute;
     margin-top: 10px;
-    right: 0;
 }
 .biomart .chart-export {
     font-size: 12px;
@@ -471,7 +470,6 @@ iframe.streaming {
 }
 .biomart .chart-export h6 {
     cursor: default;
-    float: right;
     line-height: 16px;
     padding-left: 16px;
     display: block;
