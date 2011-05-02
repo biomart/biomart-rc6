@@ -32,6 +32,8 @@
     font-variant: small-caps;
     font-weight: normal;
     background: transparent none;
+    filter: none;
+    -ms-filter: none;
     border: none;
 }
 #biomart-content .content {

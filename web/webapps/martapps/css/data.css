@@ -361,7 +361,7 @@ iframe.streaming {
 }
 .biomart .level-2 .data li.primary .key,
 .biomart .level-2 .data li.meta .key {
-    color: #bbb;
+    color: #000;
 }
 .biomart .level-2 .data .hover li.primary .key,
 .biomart .level-2 .data .hover li.meta .key {
