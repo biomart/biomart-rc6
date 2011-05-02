@@ -35,7 +35,7 @@ import org.jfree.data.general.DatasetUtilities;
 /**
  * @author jhsu
  */
-@Path("/chart")
+@Path("martservice/chart")
 public class ChartResource {
     private static final int MAX_AGE = 24 * 60 * 60;
     private static final String DEFAULT_FORMAT = "png";
