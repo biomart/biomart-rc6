@@ -348,7 +348,7 @@ iframe.streaming {
 .biomart .level-1 .data li.primary .key,
 .biomart .level-1 .data li.meta .key {
     white-space: nowrap;
-    color: #666;
+    color: #000;
 }
 .biomart .level-1 .data li.primary .value,
 .biomart .level-1 .data li.meta .value {
