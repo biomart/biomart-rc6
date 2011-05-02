@@ -51,17 +51,15 @@
         });
 
         div
-            .find('.chart-export')
-                .hoverIntent({
-                    over: function() {
-                        dialog.fadeIn(200);
-                    },
-                    out: function() {
-                        dialog.fadeOut(200);
-                    },
-                    timeout: 500
-                })
-            .end()
+            .hoverIntent({
+                over: function() {
+                    dialog.fadeIn(200);
+                },
+                out: function() {
+                    dialog.fadeOut(200);
+                },
+                timeout: 500
+            })
             .insertBefore(this._element)
             .append(dialog);
 
