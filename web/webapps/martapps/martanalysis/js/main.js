@@ -186,7 +186,8 @@ $.namespace('biomart.martform', function(self) {
                         }
                         $(this).data('prev', null);
                     }
-                });
+                })
+                .disableSelection();
         } else {
             _elements.datasets.find('p.info').hide();
             _elements.datasetList.singleselect({ selected: updateDatasets });
@@ -399,7 +400,7 @@ $.namespace('biomart.martform', function(self) {
                 .prettybox()
                 .siblings('.ui-prettybox')
                     .children('input')
-                        .attr('size', displayName.length + 5)
+                        .attr('size', displayName.length + 10)
                     .end()
                 .end()
                 .change(function(ev) {
@@ -417,7 +418,7 @@ $.namespace('biomart.martform', function(self) {
                         displayName = m.displayName;
                     }
 
-                    $select.siblings('.ui-prettybox').children('input').attr('size', displayName.length + 5);
+                    $select.siblings('.ui-prettybox').children('input').attr('size', displayName.length + 10);
                     
                     self.params.setMart(biomart.utils.hasGroupedMarts(m) ? m[0].group : m.name);
                 });
