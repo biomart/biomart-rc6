@@ -99,34 +99,32 @@ public class QueryValidator {
         client = root.getAttributeValue("client", "");
         header = root.getAttributeValue("header", "");
 
-        final boolean processLinkOut = processor.equals("TSVX") ||
-                processor.startsWith("HTML");
 
-        List<Element> datasetElements = root.getChildren("Dataset");
-
-        if (datasetElements.isEmpty()) {
-            throw new ValidationException("No datasets found in query XML");
+        boolean processLinkOut = false;
+        if (this.processor.equals("TSVX") || this.processor.startsWith("HTML")) {
+            processLinkOut = true;
         }
 
-        boolean isFirst = true;
+        List datasetsXML = root.getChildren("Dataset");
+        Iterator datasetsXMLIterator = datasetsXML.iterator();
+        Boolean isFirst = true;
+        Boolean isMultiple = false;
         String firstName = null;
-        queryStartingPoints = new ArrayList<String>();
+        this.queryStartingPoints = new ArrayList<String>();
 
         // Get and iterate over each Dataset object in the XML
-        queryElementList = new ArrayList<QueryElement>();
-
-        for (Element datasetElement : datasetElements) {
-            final String datasetNamesUnsplit = datasetElement.getAttributeValue("name");
-
-            String configName = datasetElement.getAttributeValue("config");
-            boolean isMultiple = false;
+        this.queryElementList = new ArrayList<QueryElement>();
+        while (datasetsXMLIterator.hasNext()) {
+            Element datasetXML = (Element) datasetsXMLIterator.next();
+            String datasetNamesUnsplit = datasetXML.getAttributeValue("name");
+            String config = datasetXML.getAttributeValue("config");
 
             if (datasetNamesUnsplit == null) {
                 //throw new Exception("No dataset name!");
             }
+            isMultiple = false;
             String datasetNames[] = datasetNamesUnsplit.split(",");
-            Map<Dataset,List<org.biomart.objects.objects.Element>> datasets =
-                    new HashMap<Dataset,List<org.biomart.objects.objects.Element>>();
+            HashMap<Dataset, ArrayList<org.biomart.objects.objects.Element>> datasets = new HashMap<Dataset, ArrayList<org.biomart.objects.objects.Element>>();
 
             // Do we actually need anything from the dataset objects?
             for (String datasetName : datasetNames) {
@@ -135,9 +133,7 @@ public class QueryValidator {
                 // if(this.registryObj.getDatasetByName("anonymous", "", datasetName)!=null)
                 // datasets.put(this.registryObj.getDatasetByName("anonymous", "", datasetName), new ArrayList<org.biomart.objects.objects.Element>());
 
-                Dataset curDataset = registryObj.getDatasetByName(datasetName, configName);
-                Config config = registryObj.getConfigByName(configName);
-
+                Dataset curDataset = this.registryObj.getDatasetByName(datasetName, config);
                 if (curDataset != null) {
                     datasets.put(curDataset, new ArrayList<org.biomart.objects.objects.Element>());
                     if (isFirst) {
@@ -147,50 +143,76 @@ public class QueryValidator {
             }
 
             if (datasetNames.length > 1) {
-                if (!queryStartingPoints.isEmpty()) {
+                if (this.queryStartingPoints.size() > 0) {
                     // There are already multiple starting datasets, so we can't have another one: throw an error
                     //TODO throw an error
                 } else {
                     isMultiple = true; // This flag allows us to put the attributes and filters for the starting data-points first
                     for (Dataset dataset : datasets.keySet()) {
-                        queryStartingPoints.add(dataset.getDisplayName());
+                        this.queryStartingPoints.add(dataset.getDisplayName());
                     }
                 }
             }
 
-            List<Element> attributesXML = datasetElement.getChildren("Attribute");
-            Set<String> seenAttributes = new HashSet<String>();
+            List attributesXML = datasetXML.getChildren("Attribute");
+            Iterator attributesXMLIterator = attributesXML.iterator();
+            // Get and iterate over the attribute objects in the XML
+            while (attributesXMLIterator.hasNext()) {
+                Element attributeXML = (Element) attributesXMLIterator.next();
+                int seenAlready = 0;
+                QueryElement pseudoAttObj = null;
 
-            for (Element attributeXML : attributesXML) {
-                List<String> linkAttributeNames = new ArrayList<String>();
-
-                for (final Dataset dataset : datasets.keySet()) {
-                    if (configName == null) {
-                        configName = dataset.getParent().getName();
+                ArrayList<String> linkAttributeNames = new ArrayList<String>();
+                for (Dataset dataset : datasets.keySet()) {
+                    if (config == null) {
+                        config = dataset.getParent().getName();
                     }
-                    String name = StringEscapeUtils.escapeSql(attributeXML.getAttributeValue("name"));
-                    Attribute attribute = dataset.getAttributeByName(name, configName, userGroup);
+                    Attribute attribute = dataset.getAttributeByName(attributeXML.getAttributeValue("name"), config, this.userGroup);
 
                     if (attribute == null) {
+                        Log.error("Attribute " + attributeXML.getAttributeValue("name") + " not found in " + dataset.getDisplayName());
                         throw new ValidationException("Attribute " + attributeXML.getAttributeValue("name") + " not found in " + dataset.getDisplayName());
                     }
 
-                    if (attribute.isAttributeList()) {
-                        for (Attribute subAttribute : attribute.getAttributeList()) {
-                            QueryElement pseudoAttObj = processAttribute(seenAttributes, dataset, subAttribute, isMultiple, processLinkOut, linkAttributeNames);
-                            if (pseudoAttObj != null) {
-                                pseudoAttributes.add(pseudoAttObj);
+                    if (isMultiple) {
+                        queryElementList.add(0, new QueryElement(attribute, dataset));
+                    } else {
+                        queryElementList.add(new QueryElement(attribute, dataset));
+                    }
+
+                    // add the atts only once if its a Union, not as many times as number of datasets in union
+                    if (seenAlready == 0) {
+                        this.originalAttributeOrder.add(new QueryElement(attribute, dataset));
+                        seenAlready = 1;
+                        if (!attribute.getValue().equals("")) {
+                            pseudoAttObj = new QueryElement(attribute, dataset);
+                        }
+
+                        // Add all of the linkAttributes for this attribute to the set of linkAttributes, for use in the code below outside the loop
+                        if (processLinkOut) {
+                            String[] splitLinkOut = attribute.getLinkOutUrl().split("%", -1);
+                            if ((splitLinkOut.length % 2) == 0) {
+                                Log.error("Wrong number of delimiters in linkoutURL");
+                                throw new ValidationException("wrong number of delimiters in linkoutURL!");
+                            } else {
+                                for (int i = 1; (i + 1) < splitLinkOut.length; i += 2) {
+                                    if (!splitLinkOut[i].equals("s")) {
+                                        linkAttributeNames.add(splitLinkOut[i]);
+                                    }
+                                }
                             }
                         }
-                    } else {
-                        QueryElement pseudoAttObj = processAttribute(seenAttributes, dataset, attribute, isMultiple, processLinkOut, linkAttributeNames);
-                        if (pseudoAttObj != null) {
-                            pseudoAttributes.add(pseudoAttObj);
-                        }
                     }
-                }
+                    if (seenAlready == 1 && !attribute.getValue().equals("") /*&& !this.pseudoAttributeNames.contains(attribute.getName())*/) {
+                        pseudoAttObj.setPseudoAttributeValue(dataset);
+                        Log.info("PSEUDO attribute's value: " + attribute.getValue(dataset));
+                    }
 
-                seenAttributes.clear();
+
+                }
+                if (pseudoAttObj != null) {
+                    this.pseudoAttributes.add(pseudoAttObj);
+                }
 
                 // This if loop adds the attributes that are present in the linkOutURL property of the just-added attribute
                 // Note that special handling is required for pseudo-attributes present in the links to work properly
@@ -198,101 +220,68 @@ public class QueryValidator {
                 // The list of linkAttributes must be created in the previous loop because of the presence of the dataset object, which are ignored below
                 if (processLinkOut) {
                     for (String linkAttributeName : linkAttributeNames) {
-                        for (final Dataset dataset : datasets.keySet()) {
+                        seenAlready = 0;
+                        QueryElement linkPseudoAttObj = null;
+                        for (Dataset dataset : datasets.keySet()) {
 
-                            Attribute linkAttribute = dataset.getAttributeByName(linkAttributeName, configName, userGroup);
-
+                            Attribute linkAttribute = dataset.getAttributeByName(linkAttributeName, config, this.userGroup);
                             if (linkAttribute == null) {
+                                Log.error("Link attribute " + linkAttributeName + " from " + attributeXML.getAttributeValue("name") + " not found in " + dataset.getDisplayName());
                                 throw new ValidationException("Link attribute " + linkAttributeName + " from " + attributeXML.getAttributeValue("name") + " not found in " + dataset.getDisplayName());
-                            }
-                            if (linkAttribute.isAttributeList()) {
-                                throw new ValidationException("Link attribute cannot be a list: " + linkAttributeName);
-                            }
+                            } else {
+                                if (isMultiple) {
+                                    queryElementList.add(0, new QueryElement(linkAttribute, dataset));
+                                } else {
+                                    queryElementList.add(new QueryElement(linkAttribute, dataset));
+                                }
 
-                            QueryElement pseudoAttObj = processAttribute(seenAttributes, dataset, linkAttribute, isMultiple, false, null);
-
-                            if (pseudoAttObj != null) {
-                                pseudoAttributes.add(pseudoAttObj);
+                                // add the atts only once if its a Union, not as many times as number of datasets in union
+                                if (seenAlready == 0) {
+                                    this.originalAttributeOrder.add(new QueryElement(linkAttribute, dataset));
+                                    seenAlready = 1;
+                                    if (!linkAttribute.getValue().equals("")) {
+                                        linkPseudoAttObj = new QueryElement(linkAttribute, dataset);
+                                    }
+                                }
+                                if (seenAlready == 1 && !linkAttribute.getValue().equals("") /*&& !this.pseudoAttributeNames.contains(attribute.getName())*/) {
+                                    linkPseudoAttObj.setPseudoAttributeValue(dataset);
+                                    Log.info("PSEUDO attribute's value: " + linkAttribute.getValue(dataset));
+                                }
                             }
+                        }
+                        if (linkPseudoAttObj != null && !this.pseudoAttributes.contains(linkPseudoAttObj)) {
+                            this.pseudoAttributes.add(linkPseudoAttObj);
                         }
                     }
                 }
-                seenAttributes.clear();
-
             }
 
             // Check and add filters
-            List filtersXML = datasetElement.getChildren("Filter");
+            List filtersXML = datasetXML.getChildren("Filter");
             Iterator filtersXMLIterator = filtersXML.iterator();
             // Get and iterate over the filter objects in the XML
             while (filtersXMLIterator.hasNext()) {
                 Element filterXML = (Element) filtersXMLIterator.next();
                 for (Dataset dataset : datasets.keySet()) {
-                    String name = StringEscapeUtils.escapeSql(filterXML.getAttributeValue("name"));
-                    String value = StringEscapeUtils.escapeSql(filterXML.getAttributeValue("value"));
-
-                    Filter filter = dataset.getFilterByName(name, configName, userGroup);
-
+                    //System.err.println("\tFilter: " + filterXML.getAttributeValue("name") + ", " + filterXML.getAttributeValue("value"));
+                    Filter filter = dataset.getFilterByName(filterXML.getAttributeValue("name"), config, this.userGroup);
                     //LinkIndices test = new LinkIndices(this.registryObj, filter, dataset.getDisplayName()());
-
                     if (filter == null) {
-                        throw new ValidationException("Filter " + name + " not found in " + dataset.getDisplayName());
+                        Log.error("Filter " + filterXML.getAttributeValue("name") + " not found in " + dataset.getDisplayName());
+                        throw new ValidationException("Filter " + filterXML.getAttributeValue("name") + " not found in " + dataset.getDisplayName());
                     }
                     if (isMultiple) {
-                        queryElementList.add(0, new QueryElement(filter, value, dataset));
+                        queryElementList.add(0, new QueryElement(filter, filterXML.getAttributeValue("value"), dataset));
                     } else {
-                        queryElementList.add(new QueryElement(filter, value, dataset));
+                        queryElementList.add(new QueryElement(filter, filterXML.getAttributeValue("value"), dataset));
                     }
                 }
             }
             isFirst = false;
         }
-        if (queryStartingPoints.isEmpty()) {
-            queryStartingPoints.add(firstName);
+        if (this.queryStartingPoints.isEmpty()) {
+            this.queryStartingPoints.add(firstName);
         }
-    }
-
-    private QueryElement processAttribute(final Set<String> seenAttributes, final Dataset dataset, final Attribute attribute,
-                final boolean isMultiple, final boolean processLinkOut, final List<String> linkAttributeNames) {
-        QueryElement pseudoAttObj = null;
-
-        if (isMultiple) {
-            queryElementList.add(0, new QueryElement(attribute, dataset));
-        } else {
-            queryElementList.add(new QueryElement(attribute, dataset));
-        }
-
-        // add the atts only once if its a Union, not as many times as number of datasets in union
-        if (!seenAttributes.contains(attribute.getName())) {
-
-            seenAttributes.add(attribute.getName());
-
-            attributeList.add(attribute.getAttributeList(new ArrayList<String>(){{add(dataset.getName());}}).size());
-            originalAttributeOrder.add(new QueryElement(attribute, dataset));
-
-            // Add all of the linkAttributes for this attribute to the set of linkAttributes, for use in the code below outside the loop
-            if (processLinkOut) {
-                String[] splitLinkOut = attribute.getLinkOutUrl().split("%", -1);
-                if ((splitLinkOut.length % 2) == 0) {
-                    Log.error("Wrong number of delimiters in linkoutURL");
-                    throw new ValidationException("wrong number of delimiters in linkoutURL!");
-                } else {
-                    for (int i = 1; (i + 1) < splitLinkOut.length; i += 2) {
-                        if (!splitLinkOut[i].equals("s")) {
-                            linkAttributeNames.add(splitLinkOut[i]);
-                        }
-                    }
-                }
-            }
-           
-            if (!"".equals(attribute.getValue()) /*&& !this.pseudoAttributeNames.contains(attribute.getName())*/) {
-                pseudoAttObj = new QueryElement(attribute, dataset);
-                pseudoAttObj.setPseudoAttributeValue(dataset);
-                Log.info("PSEUDO attribute's value: " + attribute.getValue(dataset));
-            }
-        }  
-
-        return pseudoAttObj;
     }
 
     public List<QueryElement> getOriginalAttributeOrder() {
