@@ -76,22 +76,25 @@ public class SequenceTest {
                 + "</Query>";
 
         OutputStream seqOut = new ByteArrayOutputStream();
-        OutputStream bufOut = new ByteArrayOutputStream();
-
-        _portal.executeQuery(xml, bufOut);
-
-        bufOut.flush();
-        bufOut.close();
 
         SequenceParser parser = new CDNAParser();
 
         parser
+            .setOutputStream(seqOut)
             .setExtraAttributes(2)
             .setDatabaseConnection(_jdbcURL, _tableName, _username, _password)
-            .streamSequence(bufOut, seqOut);
+            .validate()
+            .startUp();
+
+        OutputStream out = parser.getCallbackOutputStream();
+
+        _portal.executeQuery(xml, out);
+
+        parser.shutDown();
 
         String results = seqOut.toString();
         System.out.println(results);
+
         assertTrue("ID is present", results.contains("ENSG00000004478"));
         assertTrue("Sequence is available", !results.contains("Sequence unavailable"));
     }
@@ -131,13 +134,22 @@ public class SequenceTest {
         SequenceParser parser = new CodingGeneFlankParser();
 
         parser
-            .setExtraAttributes(2)
+            .setOutputStream(seqOut)
             .setDownstreamFlank(100)
+            .setExtraAttributes(2)
             .setDatabaseConnection(_jdbcURL, _tableName, _username, _password)
-            .streamSequence(bufOut, seqOut);
+            .validate()
+            .startUp();
+
+        OutputStream out = parser.getCallbackOutputStream();
+
+        _portal.executeQuery(xml, out);
+
+        parser.shutDown();
 
         String results = seqOut.toString();
         System.out.println(results);
+
         assertTrue("ID is present", results.contains("ENSG00000004478"));
         assertTrue("Sequence is available", !results.contains("Sequence unavailable"));
     }
@@ -176,12 +188,21 @@ public class SequenceTest {
         SequenceParser parser = new CodingParser();
 
         parser
+            .setOutputStream(seqOut)
             .setExtraAttributes(2)
             .setDatabaseConnection(_jdbcURL, _tableName, _username, _password)
-            .streamSequence(bufOut, seqOut);
+            .validate()
+            .startUp();
+
+        OutputStream out = parser.getCallbackOutputStream();
+
+        _portal.executeQuery(xml, out);
+
+        parser.shutDown();
 
         String results = seqOut.toString();
         System.out.println(results);
+
         assertTrue("ID is present", results.contains("ENSG00000004478"));
         assertTrue("Sequence is available", !results.contains("Sequence unavailable"));
     }
@@ -222,12 +243,21 @@ public class SequenceTest {
         SequenceParser parser = new PeptideParser();
 
         parser
+            .setOutputStream(seqOut)
             .setExtraAttributes(2)
             .setDatabaseConnection(_jdbcURL, _tableName, _username, _password)
-            .streamSequence(bufOut, seqOut);
+            .validate()
+            .startUp();
+
+        OutputStream out = parser.getCallbackOutputStream();
+
+        _portal.executeQuery(xml, out);
+
+        parser.shutDown();
 
         String results = seqOut.toString();
         System.out.println(results);
+
         assertTrue("ID is present", results.contains("ENSG00000004478"));
         assertTrue("Sequence is available", !results.contains("Sequence unavailable"));
     }
@@ -266,12 +296,21 @@ public class SequenceTest {
 
         parser
             .setDownstreamFlank(100)
+            .setOutputStream(seqOut)
             .setExtraAttributes(2)
             .setDatabaseConnection(_jdbcURL, _tableName, _username, _password)
-            .streamSequence(bufOut, seqOut);
+            .validate()
+            .startUp();
+
+        OutputStream out = parser.getCallbackOutputStream();
+
+        _portal.executeQuery(xml, out);
+
+        parser.shutDown();
 
         String results = seqOut.toString();
         System.out.println(results);
+
         assertTrue("ID is present", results.contains("ENSG00000004478"));
         assertTrue("Sequence is available", !results.contains("Sequence unavailable"));
     }
@@ -309,12 +348,21 @@ public class SequenceTest {
         SequenceParser parser = new FiveUTRParser();
 
         parser
+            .setOutputStream(seqOut)
             .setExtraAttributes(2)
             .setDatabaseConnection(_jdbcURL, _tableName, _username, _password)
-            .streamSequence(bufOut, seqOut);
+            .validate()
+            .startUp();
+
+        OutputStream out = parser.getCallbackOutputStream();
+
+        _portal.executeQuery(xml, out);
+
+        parser.shutDown();
 
         String results = seqOut.toString();
         System.out.println(results);
+
         assertTrue("ID is present", results.contains("ENSG00000004478"));
         assertTrue("Sequence is available", !results.contains("Sequence unavailable"));
     }
@@ -347,12 +395,21 @@ public class SequenceTest {
         SequenceParser parser = new GeneExonIntronParser();
 
         parser
+            .setOutputStream(seqOut)
             .setExtraAttributes(2)
             .setDatabaseConnection(_jdbcURL, _tableName, _username, _password)
-            .streamSequence(bufOut, seqOut);
+            .validate()
+            .startUp();
+
+        OutputStream out = parser.getCallbackOutputStream();
+
+        _portal.executeQuery(xml, out);
+
+        parser.shutDown();
 
         String results = seqOut.toString();
         System.out.println(results);
+
         assertTrue("ID is present", results.contains("ENSG00000004478"));
         assertTrue("Sequence is available", !results.contains("Sequence unavailable"));
     }
@@ -384,12 +441,21 @@ public class SequenceTest {
         SequenceParser parser = new TranscriptExonIntronParser();
 
         parser
+            .setOutputStream(seqOut)
             .setExtraAttributes(2)
             .setDatabaseConnection(_jdbcURL, _tableName, _username, _password)
-            .streamSequence(bufOut, seqOut);
+            .validate()
+            .startUp();
+
+        OutputStream out = parser.getCallbackOutputStream();
+
+        _portal.executeQuery(xml, out);
+
+        parser.shutDown();
 
         String results = seqOut.toString();
         System.out.println(results);
+
         assertTrue("ID is present", results.contains("ENSG00000004478"));
         assertTrue("Sequence is available", !results.contains("Sequence unavailable"));
     }
@@ -422,12 +488,21 @@ public class SequenceTest {
 
         parser
             .setDownstreamFlank(100)
+            .setOutputStream(seqOut)
             .setExtraAttributes(2)
             .setDatabaseConnection(_jdbcURL, _tableName, _username, _password)
-            .streamSequence(bufOut, seqOut);
+            .validate()
+            .startUp();
+
+        OutputStream out = parser.getCallbackOutputStream();
+
+        _portal.executeQuery(xml, out);
+
+        parser.shutDown();
 
         String results = seqOut.toString();
         System.out.println(results);
+
         assertTrue("ID is present", results.contains("ENSG00000004478"));
         assertTrue("Sequence is available", !results.contains("Sequence unavailable"));
     }
@@ -461,12 +536,21 @@ public class SequenceTest {
 
         parser
             .setDownstreamFlank(100)
+            .setOutputStream(seqOut)
             .setExtraAttributes(2)
             .setDatabaseConnection(_jdbcURL, _tableName, _username, _password)
-            .streamSequence(bufOut, seqOut);
+            .validate()
+            .startUp();
+
+        OutputStream out = parser.getCallbackOutputStream();
+
+        _portal.executeQuery(xml, out);
+
+        parser.shutDown();
 
         String results = seqOut.toString();
         System.out.println(results);
+
         assertTrue("ID is present", results.contains("ENSG00000004478"));
         assertTrue("Sequence is available", !results.contains("Sequence unavailable"));
     }
@@ -504,12 +588,21 @@ public class SequenceTest {
         SequenceParser parser = new ThreeUTRParser();
 
         parser
+            .setOutputStream(seqOut)
             .setExtraAttributes(2)
             .setDatabaseConnection(_jdbcURL, _tableName, _username, _password)
-            .streamSequence(bufOut, seqOut);
+            .validate()
+            .startUp();
+
+        OutputStream out = parser.getCallbackOutputStream();
+
+        _portal.executeQuery(xml, out);
+
+        parser.shutDown();
 
         String results = seqOut.toString();
         System.out.println(results);
+
         assertTrue("ID is present", results.contains("ENSG00000004478"));
         assertTrue("Sequence is available", !results.contains("Sequence unavailable"));
     }

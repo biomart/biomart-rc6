@@ -1,7 +1,6 @@
 package org.biomart.objects.objects;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import org.biomart.common.utils.XMLElements;
@@ -35,7 +34,7 @@ public class Options {
 			return null;
 		}
 		@SuppressWarnings("unchecked")
-		List<Element> martElementList = this.optionRoot.getChildren();
+		List<Element> martElementList = this.getOptionRootElement().getChildren();
 		//find mart element
 		Element martElement = null;
 		for(Element element: martElementList) {
@@ -148,7 +147,7 @@ public class Options {
 			//create a martElement, configElement, filterElement
 			martElement = new Element(XMLElements.MART.toString());
 			martElement.setAttribute(XMLElements.NAME.toString(),mart.getName());
-			this.optionRoot.addContent(martElement);
+			this.getOptionRootElement().addContent(martElement);
 		} 
 		//get master config element
 		Element configElement = getConfigElement(config, martElement);
@@ -169,8 +168,7 @@ public class Options {
 			filterElement.addContent(datasetElement);
 			for(FilterData fd: fdList) {
 				Element valueElement = new Element(XMLElements.ROW.toString());
-				String dataStr = fd.getName()+"|"+fd.getDisplayName()+"|"+((Boolean)fd.isSelected()).toString();
-				valueElement.setAttribute(XMLElements.DATA.toString(),dataStr);
+				valueElement.setAttribute(XMLElements.DATA.toString(),fd.toSavedFormat());
 				datasetElement.addContent(valueElement);
 			}			
 		} else {
@@ -194,8 +192,7 @@ public class Options {
 			}	
 			for(FilterData fd: newFdList) {
 				Element valueElement = new Element(XMLElements.ROW.toString());
-				String dataStr = fd.getName()+"|"+fd.getDisplayName()+"|"+((Boolean)fd.isSelected()).toString();
-				valueElement.setAttribute(XMLElements.DATA.toString(),dataStr);
+				valueElement.setAttribute(XMLElements.DATA.toString(),fd.toSavedFormat());
 				datasetElement.addContent(valueElement);
 			}						
 		}
@@ -219,7 +216,7 @@ public class Options {
 		//check if it already exist
 		if(this.getMartElementByName(martElement.getAttributeValue(XMLElements.NAME.toString())) !=null)
 			return;
-		this.optionRoot.addContent(martElement);
+		this.getOptionRootElement().addContent(martElement);
 	}
 	
 	public Element getOptionRootElement() {

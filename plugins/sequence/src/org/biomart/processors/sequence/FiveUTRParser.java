@@ -4,12 +4,36 @@ import java.io.IOException;
 import java.util.List;
 import java.util.TreeMap;
 import org.biomart.common.exceptions.ValidationException;
+import org.biomart.common.resources.Log;
 
 /**
  *
  * @author jhsu, jguberman
  */
 public class FiveUTRParser extends SequenceParser {
+    private static final int transcriptIDField = 0;
+    private static final int chrField = 1;
+    private static final int startField = 2;
+    private static final int endField = 3;
+    private static final int codingOffsetField = 4;
+    private static final int strandField = 6;
+    private static final int exonIDField = 7;
+    private static final int rankField = 8;
+    private static final int terminalExonField = 9;
+
+    // These TreeMaps will keep track of the exons before the start_exon
+    private TreeMap<Integer, Integer> start = new TreeMap<Integer, Integer>();
+    private TreeMap<Integer, Integer> end = new TreeMap<Integer, Integer>();
+
+    private String transcriptID = null;
+    private String terminalExonID = null;
+    private int terminalExonRank = 0;
+    private String exonID = null;
+    private String chr = null;
+    private int codingOffset = 0;
+    private int currentRank = 0;
+    private String strand = null;
+
     public FiveUTRParser() {
         super(11);
     }
@@ -26,68 +50,42 @@ public class FiveUTRParser extends SequenceParser {
 	 * @throws IOException
 	 */
     @Override
-	public void parse(List<List<String>> inputQuery) throws IOException{
-		// "5' UTR"
+	public String parseLine(String[] line) {
+        String results = "";
+        exonID = line[exonIDField];
 
-		final int transcriptIDField = 0;
-		final int chrField = 1;
-		final int startField = 2;
-		final int endField = 3;
-		final int codingOffsetField = 4;
-		final int strandField = 6;
-		final int exonIDField = 7;
-		final int rankField = 8;
-		final int terminalExonField = 9;
-
-        boolean done = false;
-
-		// These TreeMaps will keep track of the exons before the start_exon
-		TreeMap<Integer, Integer> start = new TreeMap<Integer, Integer>();
-		TreeMap<Integer, Integer> end = new TreeMap<Integer, Integer>();
-
-		String transcriptID = null;
-		String terminalExonID = null;
-		int terminalExonRank = 0;
-		String exonID = null;
-		String chr = null;
-		int codingOffset = 0;
-		int currentRank = 0;
-		String strand = null;
-
-		for(List<String> line : inputQuery){
-			exonID = line.get(exonIDField);
-			if (!line.get(transcriptIDField).equals(transcriptID)){
-				//If it's a new transcript, print the current sequence
-                if (transcriptID != null) {
-                    done = print5UTR(getHeader(), chr, start, end, codingOffset, terminalExonRank, strand);
-                }
-				transcriptID = line.get(transcriptIDField);
-				terminalExonID = line.get(terminalExonField);
-				terminalExonRank = 0;
-				chr = "";
-				start.clear();
-				end.clear();
-				strand = line.get(strandField);
-                clearHeader();
-                if (done) {
-                    break;
-                }
-			}
-			currentRank = Integer.parseInt(line.get(rankField))-1; // Subtract 1 to convert to zero indexing
-			start.put(currentRank, Integer.parseInt(line.get(startField)));
-			end.put(currentRank, Integer.parseInt(line.get(endField)));
-			if (exonID.equals(terminalExonID)){
-				// If it's the terminal exon, record the chromosome and codingOffset
-				chr = line.get(chrField);
-				codingOffset = Integer.parseInt(line.get(codingOffsetField));
-				terminalExonRank = currentRank;
-			}
-            storeHeaderInfo(line);
-		}
-        if (!done) {
-            print5UTR(getHeader(), chr, start, end, codingOffset,terminalExonRank, strand);
+        if (!line[transcriptIDField].equals(transcriptID)){
+            //If it's a new transcript, print the current sequence
+            if (transcriptID != null) {
+                results = get5UTR(getHeader(), chr, start, end, codingOffset, terminalExonRank, strand);
+            }
+            transcriptID = line[transcriptIDField];
+            terminalExonID = line[terminalExonField];
+            terminalExonRank = 0;
+            chr = "";
+            start.clear();
+            end.clear();
+            strand = line[strandField];
+            clearHeader();
         }
+        currentRank = Integer.parseInt(line[rankField])-1; // Subtract 1 to convert to zero indexing
+        start.put(currentRank, Integer.parseInt(line[startField]));
+        end.put(currentRank, Integer.parseInt(line[endField]));
+        if (exonID.equals(terminalExonID)){
+            // If it's the terminal exon, record the chromosome and codingOffset
+            chr = line[chrField];
+            codingOffset = Integer.parseInt(line[codingOffsetField]);
+            terminalExonRank = currentRank;
+        }
+        storeHeaderInfo(line);
+
+        return results;
 	}
+
+    @Override
+    public String parseLast() {
+        return get5UTR(getHeader(), chr, start, end, codingOffset, terminalExonRank, strand);
+    }
 
 	/**
 	 * Retrieves and prints sequence for QueryType TRANSCRIPT_EXON_INTRON
@@ -99,35 +97,30 @@ public class FiveUTRParser extends SequenceParser {
 	 * @param strand	Sequence strand.
 	 * @throws IOException
 	 */
-	protected final boolean print5UTR(String header, String chr,
+	protected final String get5UTR(String header, String chr,
             TreeMap<Integer, Integer> start, TreeMap<Integer, Integer> end,
-            int codingOffset,int terminalExonRank, String strand) throws IOException {
-        try {
-            StringBuilder sequence = new StringBuilder();
-            if (!chr.equals("")){
-                if (strand.equals("-1")){
-                    if(!(getSequence(chr,end.get(terminalExonRank)-codingOffset+2,end.get(terminalExonRank)).equals(""))){
-                        sequence.append(reverseComplement(getSequence(chr,end.get(0)+1,end.get(0)+upstreamFlank)));
-                        for (int i = 0; i < terminalExonRank; i++){
-                            sequence.append(reverseComplement(getSequence(chr, start.get(i), end.get(i))));
-                        }
-                        sequence.append(reverseComplement(getSequence(chr,end.get(terminalExonRank)-codingOffset+2-downstreamFlank,end.get(terminalExonRank))));
+            int codingOffset,int terminalExonRank, String strand) {
+        StringBuilder sequence = new StringBuilder();
+        if (!chr.equals("")){
+            if (strand.equals("-1")){
+                if(!(getSequence(chr,end.get(terminalExonRank)-codingOffset+2,end.get(terminalExonRank)).equals(""))){
+                    sequence.append(reverseComplement(getSequence(chr,end.get(0)+1,end.get(0)+upstreamFlank)));
+                    for (int i = 0; i < terminalExonRank; i++){
+                        sequence.append(reverseComplement(getSequence(chr, start.get(i), end.get(i))));
                     }
-                } else {
-                    if(!(getSequence(chr,start.get(terminalExonRank),start.get(terminalExonRank)+codingOffset-2).equals(""))){
-                        sequence.append(getSequence(chr,start.get(0)-upstreamFlank,start.get(0)-1));
-                        for (int i = 0; i < terminalExonRank; i++){
-                            sequence.append((getSequence(chr, start.get(i), end.get(i))));
-                        }
-                        sequence.append(getSequence(chr,start.get(terminalExonRank),start.get(terminalExonRank)+codingOffset-2+downstreamFlank));
+                    sequence.append(reverseComplement(getSequence(chr,end.get(terminalExonRank)-codingOffset+2-downstreamFlank,end.get(terminalExonRank))));
+                }
+            } else {
+                if(!(getSequence(chr,start.get(terminalExonRank),start.get(terminalExonRank)+codingOffset-2).equals(""))){
+                    sequence.append(getSequence(chr,start.get(0)-upstreamFlank,start.get(0)-1));
+                    for (int i = 0; i < terminalExonRank; i++){
+                        sequence.append((getSequence(chr, start.get(i), end.get(i))));
                     }
+                    sequence.append(getSequence(chr,start.get(terminalExonRank),start.get(terminalExonRank)+codingOffset-2+downstreamFlank));
                 }
             }
-            return printFASTA(sequence.toString(), header);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return printFASTA(SEQUENCE_UNAVAILABLE, header);
         }
-	}
+        return getFASTA(sequence.toString(), header);
+    }
 
 }

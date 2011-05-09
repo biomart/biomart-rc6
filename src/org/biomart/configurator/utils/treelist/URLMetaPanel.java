@@ -34,9 +34,14 @@ public class URLMetaPanel extends JPanel {
 	private String baseUrl;
 	private List<MartInVirtualSchema> martList;
 	private LeafCheckBoxList subList;
-
+	private URLDataLinkPanel parentPanel;
 	
-	public URLMetaPanel() {
+	public URLDataLinkPanel getParentPanel() {
+		return parentPanel;
+	}
+
+	public URLMetaPanel(URLDataLinkPanel parent) {
+		parentPanel = parent;
 		init();
 	}
 	

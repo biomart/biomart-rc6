@@ -2,8 +2,8 @@ package org.biomart.processors.sequence;
 
 import static org.junit.Assert.fail;
 
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,9 +18,14 @@ import org.biomart.processors.TSV;
  * @author Anthony Cros
  * class to test sequences
  * arguments are self-explanatory
+ * scp -r ~/workspace/biomart-java5/bin/ $BT:~/JIRA/DCCTEST-1198/biomart-java5/
+ * java -Xmx4096m -Xms4096m -ea -cp `find $PWD/lib -type f -name '*.jar' | tr "\n" ":"`./bin org.biomart.processors.sequence.SequenceMain
+ * java -Xmx4096m -Xms4096m -ea -cp `find $PWD/lib -type f -name '*.jar' | tr "\n" ":"`./bin org.biomart.processors.sequence.SequenceMain $HOME/sequence.bm8 usg 400 600 '' mmusculus ALL_CHROMOSOMES
+ * java -Xmx1024m -Xms1024m -ea -cp `find $PWD/lib -type f -name '*.jar' | tr "\n" ":"`./bin org.biomart.processors.sequence.SequenceMain $HOME/sequence.bm8 usg 400 600 '' mmusculus ALL_CHROMOSOMES
  */
 public class SequenceMain {
-
+	
+	public static String ALL_CHROMOSOMES = "ALL_CHROMOSOMES";	// [cBM1104250948]
     static {
         System.setProperty("biomart.debug", "true");
         System.setProperty("log.level", "debug");
@@ -28,6 +33,7 @@ public class SequenceMain {
 
     public static void main(String[] args) throws Exception {
     	
+    	String outputFile = null;
     	String operation = null;
     	Integer upstreamFlank = null;
     	Integer downstreamFlank = null;
@@ -36,22 +42,24 @@ public class SequenceMain {
     	String chromosome = null;
     	
     	if (args.length==0) {
-	    	operation = "fcrg";
-	    	upstreamFlank = 0;
-	    	downstreamFlank = 80;
-	    	ids = "ENSG00000101204";
-	    	species = "hsapiens";
-	    	chromosome = "20";
+    		outputFile = System.getProperty("user.home") + "/" + "sequence.bm8";
+	    	operation = "usg";
+	    	upstreamFlank = 600;
+	    	downstreamFlank = 400;
+	    	ids = "";//"ENST00000511002";//"ENST00000373345";//ENSMUST00000169191"; //;
+	    	species = "hsapiens";//"hsapiens";//"dmelanogaster";	//"mmusculus";
+	    	chromosome = "20";	//"";//YHet";//ALL_CHROMOSOMES;
     	} else {
-	    	operation = args[0];
-	    	upstreamFlank = Integer.valueOf(args[1]);
-	    	downstreamFlank = Integer.valueOf(args[2]);
-	    	ids = args[3];
-	    	species = args[4];
-	    	chromosome = args[5];
+    		outputFile = args[0];
+	    	operation = args[1];
+	    	upstreamFlank = Integer.valueOf(args[2]);
+	    	downstreamFlank = Integer.valueOf(args[3]);
+	    	ids = args[4];
+	    	species = args[5];
+	    	chromosome = args.length==6 ? "" : args[6];
     	}
     	
-		process(operation, upstreamFlank, downstreamFlank, ids, species, chromosome);
+		process(outputFile, operation, upstreamFlank, downstreamFlank, ids, species, chromosome);
 	}
 
 	private static String getCode(String operation) {
@@ -84,7 +92,7 @@ public class SequenceMain {
 		return code;
 	}
 	
-	private static void process(String operation, int upstreamFlank, int downstreamFlank, String ids, String species2, String chromosome) throws Exception {
+	private static void process(String outputFile, String operation, int upstreamFlank, int downstreamFlank, String ids, String species2, String chromosome) throws Exception {
 		List<String> idList = ids==null || ids.isEmpty() || ids.equals("\"\"") ?
 			new ArrayList<String>() : 
 			new ArrayList<String>(Arrays.asList(ids.split(",")));
@@ -93,10 +101,11 @@ public class SequenceMain {
 		System.err.println("xmlQuery = " + xmlQuery);
     	
 		Portal portal = initialize();
-    	
-		String output = executeQuery(portal, xmlQuery);
-		System.out.println(output);
-    	
+
+		FileOutputStream seqOut = new FileOutputStream(new File(outputFile));
+		portal.executeQuery(xmlQuery, seqOut);
+		seqOut.close();
+				
 		System.exit(0);
 	}
 
@@ -110,8 +119,11 @@ public class SequenceMain {
 		Portal portal = null;
 		try {
 			MartRegistryFactory factory = new XmlMartRegistryFactory(
-				"./testdata/sequence.xml",
-				"./testdata/.sequence"
+				/*"./testdata/sequence.xml",
+				"./testdata/.sequence"*/
+				
+				"./registry/CentralPortal.xml",
+				"./registry/.CentralPortal"
 			);	
 			portal = new Portal(factory);
 		} catch(Exception e) {
@@ -121,14 +133,6 @@ public class SequenceMain {
 		ProcessorRegistry.register("Sequence", Sequence.class);
 		ProcessorRegistry.register("TSV", TSV.class);
 		return portal;
-	}
-
-	private static String executeQuery(Portal portal, String xmlQuery) throws Exception {
-		OutputStream seqOut = new ByteArrayOutputStream();
-		portal.executeQuery(xmlQuery, seqOut);
-		seqOut.close();
-		String output = seqOut.toString();
-		return output;
 	}
 
 	private static String buildXmlQuery(String operation, int upstreamFlank, int downstreamFlank, List<String> idList, String species2, String chromosome) {
@@ -144,6 +148,8 @@ public class SequenceMain {
 			filter = id_type>1 ? 
 				"<Filter name=\"ensembl_transcript_id\" value=\"" + ids + "\"/>" : 
 				"<Filter name=\"ensembl_gene_id\" value=\"" + ids + "\"/>";
+		} else if (ALL_CHROMOSOMES.equals(chromosome)) {
+			filter = "";
 		} else {
 			filter = "<Filter name=\"chromosome_name\" value=\"" + chromosome + "\"/>";
 		}

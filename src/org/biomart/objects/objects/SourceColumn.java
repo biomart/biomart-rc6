@@ -25,6 +25,7 @@ public class SourceColumn extends Column {
 	public Element generateXml() {
 		org.jdom.Element element = new org.jdom.Element(XMLElements.COLUMN.toString());
 		element.setAttribute(XMLElements.NAME.toString(),this.getName());
+		element.setAttribute(XMLElements.HIDE.toString(),this.getPropertyValue(XMLElements.HIDE));
 		if(!this.getRange().isEmpty()) {
 			element.setAttribute(XMLElements.INPARTITIONS.toString(),McUtils.StrListToStr(this.getRange(), ","));
 		}else

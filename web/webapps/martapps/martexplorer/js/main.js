@@ -599,8 +599,8 @@ $.namespace('biomart.martexplorer', function(self) {
         if (hasSetFilters) {
             queue.queue(function() {
                 var params = {datasets: biomart._state.queryMart.datasets.join(',')};
-                if (biomart._state.mart.config)
-                    params.config = biomart._state.mart.config;
+                if (biomart._state.queryMart.config)
+                    params.config = biomart._state.queryMart.config;
                 biomart.resource.load('filters', function(json) {
                     for (var i=0, f, v; f=json[i]; i++) {
                         if (v = biomart._state.queryMart.filters[f.name]) {
@@ -615,8 +615,8 @@ $.namespace('biomart.martexplorer', function(self) {
         if (hasSetAttributes) {
             queue.queue(function() {
                 var params = {datasets: biomart._state.queryMart.datasets.join(',')};
-                if (biomart._state.mart.config)
-                    params.config = biomart._state.mart.config;
+                if (biomart._state.queryMart.config)
+                    params.config = biomart._state.queryMart.config;
                 biomart.resource.load('attributes', function(json) {
                     for (var i=0, a; a=json[i]; i++) {
                         if (biomart._state.queryMart.attributes[a.name]) {
@@ -747,10 +747,19 @@ $.namespace('biomart.martexplorer', function(self) {
     }
 
     function updateMart(item) {
+        var name;
+
         biomart._state.mart = item;
+
+        if ($.isArray(item)) {
+            name = item[0].group;
+        } else {
+            name = item.name;
+        }
+
         // reset all selections
         biomart._state.queryMart = { dataset: null, attributes:{}, filters: {} };
-        updateParam('mart', item.name);
+        updateParam('mart', name);
         updateParam('datasets', null);
         updateParam('attributes', null);
         updateParam('filters', null);
@@ -888,6 +897,8 @@ $.namespace('biomart.martexplorer', function(self) {
                     }
                 }
             } else {
+                var num = 0;
+
                 for (var k in json) {
                     var datasets = json[k],
                         mart;
@@ -900,12 +911,14 @@ $.namespace('biomart.martexplorer', function(self) {
                     }
 
                     for (var i=0, ds; ds=datasets[i]; i++) {
-                        selected = (dsArr.length && $.inArray(ds.name, dsArr) != -1) || (!dsArr.length && i==0);
+                        selected = (dsArr.length && $.inArray(ds.name, dsArr) != -1) || (num==0);
                         ds.mart = mart;
                         $(['<option value="', ds.name, '"', selected ? ' selected="selected"' : '', '>', ds.displayName, '</option>'].join(''))
                             .data('item', ds)
                             .appendTo(_elements.datasetSelect);
                     }
+
+                    num++;
                 }
             }
 

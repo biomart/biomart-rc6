@@ -335,5 +335,6 @@
 		<item name="description" editable="1" visible="1" autosave="true"/>
 		<item name="hide" editable="1" visible="1" autosave="true"/>
 		<item name="value" editable="1" visible="1" autosave="true"/>
+		<item name="uniqueid" editable="0" visible="1" autosave="true"/>
 	</node>	
 </config>

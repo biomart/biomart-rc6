@@ -109,6 +109,10 @@ public class JSON extends ProcessorImpl {
             ObjectMapper mapper = new ObjectMapper();
             String jsonRow = mapper.writeValueAsString(value);
 
+            if (streaming.value && !"".equals(callback.value)) {
+                jsonRow = callback.value + "(" + jsonRow + ")";
+            }
+
             out.write(jsonRow.getBytes());
 
             if (streaming.value) {
@@ -141,10 +145,10 @@ public class JSON extends ProcessorImpl {
 
     @Override
     public void beforeQuery(Query query, OutputStream outputHandle) throws IOException  {
+        originalOut = outputHandle;
 
         // store data if not streaming
         if (!streaming.value) {
-            originalOut = outputHandle;
             outputHandle = dataOut = new ByteArrayOutputStream();
         }
 
@@ -161,34 +165,38 @@ public class JSON extends ProcessorImpl {
 
     @Override
     public void afterQuery() {
-        if (streaming.value) {
-            return;
-        }
-
-        String results = dataOut.toString();
-        int total = ((JsonOutputStream)out).getTotal();
-
         try {
-            out.flush();
-            out.close();
+            int total = ((JsonOutputStream)out).getTotal();
 
-            if (isJsonp) {
-                originalOut.write((callback.value + "(").getBytes());
+            if (streaming.value) {
+                if (!"".equals(callback.value)) {
+                    originalOut.write((callback.value + "({\"status\":\"success\",\"total\":" + total + "})").getBytes());
+                } else {
+                    originalOut.write(("{\"status\":\"success\",\"total\":" + total + "}").getBytes());
+                }
+            } else {
+                out.flush();
+                out.close();
+
+                String results = dataOut.toString();
+
+                if (isJsonp) {
+                    originalOut.write((callback.value + "(").getBytes());
+                }
+
+                // Write header
+                originalOut.write(("{\"total\":" + total + ",\"data\":[").getBytes());
+
+                // Remove last trailing comma
+                originalOut.write(results.substring(0, results.length()-1).getBytes());
+
+                // End
+                originalOut.write("]}".getBytes());
+
+                if (isJsonp) {
+                    originalOut.write(")".getBytes());
+                }
             }
-
-            // Write header
-            originalOut.write(("{\"total\":" + total + ",\"data\":[").getBytes());
-
-            // Remove last trailing comma
-            originalOut.write(results.substring(0, results.length()-1).getBytes());
-
-            // End
-            originalOut.write("]}".getBytes());
-
-            if (isJsonp) {
-                originalOut.write(");".getBytes());
-            }
-
         } catch(IOException e) {
             throw new BioMartException("Error occurred during JSON output", e);
         }

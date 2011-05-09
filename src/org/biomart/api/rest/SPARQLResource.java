@@ -37,6 +37,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
+import org.apache.commons.lang.StringUtils;
 import org.biomart.api.Portal;
 import org.biomart.api.arq.QueryEngine;
 import org.biomart.api.arq.QueryMetaData;
@@ -51,6 +52,7 @@ import org.biomart.api.rdf.RDFObject;
 import org.biomart.api.rdf.RDFProperty;
 import org.biomart.common.exceptions.FunctionalException;
 import org.biomart.common.exceptions.TechnicalException;
+import org.biomart.common.resources.Log;
 
 /**
  *
@@ -124,7 +126,7 @@ public class SPARQLResource {
         }
     }
 
-    @Path("{format}/{mart}/get")
+    @Path("{mart}/{format}/get")
     @GET 
     public Response queryGetRequestWrapper(
             @QueryParam("callback") @DefaultValue("") String callback,
@@ -171,6 +173,8 @@ public class SPARQLResource {
 
         String queryString = request.getParameter("query");
         Query query = new com.hp.hpl.jena.query.Query();
+
+        Log.info("Incoming SPARQL query: " + queryString);
 
         try {
             new ParserSPARQL11().parse(query, queryString);
@@ -361,6 +365,37 @@ public class SPARQLResource {
         return ref.replaceFirst("^http:", "biomart:");
     }
 
+    private static void concatRDFClassList(StringBuilder string, List<RDFClass> classes, int indent) {
+        RDFClass rdfClass = classes.remove(0);
+
+        String indentString = StringUtils.repeat(" ", indent);
+
+        string.append(indentString);
+        string.append("          <rdf:List>\n");
+        string.append(indentString);
+        string.append("            <rdf:first>\n");
+        string.append(indentString);
+        string.append("              <rdf:type rdf:resource=\"" + rdfClass.getFullName() + "\" />\n");
+        string.append(indentString);
+        string.append("            </rdf:first>\n");
+
+        if (!classes.isEmpty()) {
+            string.append(indentString);
+            string.append("            <rdf:rest>\n");
+
+            concatRDFClassList(string, classes, indent + 2);
+
+            string.append(indentString);
+            string.append("            </rdf:rest>\n");
+        } else {
+            string.append(indentString);
+            string.append("            <rdf:rest rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#nil\" />\n");
+        }
+
+        string.append(indentString);
+        string.append("          </rdf:List>\n");
+    }
+
     public Response metadataGetRequest(
             @QueryParam("callback") @DefaultValue("") String callback,
             @PathParam("format") String format,
@@ -379,9 +414,11 @@ public class SPARQLResource {
 
         rdfOntology.append("\n");
 
-        rdfOntology.append("  xmlns:config=\"");
+        /*
+        rdfOntology.append("  xmlns:accesspoint=\"");
         rdfOntology.append(ontologyUri);
         rdfOntology.append("#\"\n");
+         */
 
         rdfOntology.append("  xmlns:class=\"");
         rdfOntology.append(site2Reference(ontologyUri));
@@ -399,53 +436,88 @@ public class SPARQLResource {
         rdfOntology.append(ontologyUri);
         rdfOntology.append("\"/>\n\n");
 
+        HashSet<RDFClass> allClasses = new HashSet<RDFClass>();
+
         for (Dataset datasetLite : mart.getDatasets()) {
 
             String dataset = datasetLite.getName();
 
             Ontology ontology = getOntology(mart, dataset, ontologyUri);
 
-            rdfOntology.append("  <owl:Class rdf:about=\"" + site2Reference(ontologyUri) + "/datasets#" + dataset + "\">\n");
-            rdfOntology.append("    <rdfs:label>dataset</rdfs:label>\n");
+            //rdfOntology.append("  <owl:Class rdf:about=\"" + site2Reference(ontologyUri) + "/datasets#" + dataset + "\">\n");
+            rdfOntology.append("  <owl:Class rdf:ID=\"Dataset\">\n");
+            rdfOntology.append("    <rdfs:label>Dataset</rdfs:label>\n");
             rdfOntology.append("    <rdfs:comment>Generic representation of values in the mart.</rdfs:comment>\n");
             rdfOntology.append("  </owl:Class>\n\n");
 
-            for (RDFClass rdfClass : ontology.getRDFClasses()) {
-                rdfOntology.append("  <owl:DatatypeProperty rdf:about=\"http://www.biomart.org/ontology#datasetOf\">\n");
-                rdfOntology.append("    <rdfs:label>" + dataset + "</rdfs:label>\n");
-                rdfOntology.append("    <rdfs:domain rdf:resource=\"" + site2Reference(ontologyUri) + "/datasets#" + dataset + "\" />\n");
-                rdfOntology.append("    <rdfs:range rdf:resource=\"" + rdfClass.getFullName() + "\" />\n");
-                rdfOntology.append("    <rdfs:comment>Dataset connection</rdfs:comment>\n");
+            rdfOntology.append("  <owl:Thing rdf:about=\"" + site2Reference(ontologyUri) + "/datasets#" + dataset + "\">\n");
+            rdfOntology.append("    <rdfs:label>" + dataset + "</rdfs:label>\n");
+            rdfOntology.append("    <rdf:type rdf:resource=\"#Dataset\" />\n");
+            rdfOntology.append("  </owl:Thing>\n\n");
+
+            rdfOntology.append("  <owl:ObjectProperty rdf:ID=\"usesClasses\">\n");
+            //rdfOntology.append("    <rdfs:label>" + dataset + "</rdfs:label>\n");
+            rdfOntology.append("    <rdfs:domain rdf:resource=\"" + site2Reference(ontologyUri) + "/datasets#" + dataset + "\" />\n");
+            //rdfOntology.append("    <rdfs:range rdf:resource=\"http://www.w3.org/2002/07/owl#Class\" />\n");
+            //rdfOntology.append("    <rdfs:comment>Dataset connection</rdfs:comment>\n");
+            rdfOntology.append("    <rdfs:range>\n");
+            //rdfOntology.append("      <owl:DataRange>\n");
+            //rdfOntology.append("        <owl:oneOf>\n");
+
+            rdfOntology.append("      <owl:Class>\n");
+            rdfOntology.append("        <owl:unionOf rdf:parseType=\"Collection\">\n");
+            for (RDFClass rdfClass : ontology.getRDFClasses())
+                rdfOntology.append("          <owl:Class rdf:about=\"" + rdfClass.getFullName() + "\" />\n");
+            rdfOntology.append("        </owl:unionOf>\n");
+            rdfOntology.append("      </owl:Class>\n");
+            //concatRDFClassList(rdfOntology, new LinkedList<RDFClass>(ontology.getRDFClasses()), 0);
+
+            //rdfOntology.append("        </owl:oneOf>\n");
+            //rdfOntology.append("      </owl:DataRange>\n");
+            rdfOntology.append("    </rdfs:range>\n");
+
+            rdfOntology.append("  </owl:ObjectProperty>\n\n");
+
+            /*
+            rdfOntology.append("  <owl:Thing rdf:about=\"" + site2Reference(ontologyUri) + "/datasets#" + dataset + "\">\n");
+            rdfOntology.append("    <rdfs:label>" + dataset + "</rdfs:label>\n");
+            rdfOntology.append("    <rdfs:comment>Dataset: " + dataset + ".</rdfs:comment>\n");
+            rdfOntology.append("    <rdf:type rdf:resource=\"#Dataset\" />");
+            for (RDFClass rdfClass : ontology.getRDFClasses())
+                rdfOntology.append("    <usesClass rdf:resource=\"" + rdfClass.getFullName() + "\" />\n");
+            rdfOntology.append("  </owl:Thing>\n\n");
+             */
+
+            allClasses.addAll(ontology.getRDFClasses());
+        }
+
+        for (RDFClass rdfClass : allClasses) {
+            rdfOntology.append("  <owl:Class rdf:about=\"" + rdfClass.getFullName() + "\">\n");
+            rdfOntology.append("    <rdfs:label>" + rdfClass.getShortName() + "</rdfs:label>\n");
+            rdfOntology.append("    <rdfs:comment>URI over mart attributes: " + rdfClass.getURIAttributes().toString() + "</rdfs:comment>\n");
+            rdfOntology.append("  </owl:Class>\n\n");
+
+            for (RDFProperty property : rdfClass.getProperties()) {
+                String attribute = property.getAttribute();
+                String filter = property.getFilter();
+
+                if (attribute == null || attribute.isEmpty())
+                    attribute = "-";
+
+                if (filter == null || filter.isEmpty())
+                    filter = "-";
+
+                rdfOntology.append("  <owl:DatatypeProperty rdf:about=\"" + property.getFullName() + "\">\n");
+                rdfOntology.append("    <rdfs:label>" + property.getShortName() + "</rdfs:label>\n");
+                rdfOntology.append("    <rdfs:domain rdf:resource=\"" + rdfClass.getFullName() + "\" />\n");
+                rdfOntology.append("    <rdfs:range rdf:resource=\"" + property.getFullRange() + "\" />\n");
+                rdfOntology.append("    <rdfs:comment>Mart attribute: " +
+                                        attribute +
+                                        ", mart filter: " +
+                                        filter +
+                                        "</rdfs:comment>\n");
                 rdfOntology.append("  </owl:DatatypeProperty>\n\n");
-
-                rdfOntology.append("  <owl:Class rdf:about=\"" + rdfClass.getFullName() + "\">\n");
-                rdfOntology.append("    <rdfs:label>" + rdfClass.getShortName() + "</rdfs:label>\n");
-                rdfOntology.append("    <rdfs:comment>URI over mart attributes: " + rdfClass.getURIAttributes().toString() + "</rdfs:comment>\n");
-                rdfOntology.append("  </owl:Class>\n\n");
-
-                for (RDFProperty property : rdfClass.getProperties()) {
-                    String attribute = property.getAttribute();
-                    String filter = property.getFilter();
-
-                    if (attribute == null || attribute.isEmpty())
-                        attribute = "-";
-
-                    if (filter == null || filter.isEmpty())
-                        filter = "-";
-
-                    rdfOntology.append("  <owl:DatatypeProperty rdf:about=\"" + property.getFullName() + "\">\n");
-                    rdfOntology.append("    <rdfs:label>" + property.getShortName() + "</rdfs:label>\n");
-                    rdfOntology.append("    <rdfs:domain rdf:resource=\"" + rdfClass.getFullName() + "\" />\n");
-                    rdfOntology.append("    <rdfs:range rdf:resource=\"" + property.getFullRange() + "\" />\n");
-                    rdfOntology.append("    <rdfs:comment>Mart attribute: " +
-                                            attribute +
-                                            ", mart filter: " +
-                                            filter +
-                                            "</rdfs:comment>\n");
-                    rdfOntology.append("  </owl:DatatypeProperty>\n\n");
-                }
             }
-
         }
 
         rdfOntology.append("</rdf:RDF>\n");
@@ -501,7 +573,7 @@ public class SPARQLResource {
         final StringBuilder rdfOntology = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rdf:RDF\n");
         rdfOntology.append("  xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n");
         rdfOntology.append("  xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\"\n");
-        rdfOntology.append("  xmlns:config=\"" + ontologyUri + "#\"\n");
+        rdfOntology.append("  xmlns:accesspoint=\"" + ontologyUri + "#\"\n");
         rdfOntology.append("  xmlns:class=\"" + site2Reference(ontologyUri) + "/class#\"\n");
         rdfOntology.append("  xmlns:dataset=\"" + site2Reference(ontologyUri) + "/dataset#\"\n");
         rdfOntology.append("  xmlns:attribute=\"" + site2Reference(ontologyUri) + "/attribute#\">\n\n");
@@ -510,6 +582,12 @@ public class SPARQLResource {
             rdfOntology.append("  <class:" + rdfClass.getShortName() + ">\n");
 
             for (RDFProperty property : rdfClass.getProperties()) {
+
+                if (property.getAttribute().equals("chromosome_name")) {
+                    int i = 0;
+                }
+
+
                 for (String literal : literals) {
                     rdfOntology.append("    <attribute:" + property.getShortName() + ">");
                     rdfOntology.append(literal);
@@ -545,7 +623,7 @@ public class SPARQLResource {
         ontology.addNamespace("rdf:", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
         ontology.addNamespace("rdfs:", "http://www.w3.org/2000/01/rdf-schema#");
 
-        ontology.addNamespace("config:", ontologyUri + "#");
+        ontology.addNamespace("accesspoint:", ontologyUri + "#");
         ontology.addNamespace("class:", site2Reference(ontologyUri) + "/class#");
         ontology.addNamespace("dataset:", site2Reference(ontologyUri) + "/dataset#");
         ontology.addNamespace("attribute:", site2Reference(ontologyUri) + "/attribute#");

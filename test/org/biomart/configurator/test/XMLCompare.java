@@ -59,7 +59,7 @@ public class XMLCompare {
 		}
 		
 		for(Attribute a1: al1) {
-			Attribute a2 = e2.getAttribute(a1.getName());
+			Attribute a2 = e2.getAttribute(a1.getName().toLowerCase());
 			if(a2 == null) {
 				Log.error("attribute not match "+a1.getName() + " in "+ e1.getName()+" "+e1.getAttributeValue("name"));
 				return false;

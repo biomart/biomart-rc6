@@ -54,6 +54,20 @@ iframe.streaming {
     overflow: auto;
     min-height: 3em;
 }
+.biomart .content .data.table::-webkit-scrollbar{
+    height:12px;
+    width:12px;
+}
+.biomart .content .data.table::-webkit-scrollbar-track-piece{
+    margin-bottom:10px;background-color:#e5e5e5;border-bottom-left-radius:6px 6px;border-bottom-right-radius:6px 6px;border-top-left-radius:6px 6px;border-top-right-radius:6px 6px;
+}
+.biomart .content .data.table::-webkit-scrollbar-thumb:vertical{
+    height:25px;background-color:#999;-webkit-border-radius:6px;-webkit-box-shadow:0 1px 1px rgba(255,255,255,1);
+}
+.biomart .content .data.table::-webkit-scrollbar-thumb:horizontal{
+    width:25px;background-color:#999;-webkit-border-radius:6px;
+}
+
 .biomart table.writee, 
 .biomart .data table {
     overflow: auto;

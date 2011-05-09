@@ -51,8 +51,8 @@ public enum XMLElements {
 	 OPERATION("operation"),
 	 DATAFILE("datafile"),
 	
-	 UNIQUEID("uniqueId"),
-	 DRIVERCLASSNAME("driverclassName"),
+	 UNIQUEID("uniqueid"),
+	 DRIVERCLASSNAME("driverclassname"),
 	 URL("url"),
 	 DATABASENAME("databasename"),
 	 SCHEMANAME("schemaname"),
@@ -160,7 +160,7 @@ public enum XMLElements {
 	 
 	 public static XMLElements valueFrom(String value) {
 		 for(XMLElements xe: XMLElements.values()) {
-			 if(xe.toString().equals(value))
+			 if(xe.toString().equalsIgnoreCase(value))
 				 return xe;
 		 }
 		 return null;

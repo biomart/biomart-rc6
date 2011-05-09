@@ -22,7 +22,9 @@ $.namespace('biomart.validator', {
                 return null;
             },
             'upload': function(element) {
-                return element.find('textarea.field').val() || null;
+                var value = element.find('textarea.field').val() || null;
+                value = replaceWhitespaces(value);
+                return value;
             },
             'singleSelect': function(element) {
                 var list = element.find('select');
@@ -51,7 +53,7 @@ $.namespace('biomart.validator', {
                     name = list.val(),
                     value = element.find('textarea.field').val() || null,
                     displayName = list.children('option[value=' + name + ']').text();
-                value = $.trim(value).replace(/\n/g, ',');
+                value = replaceWhitespaces(value);
                 return [name, value, displayName];
             },
             'multiSelect': function(element) {
@@ -87,10 +89,14 @@ $.namespace('biomart.validator', {
                     }
                 });
                 displayNames = displayNames.join(', ');
-                value = $.trim(value).replace(/\n/g, ',');
+                value = replaceWhitespaces(value);
                 return [names, value, [item.displayName, ': ', displayNames].join('')];
             }
         };
+
+        function replaceWhitespaces(value) {
+            return $.trim(value).replace(/\n/g, ',');
+        }
 
         return function(element) {
             var item = element.data('item'),

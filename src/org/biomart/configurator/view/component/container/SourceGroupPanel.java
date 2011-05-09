@@ -69,25 +69,6 @@ class SourceGroupPanel extends JPanel implements ActionListener {
 		panel.setFloatable(false);
 		return panel;
 	}
-
-	 private boolean isCreateLink(){
-	    int value = MessageConfig.getInstance().showDialog("rebuildlink");
-		if(value == 3) //no and don't warn me anymore
-			return false;
-		boolean create = false;
-		if(value == 2)
-			create = true; //yes and don't warn me anymore
-		else {
-			WarningDialog dialog = new WarningDialog("rebuildlink");
-			dialog.showDialogFor("rebuildlink",	"create link from Backward Compatibility?");
-			value = dialog.getResult();
-			if(value == 0 || value == 2)
-				create = true;
-			else
-				create = false;
-		}
-		return create;
-    }
  
 	public boolean addMarts(final UserGroup user, final String group) {
 		final DataLinkInfo dlinkInfo = DataLinkDialog.showDialog();
@@ -101,10 +82,7 @@ class SourceGroupPanel extends JPanel implements ActionListener {
 		final SwingWorker worker = new SwingWorker() {
 			public Object construct() {
 				try {
-					if(dlinkInfo.getUseOldConfigFlag())
-						oc.initMarts(dlinkInfo,user,group, SourceGroupPanel.this.isCreateLink());
-					else
-						oc.initMarts(dlinkInfo,user,group, true);
+					oc.initMarts(dlinkInfo,user,group);
 				} catch (final Throwable t) {
 					SwingUtilities.invokeLater(new Runnable() {
 						public void run() {

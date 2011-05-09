@@ -56,7 +56,10 @@ public class ConfigTableTransferHandler extends TransferHandler {
             if (info.isDrop()) { //This is a drop
             	JTable.DropLocation dl = (JTable.DropLocation)info.getDropLocation();
                 int index = dl.getRow();
+                
                 if (dl.isInsertRow()) {
+                	//clear selection
+                	table.clearSelection();
                 	for(MartPointer mp : data){
                 		int fromindex = model.indexOf(mp);
                 		int delindex = gc.getMartPointerList().indexOf(mp);
@@ -73,11 +76,17 @@ public class ConfigTableTransferHandler extends TransferHandler {
                 			delindex ++;
                 		gc.getMartPointerList().remove(delindex);
                 	}
+                	//restore selection
+                	for(MartPointer mp : data){
+                    	int selindex = model.indexOf(mp);
+                    	table.addRowSelectionInterval(selindex, selindex);
+                    }
                     return true;
                 } else {
                     //model.set(index, data);
                     return true;
                 }
+                
             } else { //This is a paste
                 int index = table.getSelectedRow();
                 // if there is a valid selection,
@@ -125,6 +134,7 @@ public class ConfigTableTransferHandler extends TransferHandler {
     	}else
     		this.rootPanel.addMultipleConfigs(martList, user);
     	//clear the selection in source
+    	((McViewSourceGroup)McViews.getInstance().getView(IdwViewType.SOURCEGROUP)).unHighlightAllComponent();
     	((McViewSourceGroup)McViews.getInstance().getView(IdwViewType.SOURCEGROUP)).unselectOthers(null);
     }
     /**

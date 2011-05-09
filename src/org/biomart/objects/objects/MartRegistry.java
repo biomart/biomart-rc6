@@ -95,6 +95,7 @@ public class MartRegistry extends MartConfiguratorObject implements Serializable
 				}
 			}
 		
+		//remove options
 		
 		if(this.martList.remove(mart)) {
 			MartController.getInstance().setChanged(true);

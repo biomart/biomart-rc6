@@ -1,8 +1,6 @@
 package org.biomart.processors.sequence;
 
 import com.google.common.collect.ImmutableMap;
-import java.io.ByteArrayOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -86,10 +84,10 @@ public class Sequence extends ProcessorImpl implements SequenceConstants {
     public IntegerField downstreamFlank = new IntegerField("Downstream Flank");
 
     private String tableName;
-    private OutputStream originalOut;
     private int extraAttributes = 0;
     private int limit = Integer.MAX_VALUE;
     private SequenceParser parser;
+    private OutputStream originalOut;
 
     /*
      * Add additional attribute list for sequence retrieval
@@ -147,9 +145,9 @@ public class Sequence extends ProcessorImpl implements SequenceConstants {
 
     @Override
 	public void beforeQuery(Query query, OutputStream out) throws IOException {
+        originalOut = out;
+
         checkParameters();
-        this.originalOut = out;
-        this.out = new ByteArrayOutputStream();
 
         QueryType queryType = QueryType.get(type.value);
 
@@ -167,10 +165,15 @@ public class Sequence extends ProcessorImpl implements SequenceConstants {
                 }
 
                 parser
+                    .setOutputStream(out)
                     .setDatabaseConnection(jdbcConnectionURL.value, tableName, username.value, password.value)
                     .setExtraAttributes(extraAttributes)
                     .setLimit(limit)
-                    .validate();
+                    .validate()
+                    .startUp();
+
+                this.out = parser.getCallbackOutputStream();
+
             } else {
                 // Handle error
             }
@@ -182,25 +185,9 @@ public class Sequence extends ProcessorImpl implements SequenceConstants {
     }
 
     @Override
-    public void afterQuery() throws IOException {
-
-        this.out.flush();
-        this.out.close();
-        try {
-            parser.streamSequence(this.out, this.originalOut);
-        } catch (Exception e) {
-            if (e instanceof EOFException) {
-                Log.debug("Client closed connnection");
-            } else {
-                Log.error("Error occurred during sequence retrieval", e);
-                this.originalOut.write("error=true".getBytes());
-            }
-        } finally {
-            Log.debug("Finished sequence query");
-            this.out.close();
-        }
-
-	}
+	public void afterQuery() throws IOException {
+        parser.shutDown();
+    }
 
     private void checkParameters() {
         if (this.jdbcConnectionURL.value == null) {

@@ -7,6 +7,7 @@ import org.biomart.configurator.utils.type.McNodeType;
 import org.jdom.Element;
 
 public class SourceContainer extends MartConfiguratorObject {
+	boolean expanded = true;
 	
 	public SourceContainer(Element element) {
 		super(element);
@@ -41,5 +42,13 @@ public class SourceContainer extends MartConfiguratorObject {
 	
 	public void setGroup(boolean b) {
 		this.setProperty(XMLElements.GROUP, Boolean.toString(b));
+	}
+	
+	public boolean isExpanded() {
+		return this.expanded;
+	}
+	
+	public void setExpanded(boolean b) {
+		this.expanded = b;
 	}
 }

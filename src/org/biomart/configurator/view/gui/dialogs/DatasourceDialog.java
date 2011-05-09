@@ -200,6 +200,13 @@ public class DatasourceDialog extends JDialog implements ActionListener, ListSel
 			//get the first partition table
 			if(this.martList.size() > 0 && this.martList.get(0).getPartitionTableList().size() > 0){
 				PartitionTable pt = this.martList.get(0).getPartitionTableList().get(0);
+				//hardcode for now, from BC url, only create 9 fixed columns
+				if(pt.getTotalColumns()<15) {
+					int count = pt.getTotalColumns();
+					for(int i = count; i<15; i++){
+						pt.addColumn("");
+					}
+				}
 				if(pt!=null) 
 					new PartitionTableDialog(this, pt,0,-1);
 			}

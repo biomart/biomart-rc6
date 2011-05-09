@@ -1,10 +1,5 @@
 package org.biomart.processors.sequence;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.biomart.common.exceptions.TechnicalException;
 import org.biomart.common.exceptions.ValidationException;
@@ -15,6 +10,39 @@ import org.biomart.common.resources.Log;
  * @author jhsu, jguberman
  */
 public class CodingGeneFlankParser extends SequenceParser {
+    // "Flank-coding region (Gene)"
+    // TODO Optimize by using the transcript_count info when initializing lists? (Except transcript_count seems to be empty)
+    // TODO Clean up in general
+
+    // Set up the fields
+    private static final int geneIDfield = 0;
+    private static final int transcriptIDfield = 1;
+    private static final int chrField = 2;
+    private static final int startField = 3;
+    private static final int endField = 4;
+    private static final int codingStartOffsetField = 5;
+    private static final int codingEndOffsetField = 6;
+    private static final int strandField = 7;
+    private static final int exonIDField = 8;
+    private static final int rankField = 9;
+    private static final int startExonIDField = 10;
+    private static final int endExonIDField = 11;
+    private static final int transcriptCountField = 12;
+
+    private int terminalExonField;
+    private int codingOffsetField;
+
+    private String transcriptID = null;
+    private String terminalExonID = null;
+    private String chr = "";
+    private Integer start = null;
+    private Integer end = null;
+    private String strand = null;
+    private int codingOffset = 0;
+    private String exonID = null;
+
+    private String currGeneID = null;
+
     public CodingGeneFlankParser() {
         super(13);
     }
@@ -22,6 +50,15 @@ public class CodingGeneFlankParser extends SequenceParser {
     @Override
     public SequenceParser validate() throws ValidationException {
 		checkFlank();
+
+		if (upstreamFlank > 0) {
+			terminalExonField = startExonIDField;
+			codingOffsetField = codingStartOffsetField;
+		} else {
+			terminalExonField = endExonIDField;
+			codingOffsetField = codingEndOffsetField;
+		}
+
         return this;
     }
 
@@ -32,156 +69,98 @@ public class CodingGeneFlankParser extends SequenceParser {
 	 * @throws TechnicalException
 	 */
 	@Override
-    public void parse(List<List<String>> inputQuery) throws IOException {
-		// "Flank-coding region (Gene)"
-		// TODO Optimize by using the transcript_count info when initializing lists? (Except transcript_count seems to be empty)
-		// TODO Clean up in general
+	public String parseLine(String[] line) {
+        String results = "";
 
-		// Set up the fields
-		final int geneIDfield = 0;
-		final int transcriptIDfield = 1;
-		final int chrField = 2;
-		final int startField = 3;
-		final int endField = 4;
-		final int codingStartOffsetField = 5;
-		final int codingEndOffsetField = 6;
-		final int strandField = 7;
-		final int exonIDField = 8;
-		final int rankField = 9;
-		final int startExonIDField = 10;
-		final int endExonIDField = 11;
-		final int transcriptCountField = 12;
+        // Check if new gene ID is seen
+        String geneID = line[geneIDfield];
 
-        boolean done = false;
-
-		int terminalExonField ;
-		int codingOffsetField ;
-
-		if (upstreamFlank >0 ){
-			terminalExonField = startExonIDField;
-			codingOffsetField = codingStartOffsetField;
-		} else {
-			terminalExonField = endExonIDField;
-			codingOffsetField = codingEndOffsetField;
-		}
-
-		// Initialize hashmap mapping geneIDs to input lines, so we don't need to worry about the order of the input
-		Map<String, List<List<String>>> geneMap = new HashMap<String,List<List<String>>>();
-
-		for(List<String> line : inputQuery) {
-			String currentGeneID = line.get(geneIDfield);
-            List<List<String>> list = geneMap.get(currentGeneID);
-			if(null == list) {
-				list = new ArrayList<List<String>>();
-                geneMap.put(currentGeneID, list);
-			}
-			list.add(line);
-		}
-
-		for(String geneID : geneMap.keySet()) {
-			
-			
-			if (isDebug) System.out.println(geneID);
-
-            List<List<String>> lines = geneMap.get(geneID);
-			String transcriptID = null;
-			String terminalExonID = null;
-			String chr = "";
-			Integer start = null;
-			Integer end = null;
-			String strand = null;
-			int codingOffset = 0;
-			String exonID = null;
-
-			for(List<String> line : lines){
-                storeHeaderInfo(line);
-
-                exonID = line.get(exonIDField);
-
-				if (!line.get(transcriptIDfield).equals(transcriptID)){
-					transcriptID = line.get(transcriptIDfield);
-					terminalExonID = line.get(terminalExonField);
-					strand = line.get(strandField);
-				}
-
-                if (terminalExonID.equals(exonID)){
-					codingOffset = Integer.parseInt(line.get(codingOffsetField));
-					
-					int startTmp, endTmp;
-					if (strand.equals("-1")) {
-	                    startTmp = Integer.parseInt(line.get(startField));
-						int startTmp2 = startTmp + codingOffset;
-						start = start!=null ? Math.max(start, startTmp2) : startTmp2;
-	                    endTmp = Integer.parseInt(line.get(endField));
-						int endTmp2 = endTmp - codingOffset;
-						end = end!=null ? Math.min(end, endTmp2) : endTmp2;
-					} else {
-						startTmp = Integer.parseInt(line.get(startField));
-						int startTmp2 = startTmp + codingOffset;
-						start = start!=null ? Math.min(start, startTmp2) : startTmp2;
-	                    endTmp = Integer.parseInt(line.get(endField));
-						int endTmp2 = endTmp - codingOffset;
-						end = end!=null ? Math.max(end, endTmp2) : endTmp2;
-					}
-					if (isDebug) System.out.println(startTmp + ", " + endTmp + ", " + (endTmp-startTmp) + ", " + exonID + ", " + codingOffset);
-
-					chr = line.get(chrField);
-				}
-			}
-			
-			if (isDebug) System.out.println(">" + start + ", " + end + ", " + strand);
-			
-			// undefined
-			if (null==start && null==end) {
-				start = Integer.MIN_VALUE;
-				end = Integer.MAX_VALUE;
-			}
-			
-            done = printCodingGeneFlank(getHeader(), chr, start, end, strand);
+        if (!geneID.equals(currGeneID)) {
+            if (currGeneID != null) {
+                results = getCodingGeneFlank(getHeader(), chr, start, end, strand);
+                start = null;
+                end = null;
+            }
 
             clearHeader();
 
-            if (done) {
-                break;
+            currGeneID = geneID;
+        }
+
+        storeHeaderInfo(line);
+
+        exonID = line[exonIDField];
+
+        if (!line[transcriptIDfield].equals(transcriptID)){
+            transcriptID = line[transcriptIDfield];
+            terminalExonID = line[terminalExonField];
+            strand = line[strandField];
+        }
+
+        if (terminalExonID.equals(exonID)){
+            codingOffset = Integer.parseInt(line[codingOffsetField]);
+
+            int startTmp, endTmp;
+            if (strand.equals("-1")) {
+                startTmp = Integer.parseInt(line[startField]);
+                int startTmp2 = startTmp + codingOffset;
+                start = start!=null ? Math.max(start, startTmp2) : startTmp2;
+                endTmp = Integer.parseInt(line[endField]);
+                int endTmp2 = endTmp - codingOffset;
+                end = end!=null ? Math.min(end, endTmp2) : endTmp2;
+            } else {
+                startTmp = Integer.parseInt(line[startField]);
+                int startTmp2 = startTmp + codingOffset;
+                start = start!=null ? Math.min(start, startTmp2) : startTmp2;
+                endTmp = Integer.parseInt(line[endField]);
+                int endTmp2 = endTmp - codingOffset;
+                end = end!=null ? Math.max(end, endTmp2) : endTmp2;
             }
-		}
+            if (isDebug) System.out.println(startTmp + ", " + endTmp + ", " + (endTmp-startTmp) + ", " + exonID + ", " + codingOffset);
+
+            chr = line[chrField];
+        }
+
+        return results;
 	}
-	protected final boolean printCodingGeneFlank(String header, String chr, int start,
-            int end, String strand) throws IOException {
-		try {
-			String sequence;
-	
-	        Log.info(String.format("start = %s, end = %s", start, end));
-	
-	        if (upstreamFlank > 0) {
-	            if (strand.equals("-1")) {
-	                start = end + 2;
-	                end = end + upstreamFlank + 1;
-	            } else {
-	                end = start - 2;
-	                start = start - upstreamFlank - 1;
-	            }
-	        } else {
-	            if (strand.equals("-1")) {
-	            	start = end - downstreamFlank + 1;
-	            } else {
-	            	end = start + downstreamFlank - 1;
-	            }
-	        }
-	
-	        if (isDebug) System.out.println(">>" + start + ", " + end + ", " + (end-start));
-			
-			// Take the reverse complement if necessary
-			if (strand.equals("-1")){
-				sequence = reverseComplement(getSequence(chr, start, end));
-			} else {
-				sequence = getSequence(chr, start, end);
-			}
-			return printFASTA(sequence, header);
-		} catch (Exception e) {
-		    e.printStackTrace();
-		    return printFASTA(SEQUENCE_UNAVAILABLE, header);
-		}
+
+    @Override
+    public String parseLast() {
+        return getCodingGeneFlank(getHeader(), chr, start, end, strand);
+    }
+
+	protected final String getCodingGeneFlank(String header, String chr, int start,
+            int end, String strand) {
+
+        String sequence;
+
+        Log.info(String.format("start = %s, end = %s", start, end));
+
+        if (upstreamFlank > 0) {
+            if (strand.equals("-1")) {
+                start = end + 2;
+                end = end + upstreamFlank + 1;
+            } else {
+                end = start - 2;
+                start = start - upstreamFlank - 1;
+            }
+        } else {
+            if (strand.equals("-1")) {
+                start = end - downstreamFlank + 1;
+            } else {
+                end = start + downstreamFlank - 1;
+            }
+        }
+
+        if (isDebug) System.out.println(">>" + start + ", " + end + ", " + (end-start));
+
+        // Take the reverse complement if necessary
+        if (strand.equals("-1")){
+            sequence = reverseComplement(getSequence(chr, start, end));
+        } else {
+            sequence = getSequence(chr, start, end);
+        }
+        return getFASTA(sequence, header);
 	}
 }
 

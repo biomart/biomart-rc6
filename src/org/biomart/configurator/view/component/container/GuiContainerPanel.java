@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -57,6 +58,7 @@ import org.biomart.configurator.view.gui.dialogs.AddConfigFromMartDialog;
 import org.biomart.configurator.view.gui.dialogs.ConfigDialog;
 import org.biomart.configurator.view.gui.dialogs.ReportAttributesSelectDialog;
 import org.biomart.configurator.view.idwViews.McViewPortal;
+import org.biomart.configurator.view.idwViews.McViewSourceGroup;
 import org.biomart.configurator.view.idwViews.McViews;
 import org.biomart.configurator.view.menu.ContextMenuConstructor;
 import org.biomart.objects.enums.GuiType;
@@ -68,6 +70,8 @@ import org.biomart.objects.portal.GuiContainer;
 import org.biomart.objects.portal.MartPointer;
 import org.biomart.objects.portal.UserGroup;
 
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
@@ -75,7 +79,7 @@ import java.beans.PropertyChangeListener;
 
 import e.gui.ETable;
 
-public class GuiContainerPanel extends JPanel implements MouseListener,ClipboardOwner, PropertyChangeListener {
+public class GuiContainerPanel extends JPanel implements MouseListener,ClipboardOwner, PropertyChangeListener , MouseMotionListener {
 
 	/**
 	 * 
@@ -90,7 +94,9 @@ public class GuiContainerPanel extends JPanel implements MouseListener,Clipboard
 	private JButton addButton;
 	private JButton rdfButton;
 	private JList configList;
-	private ETable configTable;
+	private ConfigTable configTable;
+	private ConfigTableCellRenderer tableRenderer;
+	private ConfigListCellRenderer renderer;
 	
 	public JTable getConfigTable() {
 		return configTable;
@@ -114,7 +120,7 @@ public class GuiContainerPanel extends JPanel implements MouseListener,Clipboard
 	
 	public void regenerateRDF() {
 		if(this.getSelectedMPs().size() == 0){
-			JOptionPane.showMessageDialog(this, "Please select configs to generate RDF");
+			JOptionPane.showMessageDialog(this, "Please select one or more configs to generate semantics.");
 			return;
 		}
 		Object[] options = {"Yes", "No"};
@@ -146,7 +152,7 @@ public class GuiContainerPanel extends JPanel implements MouseListener,Clipboard
 		//configPanel.setLayout(flo);
 		flo.setAlignment(FlowLayout.LEFT);
 		
-		addButton = new JButton(Resources.get("ADDCONFIG"),McUtils.createImageIcon("images/add_group.gif"));
+		addButton = new JButton(Resources.get("ADDACCESSPOINT"),McUtils.createImageIcon("images/add_group.gif"));
 		//addButton.setToolTipText(Resources.get("ADDCONFIG"));
 		addButton.addActionListener(new ActionListener() {
 			@Override
@@ -168,6 +174,7 @@ public class GuiContainerPanel extends JPanel implements MouseListener,Clipboard
 		checkboxPanel.add(addButton);
 		//checkboxPanel.add(rdfButton);
 		checkboxPanel.addMouseListener(this);
+		//checkboxPanel.addMouseMotionListener(this);
 		
 		//DefaultListModel model = new DefaultListModel();
 		String[] colNames = {	
@@ -196,16 +203,16 @@ public class GuiContainerPanel extends JPanel implements MouseListener,Clipboard
 		configList.setTransferHandler(listHandler);
 		this.setMappings(configList);
 		configList.setAutoscrolls(true);
-		ConfigListCellRenderer renderer = new ConfigListCellRenderer(true);
+		renderer = new ConfigListCellRenderer(true);
 		configList.setCellRenderer(renderer);
 		configList.addMouseListener(this);
-		
+		//configList.addMouseMotionListener(this);
 		
 		JScrollPane listsp = new JScrollPane(configList);
 		//listsp.setPreferredSize(new Dimension(1050,750));
 		//listsp.setAlignmentX(LEFT_ALIGNMENT);
 		
-		configTable = new ETable(model);
+		configTable = new ConfigTable(model);
 		configTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		configTable.setDragEnabled(true);
 		configTable.setDropMode(DropMode.INSERT);
@@ -214,12 +221,12 @@ public class GuiContainerPanel extends JPanel implements MouseListener,Clipboard
 		configTable.setTransferHandler(tableHandler);
 		this.setMappings(configTable);
 		configTable.addMouseListener(this);
-		ConfigTableCellRenderer tableRenderer = new ConfigTableCellRenderer();
+		//configTable.addMouseMotionListener(this);
+		tableRenderer = new ConfigTableCellRenderer();
 		configTable.getColumnModel().getColumn(0).setCellRenderer(tableRenderer);
 		configTable.setRowHeight(20);
 		configTable.setFont(new Font(this.getFont().getFamily(), Font.PLAIN, 14));		
 		configTable.setAutoCreateRowSorter(false);
-		
 		
 		JScrollPane tablesp = new JScrollPane(configTable);
 		//tablesp.setPreferredSize(new Dimension(1050,750));
@@ -231,7 +238,8 @@ public class GuiContainerPanel extends JPanel implements MouseListener,Clipboard
 		else
 			this.add(listsp,BorderLayout.CENTER);
 		
-		
+		configTable.addMouseMotionListener(this);
+		//addMouseMotionListener(this);
 		//this.add(configPanel,BorderLayout.CENTER);
 		
 		//add another panel for checkbox group at right
@@ -521,16 +529,6 @@ public class GuiContainerPanel extends JPanel implements MouseListener,Clipboard
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
-		if(e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
-			int index = 0;
-			if(this.configList.getSelectedValue() != null)
-				index = this.configList.getSelectedIndex();
-			else if(this.configTable.getSelectedRowCount() > 0)
-				index = this.configTable.getSelectedRow();
-			
-			MartPointer mp = (MartPointer)this.configList.getModel().getElementAt(index);
-			new ConfigDialog(mp.getConfig());
-		}
 	}
 
 	@Override
@@ -541,11 +539,63 @@ public class GuiContainerPanel extends JPanel implements MouseListener,Clipboard
 	@Override
 	public void mouseExited(MouseEvent e) {
 		// TODO Auto-generated method stub
+		tableRenderer.setRow(-1);
+		this.configTable.setMart(null);
+		this.configTable.setSelfOnly(false);
 		
+		this.configTable.repaint();
+		McViewSourceGroup groupView = (McViewSourceGroup)McViews.getInstance().getView(IdwViewType.SOURCEGROUP);
+		groupView.refreshGui();
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+		if(e.getButton() == MouseEvent.BUTTON3) {
+			int row = this.configTable.rowAtPoint(e.getPoint());
+			if(row >= 0) {
+				this.configTable.addRowSelectionInterval(row, row);
+			}
+		}
+		if(e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
+			int index = 0;
+			if(this.configList.getSelectedValue() != null)
+				index = this.configList.getSelectedIndex();
+			else if(this.configTable.getSelectedRowCount() > 0)
+				index = this.configTable.getSelectedRow();
+			
+			MartPointer mp = (MartPointer)this.configList.getModel().getElementAt(index);
+			new ConfigDialog(mp.getConfig());
+		}
+		
+		McViewSourceGroup groupView = (McViewSourceGroup)McViews.getInstance().getView(IdwViewType.SOURCEGROUP);
+		groupView.refreshGui();
+		boolean outside = true;
+		if(this.configList.getModel().getSize() == 0)
+			outside = true;
+		else if(Boolean.parseBoolean(Settings.getProperty("portal.listview")))
+			outside =  this.configTable.rowAtPoint(e.getPoint()) < 0;
+		else
+			outside = !this.configList.getCellBounds(0, this.configList.getModel().getSize()-1).contains(e.getPoint());
+		if(!outside){
+			if(e.isPopupTrigger()) {
+				JPopupMenu menu = ContextMenuConstructor.getInstance().getContextMenu(this,"config",
+							this.getSelectedMPs().size()>1);
+				menu.show(e.getComponent(), e.getX(), e.getY());
+			}
+		}else{
+			if(e.isPopupTrigger()) {
+				JPopupMenu menu = ContextMenuConstructor.getInstance().getContextMenu(this, "guipanel",false);
+				menu.show(e.getComponent(), e.getX(), e.getY());
+			}
+			this.configList.clearSelection();
+			this.configTable.clearSelection();
+		}
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+
 		boolean outside = true;
 		if(this.configList.getModel().getSize() == 0)
 			outside = true;
@@ -568,32 +618,6 @@ public class GuiContainerPanel extends JPanel implements MouseListener,Clipboard
 			this.configTable.clearSelection();
 			
 		}
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		boolean outside = true;
-		if(this.configList.getModel().getSize() == 0)
-			outside = true;
-		else if(Boolean.parseBoolean(Settings.getProperty("portal.listview")))
-			outside =  this.configTable.rowAtPoint(e.getPoint()) < 0;
-		else
-			outside = !this.configList.getCellBounds(0, this.configList.getModel().getSize()-1).contains(e.getPoint());
-		if(!outside){
-			if(e.isPopupTrigger()) {
-				JPopupMenu menu = ContextMenuConstructor.getInstance().getContextMenu(this,"config",
-							this.getSelectedMPs().size()>1);
-				menu.show(e.getComponent(), e.getX(), e.getY());
-			}	
-		}else{
-			if(e.isPopupTrigger()) {
-				JPopupMenu menu = ContextMenuConstructor.getInstance().getContextMenu(this, "guipanel",false);
-				menu.show(e.getComponent(), e.getX(), e.getY());
-			}
-			this.configList.clearSelection();
-			this.configTable.clearSelection();
-			
-		}		
 	}
 
 	public Set<Mart> getLinkedMartForConfig(Config config) {
@@ -724,4 +748,42 @@ public class GuiContainerPanel extends JPanel implements MouseListener,Clipboard
 		//UserGroup ug = (UserGroup)evt.getNewValue();
 		
 	}
+
+	public void setHighlight(Mart mart) {
+		// TODO Auto-generated method stub
+		this.configTable.setMart(mart);
+		this.configTable.setSelfOnly(false);
+		this.configTable.repaint();
+	}
+
+	@Override
+	public void mouseDragged(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
+		// TODO Auto-generated method stub
+	
+		int row = configTable.rowAtPoint(e.getPoint());
+		if(row >= 0) {
+			McViewSourceGroup groupView = (McViewSourceGroup)McViews.getInstance().getView(IdwViewType.SOURCEGROUP);
+			groupView.refreshGui();
+			tableRenderer.setRow(row);
+			SharedDataModel model = (SharedDataModel)configTable.getModel();
+			MartPointer mp = (MartPointer)model.elementAt(row);
+			this.configTable.setMart(mp.getMart());
+			this.configTable.setSelfOnly(true);
+		}else {
+			tableRenderer.setRow(row);
+			this.configTable.setMart(null);
+			this.configTable.setSelfOnly(false);
+		}
+	
+		this.configTable.repaint();
+		McViewSourceGroup groupView = (McViewSourceGroup)McViews.getInstance().getView(IdwViewType.SOURCEGROUP);
+		groupView.refreshGui();
+	}
+
 }

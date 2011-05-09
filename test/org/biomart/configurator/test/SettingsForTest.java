@@ -5,12 +5,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.biomart.backwardCompatibility.DatasetFromUrl;
 import org.biomart.backwardCompatibility.MartInVirtualSchema;
+import org.biomart.configurator.controller.ObjectController;
 import org.biomart.configurator.controller.dialects.McSQL;
 import org.biomart.configurator.model.object.DataLinkInfo;
+import org.biomart.configurator.utils.FileLinkObject;
 import org.biomart.configurator.utils.JdbcLinkObject;
 import org.biomart.configurator.utils.McGuiUtils;
 import org.biomart.configurator.utils.UrlLinkObject;
@@ -20,6 +23,7 @@ import org.biomart.configurator.utils.type.JdbcType;
 import org.biomart.objects.portal.UserGroup;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
 public class SettingsForTest {
@@ -140,6 +144,38 @@ public class SettingsForTest {
 				
 				dli.setUrlLinkObject(conObject);
 				break;
+			case FILE:
+				Element fileElement = conElement.getChild("file");
+				Element directory = rootElement.getChild("datadirectory");
+				String directoryString = directory.getAttributeValue("name");
+				String fileName = directoryString+"/"+fileElement.getText();
+				File file = new File(fileName);
+				ObjectController oc = new ObjectController();
+				List<MartInVirtualSchema> martList = null;
+				Map<MartInVirtualSchema, List<DatasetFromUrl>> map = new LinkedHashMap<MartInVirtualSchema, List<DatasetFromUrl>>();
+				try {
+					martList = oc.getURLMartFromFile(file);
+					for(MartInVirtualSchema mart: martList) {
+						if(mart.isURLMart()) {
+							List<DatasetFromUrl> dss = McGuiUtils.INSTANCE.getDatasetsFromUrlForMart(mart);
+							map.put(mart, dss);
+						} else {
+							map.put(mart, new ArrayList<DatasetFromUrl>());
+						}
+					}
+				} catch (JDOMException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				FileLinkObject linkObject = new FileLinkObject();
+				linkObject.setDsInfoMap(map);
+				dli.setFileLinkObject(linkObject);
+				dli.setIncludePortal(true);
+				dli.setSourceGrouped(false);
+				break;
 			}		
 			dli.setAllTables(allTablesMap);
 			dli.setSelectedTables(selectedTablesMap);
@@ -152,6 +188,11 @@ public class SettingsForTest {
 		Element element = getTestCase(testcase).getChild("usergroup");
 		UserGroup ug = new UserGroup(element.getText(),element.getText(),"");
 		return ug;
+	}
+	
+	public static String getAttribute(String testcase) {
+		Element element = getTestCase(testcase).getChild("attribute");
+		return element.getAttributeValue("name");
 	}
 	
 	public static String getSavedXMLPath(String testcase) {
@@ -186,6 +227,14 @@ public class SettingsForTest {
 	
 	public static String getSourceXMLPath(String testcase) {
 		Element element = getTestCase(testcase).getChild("sourcexml");
+		Element directory = rootElement.getChild("datadirectory");
+		String directoryString = directory.getAttributeValue("name");
+
+		return directoryString+"/"+element.getText();
+	}
+	
+	public static String getBaseXMLPath(String testcase) {
+		Element element = getTestCase(testcase).getChild("basexml");
 		Element directory = rootElement.getChild("datadirectory");
 		String directoryString = directory.getAttributeValue("name");
 

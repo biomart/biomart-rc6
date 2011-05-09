@@ -416,11 +416,14 @@ public class McMenus implements ActionListener {
 			JOptionPane.showMessageDialog(null, e.getMessage());
 			return;
 		}
+		String oldKey = McUtils.getKey();
 		McUtils.setKey(key);
 		this.importObjectsAndShowGui(registry, document);
 		if(Boolean.parseBoolean(System.getProperty("xmlautofix"))) {
 			MartController.getInstance().fixPartitionTable();
 		}
+		//restore the oldkey after decypt the imported mart
+		McUtils.setKey(oldKey);
 		//clear document
 		document = null;
 		MartController.getInstance().setChanged(false);
@@ -583,7 +586,26 @@ public class McMenus implements ActionListener {
     				}
     			}
     		}
-    		
+    		if(!martList.isEmpty()) {
+				Element importedOptions = registryElement.getChild(XMLElements.OPTIONS.toString());
+				@SuppressWarnings("unchecked")
+				List<Element> martsOptions = importedOptions.getChildren();
+	    		//import options
+	    		for(Mart mart: martList) {
+	    			Element martElement = null;
+	    			//find the mart
+	    			for(Element martE: martsOptions) {
+	    				if(martE.getAttributeValue(XMLElements.NAME.toString()).equals(mart.getName())) {
+	    					martElement = martE;
+	    					break;
+	    				}
+	    			}
+	    			if(martElement!=null) {
+	    				martElement.detach();
+	    				Options.getInstance().addMartElement(martElement);
+	    			}
+	    		}
+	    	}
     		//add related portal
     		if(mds.isImportPortal() && !martList.isEmpty()) {
     			String newgcName = McGuiUtils.INSTANCE.getNextGuiContainerName("import");

@@ -40,12 +40,14 @@
       <buildFile>build.xml</buildFile>
     </hudson.tasks.Ant>
     <hudson.tasks.Shell>
-      <command>chmod +x ./dist/scripts/hudson.sh ./dist/scripts/slave.sh ./dist/scripts/selenium.sh &amp;&amp; ./dist/scripts/hudson.sh</command>
+      <command>#cp /home/anthony/svn/biomart/biomart-java/trunk2/scripts/hudson.sh /home/anthony/svn/biomart/biomart-java/trunk2/scripts/selenium.sh /home/anthony/svn/biomart/biomart-java/trunk2/scripts/slave.sh ./dist/scripts/
+#cp /home/anthony/svn/biomart/biomart-java/trunk2/web/webapps/martapps/tests/qunit.html ./dist/web/webapps/martapps/tests/
+chmod +x ./dist/scripts/hudson.sh ./dist/scripts/slave.sh ./dist/scripts/selenium.sh &amp;&amp; ./dist/scripts/hudson.sh</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
     <hudson.tasks.Mailer>
-      <recipients>Jack.Hsu@oicr.on.ca anthony.cros@oicr.on.ca</recipients>
+      <recipients>jack.hsu@oicr.on.ca anthony.cros@oicr.on.ca</recipients>
       <dontNotifyEveryUnstableBuild>false</dontNotifyEveryUnstableBuild>
       <sendToIndividuals>false</sendToIndividuals>
     </hudson.tasks.Mailer>

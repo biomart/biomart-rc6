@@ -96,7 +96,7 @@
     height: auto;
     margin-top: 0;
 }
-.biomart .items .item.active {
+.biomart .items .item.ui-active {
     background-color: #eee;
 }
 .biomart .filters .item.singleSelectBoolean .subgroup {

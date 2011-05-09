@@ -302,7 +302,7 @@ public class UpdateMartModel {
 			
 			List<Filter> allFilter = config.getFilters(new ArrayList<String>(), true, true);
 			for(Filter filter: allFilter) {
-				if(filter.getFilterType() == FilterType.SINGLESELECT && filter.getObjectStatus() == ValidationStatus.VALID) {
+				if(filter.hasDropDown() && filter.getObjectStatus() == ValidationStatus.VALID) {
 					if(filter.getQualifier() != OperatorType.RANGE) {
 						filter.updateDropDown(dslist);
 					}
@@ -733,7 +733,7 @@ public class UpdateMartModel {
 		return true;
 	}
 	
-private void updateDatasetForSourceDB(Dataset ds) throws MartBuilderException {
+	private void updateDatasetForSourceDB(Dataset ds) throws MartBuilderException {
 		
 		//progressMonitor.setStatus("updating dataset "+ds.getName() + " in mart "+ds.getParentMart().getName());
 		Mart mart = ds.getParentMart();

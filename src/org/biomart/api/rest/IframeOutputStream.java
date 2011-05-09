@@ -18,8 +18,8 @@ public class IframeOutputStream extends FilterOutputStream implements OutputCons
         HTML = new byte[5][];
         HTML[0] = "<!doctype html><html><head><title></title></head><body>".getBytes();
         HTML[1] = ("<script>parent." + scope + ".write('" + uuid + "','").getBytes();
-        HTML[2] = ("');</script>\n<script>parent." + scope + ".write('" + uuid + "','").getBytes();
-        HTML[3] = ("');</script></body></html>").getBytes();
+        HTML[2] = ("')</script>\n<script>parent." + scope + ".write('" + uuid + "','").getBytes();
+        HTML[3] = ("')</script>\n<script>parent." + scope + ".done('" + uuid + "')</script></body></html>").getBytes();
         HTML[4] = "<span></span>".getBytes();
 
         out.write(HTML[0]);

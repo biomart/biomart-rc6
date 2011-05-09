@@ -12,6 +12,7 @@ public class DataLinkInfo {
 	private DataLinkType type;
 	private boolean includePortal;
 	private boolean isSourceGrouped;
+	private boolean rebuildlink;
 	//for target only
 	private boolean useOldConfig;
 	private boolean targetTableNamePartitioned;
@@ -119,7 +120,15 @@ public class DataLinkInfo {
 		return isSourceGrouped;
 	}
 	
+	public void setRebuildLink(boolean b) {
+		this.rebuildlink = b;
+	}
+	
+	public boolean isRebuildLink() {
+		return this.rebuildlink;
+	}
 	//for file
+
 	public void setFileLinkObject(FileLinkObject value) {
 		this.fileLinkObject = value;
 	}

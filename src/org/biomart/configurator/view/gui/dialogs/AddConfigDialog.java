@@ -49,15 +49,16 @@ public class AddConfigDialog extends JDialog {
 		JLabel nameLabel = new JLabel("Name");
 		this.nameField = new JTextField(20);
 		this.nameField.setText(defaultName);
-		this.naiveCB = new JCheckBox("do naive");
-		this.naiveCB.setSelected(true);
+		this.naiveCB = new JCheckBox("blank");
+		this.naiveCB.setSelected(false);
 		//this.rdfCB = new JCheckBox("generate RDF-triples");
 		//this.rdfCB.setSelected(true);
 		//this.rdfCB.setEnabled(true);
 		
 		inputPanel.add(nameLabel);
 		inputPanel.add(this.nameField);
-		inputPanel.add(this.naiveCB);
+		if(!this.report)
+			inputPanel.add(this.naiveCB);
 		//inputPanel.add(this.rdfCB);
 		
 		JButton cancelButton = new JButton(Resources.get("CANCEL"));
@@ -74,7 +75,7 @@ public class AddConfigDialog extends JDialog {
 				if(isNameValid(AddConfigDialog.this.nameField.getText())) {
 					AddConfigDialog.this.configInfo = new AddConfigInfo();
 					AddConfigDialog.this.configInfo.setName(AddConfigDialog.this.nameField.getText());
-					AddConfigDialog.this.configInfo.setDoNaive(AddConfigDialog.this.naiveCB.isSelected());
+					AddConfigDialog.this.configInfo.setDoNaive(!AddConfigDialog.this.naiveCB.isSelected());
 					AddConfigDialog.this.setVisible(false);
 					AddConfigDialog.this.dispose();
 				}else {
@@ -88,7 +89,7 @@ public class AddConfigDialog extends JDialog {
 		content.add(inputPanel, BorderLayout.CENTER);
 		content.add(buttonPanel,BorderLayout.SOUTH);
 		this.add(content);
-		this.setTitle("Add config");
+		this.setTitle(Resources.get("ADDACCESSPOINT"));
 	}
 	
 	private boolean isNameValid(String name) {

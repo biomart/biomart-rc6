@@ -1,7 +1,6 @@
 package org.biomart.processors.sequence;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import org.biomart.common.exceptions.ValidationException;
@@ -11,6 +10,21 @@ import org.biomart.common.exceptions.ValidationException;
  * @author jhsu, jguberman
  */
 public class CDNAParser extends SequenceParser {
+    private static final int transcriptIDfield = 0;
+    private static final int chrField = 1;
+    private static final int startField = 2;
+    private static final int endField = 3;
+    private static final int strandField = 4;
+    private static final int rankField = 5;
+
+    // These TreeMaps will keep track of the exons
+    private Map<Integer,Integer> start = new TreeMap<Integer,Integer>();
+    private Map<Integer,Integer> end = new TreeMap<Integer,Integer>();
+
+    private String transcriptID = null;
+    private String chr = null;
+    private String strand = null;
+
     public CDNAParser() {
         super(6);
     }
@@ -27,57 +41,38 @@ public class CDNAParser extends SequenceParser {
 	 * @throws IOException
 	 */
     @Override
-	public void parse(List<List<String>> inputQuery) throws IOException {
-		// "cDNA sequences"
+	public String parseLine(String[] line) {
+        int currentRank = Integer.parseInt(line[rankField])-1; // Subtract 1 to convert to zero indexing
+        String results = "";
 
-		final int transcriptIDfield = 0;
-		final int chrField = 1;
-		final int startField = 2;
-		final int endField = 3;
-		final int strandField = 4;
-		final int rankField = 5;
+        // If new transcript ID or last line
+        if (!line[transcriptIDfield].equals(transcriptID)) {
+            if (transcriptID != null) {
+                results = getCDNA(getHeader(), chr, start, end, strand);
+                start.clear();
+                end.clear();
+            }
 
-        boolean done = false;
+            chr = line[chrField];
+            transcriptID = line[transcriptIDfield];
+            strand = line[strandField];
 
-		// These TreeMaps will keep track of the exons
-		Map<Integer,Integer> start = new TreeMap<Integer,Integer>();
-		Map<Integer,Integer> end = new TreeMap<Integer,Integer>();
-
-        String transcriptID = null;
-        String chr = null;
-        String strand = null;
-
-		for (List<String> line : inputQuery){
-			int currentRank = Integer.parseInt(line.get(rankField))-1; // Subtract 1 to convert to zero indexing
-
-            // If new transcript ID or last line
-			if (!line.get(transcriptIDfield).equals(transcriptID)) {
-                if (transcriptID != null) {
-                    done = printCDNA(getHeader(), chr, start, end, strand);
-                    start.clear();
-                    end.clear();
-                    clearHeader();
-                    if (done) {
-                        break;
-                    }
-                }
-
-                chr = line.get(chrField);
-                transcriptID = line.get(transcriptIDfield);
-                strand = line.get(strandField);
-			}
-
-			start.put(currentRank, Integer.parseInt(line.get(startField)));
-			end.put(currentRank, Integer.parseInt(line.get(endField)));
-
-            storeHeaderInfo(line);
-		}
-
-        // Print last line
-        if (!done) {
-            printCDNA(getHeader(), chr, start, end, strand);
+            clearHeader();
         }
+
+        start.put(currentRank, Integer.parseInt(line[startField]));
+        end.put(currentRank, Integer.parseInt(line[endField]));
+
+        storeHeaderInfo(line);
+
+        return results;
 	}
+
+    @Override
+    public String parseLast() {
+        return getCDNA(getHeader(), chr, start, end, strand);
+    }
+
 
 	/**
 	 * Retrieves and prints sequence for QueryType CDNA.
@@ -88,29 +83,24 @@ public class CDNAParser extends SequenceParser {
 	 * @param strand	Sequence strand.
 	 * @throws IOException
 	 */
-	protected final boolean printCDNA(String header, String chr,
-			Map<Integer,Integer> start, Map<Integer,Integer> end, String strand) throws IOException {
-        try {
-            StringBuilder sequence = new StringBuilder();
-            if (!chr.equals("")) {
-                if (strand.equals("-1")){
-                    sequence.append(reverseComplement(getSequence(chr,end.get(0)+1,end.get(0)+upstreamFlank)));
-                    for (int i = 0; i < start.size(); i++){
-                        sequence.append(reverseComplement(getSequence(chr, start.get(i), end.get(i))));
-                    }
-                    sequence.append(reverseComplement(getSequence(chr,start.get(start.size()-1)-downstreamFlank,start.get(start.size()-1)-1)));
-                } else {
-                    sequence.append(getSequence(chr,start.get(0)-upstreamFlank,start.get(0)-1));
-                    for (int i = 0; i < start.size(); i++){
-                        sequence.append((getSequence(chr, start.get(i), end.get(i))));
-                    }
-                    sequence.append(getSequence(chr,end.get(end.size()-1)+1,end.get(end.size()-1)+downstreamFlank));
+	protected String getCDNA(String header, String chr,
+			Map<Integer,Integer> start, Map<Integer,Integer> end, String strand) {
+        StringBuilder sequence = new StringBuilder();
+        if (!chr.equals("")) {
+            if (strand.equals("-1")){
+                sequence.append(reverseComplement(getSequence(chr,end.get(0)+1,end.get(0)+upstreamFlank)));
+                for (int i = 0; i < start.size(); i++){
+                    sequence.append(reverseComplement(getSequence(chr, start.get(i), end.get(i))));
                 }
+                sequence.append(reverseComplement(getSequence(chr,start.get(start.size()-1)-downstreamFlank,start.get(start.size()-1)-1)));
+            } else {
+                sequence.append(getSequence(chr,start.get(0)-upstreamFlank,start.get(0)-1));
+                for (int i = 0; i < start.size(); i++){
+                    sequence.append((getSequence(chr, start.get(i), end.get(i))));
+                }
+                sequence.append(getSequence(chr,end.get(end.size()-1)+1,end.get(end.size()-1)+downstreamFlank));
             }
-            return printFASTA(sequence.toString(), header);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return printFASTA(SEQUENCE_UNAVAILABLE, header);
         }
+        return getFASTA(sequence.toString(), header);
 	}
 }

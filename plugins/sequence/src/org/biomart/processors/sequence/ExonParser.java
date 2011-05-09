@@ -1,13 +1,31 @@
 package org.biomart.processors.sequence;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  *
  * @author jhsu, jguberman
  */
 public class ExonParser extends TranscriptExonIntronParser {
+    // "Unspliced (Transcript)"
+    // Doesn't yet handle flank
+
+    // Set up the fields
+    private static final int transcriptIDfield = 0;
+    private static final int chrField = 1;
+    private static final int startField = 2;
+    private static final int endField = 3;
+    private static final int strandField = 4;
+    private static final int exonIDField = 5;
+
+    // Read the first line of the input and initialize the variables
+    private String transcriptID = null;
+    private String chr = null;
+    private String strand = null;
+    private int start = 0;
+    private int end = 0;
+    private String exonID = null;
+
     public ExonParser() {
         super(6);
     }
@@ -19,58 +37,32 @@ public class ExonParser extends TranscriptExonIntronParser {
 	 * @throws IOException
 	 */
 	@Override
-    public void parse(List<List<String>> inputQuery) throws IOException {
-		// "Unspliced (Transcript)"
-		// Doesn't yet handle flank
+    public String parseLine(String[] line) {
+        String results = "";
+        // Check if the current row belongs to the same transcript
+        if (line[exonIDField].equals(exonID)) {
+            // If it does, adjust the start and end positions if needed
+            start = Math.min(start, Integer.parseInt(line[startField]));
+            end = Math.max(end, Integer.parseInt(line[endField]));
+            // Update header as necessary
+        } else {
+            if (exonID != null) {
+                results = getTranscriptExonIntron(getHeader(), chr, start, end, strand);
+            }
 
-		// Set up the fields
-		final int transcriptIDfield = 0;
-		final int chrField = 1;
-		final int startField = 2;
-		final int endField = 3;
-		final int strandField = 4;
-		final int exonIDField = 5;
-
-		// Read the first line of the input and initialize the variables
-        String transcriptID = null;
-        String chr = null;
-        String strand = null;
-		int start = 0;
-		int end = 0;
-        String exonID = null;
-
-        boolean done = false;
-
-		for(List<String> line : inputQuery){
-			// Check if the current row belongs to the same transcript
-			if (line.get(exonIDField).equals(exonID)) {
-				// If it does, adjust the start and end positions if needed
-				start = Math.min(start, Integer.parseInt(line.get(startField)));
-				end = Math.max(end, Integer.parseInt(line.get(endField)));
-				// Update header as necessary
-			} else {
-                if (exonID != null) {
-                    done = printTranscriptExonIntron(getHeader(), chr, start, end, strand);
-                }
-
-				// Initialize for the next transcript ID, and re-enter the loop
-				transcriptID = line.get(transcriptIDfield);
-				exonID = line.get(exonIDField);
-				chr = line.get(chrField);
-				start = Integer.parseInt(line.get(startField));
-				end = Integer.parseInt(line.get(endField));
-				strand = line.get(strandField);
-				// Re-initialize header
-                clearHeader();
-
-                if (done) {
-                    break;
-                }
-			}
-            storeHeaderInfo(line);
-		}
-        if (!done) {
-            printTranscriptExonIntron(getHeader(), chr, start, end, strand);
+            // Initialize for the next transcript ID, and re-enter the loop
+            transcriptID = line[transcriptIDfield];
+            exonID = line[exonIDField];
+            chr = line[chrField];
+            start = Integer.parseInt(line[startField]);
+            end = Integer.parseInt(line[endField]);
+            strand = line[strandField];
+            // Re-initialize header
+            clearHeader();
         }
+
+        storeHeaderInfo(line);
+
+        return results;
 	}
 }

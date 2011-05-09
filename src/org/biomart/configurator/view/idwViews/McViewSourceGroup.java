@@ -97,8 +97,16 @@ public class McViewSourceGroup extends McView {
 		return false;
 	}
 	
-	public void refreshGui() {		
+	public void refreshGui() {
+		List<Mart> selMarts = this.getSelectedMarts();
 		JPanel panel = this.getMainPanel();
+		for(Component c : panel.getComponents()){
+			if(c instanceof ContainerComponent){
+				ContainerComponent cc = (ContainerComponent)c;
+				SourceContainer sc = cc.getSourceContainer();
+				sc.setExpanded(cc.getExpandingArea().isVisible());
+			}
+		}
 		panel.removeAll();
 		panel.repaint();
         GridBagConstraints gbc = new GridBagConstraints();  
@@ -108,7 +116,7 @@ public class McViewSourceGroup extends McView {
         gbc.gridwidth = GridBagConstraints.REMAINDER;  
 
 		for(SourceContainer sc: this.scs.getSourceContainerList()) {
-			ContainerComponent cc = new ContainerComponent(sc,true,sc.isGrouped());
+			ContainerComponent cc = new ContainerComponent(sc,sc.isExpanded(),sc.isGrouped());
 			panel.add(cc,gbc);
 			for(Mart mart: sc.getMartList()) {
 				MartComponent mc = new MartComponent(mart);
@@ -122,7 +130,10 @@ public class McViewSourceGroup extends McView {
 		JLabel padding = new JLabel();
 		gbc.fill = GridBagConstraints.NONE;
 		panel.add(padding, gbc);
+		
 		panel.revalidate();
+		
+		this.setSelectedMarts(selMarts);
 	}
 	
 	
@@ -210,6 +221,15 @@ public class McViewSourceGroup extends McView {
 		return result;
 	}
 	
+	public void setSelectedMarts(List<Mart> marts) {
+		for(MartComponent mc: this.getAllMartComponents()) {
+			if(marts.contains(mc.getMart())) {
+				mc.setSelected(true);
+				mc.setBorder(BorderFactory.createLineBorder(Color.RED));
+			}
+		}
+	}
+	
 	public List<MartComponent> getSelectedComponents() {
 		List<MartComponent> result = new ArrayList<MartComponent>();
 		for(MartComponent mc: this.getAllMartComponents()) {
@@ -227,14 +247,17 @@ public class McViewSourceGroup extends McView {
 		return lastpoint;
 	}
 	
-	public List<MartComponent> getComponentsBetween(double y0, double y1) {
-		double low = y0>y1?y1:y0;
-		double high = y0>y1?y0:y1;
+	public List<MartComponent> getComponentsBetween(MartComponent mc0, MartComponent mc1) {
 		List<MartComponent> result = new ArrayList<MartComponent>();
-		for(MartComponent mc: this.getAllMartComponents()) {
-			double y = mc.getLocationOnScreen().getY();
-			if(y>=low && y<=high)
-				result.add(mc);
+		List<MartComponent> all = this.getAllMartComponents();
+		int i0 = all.indexOf(mc0);
+		int i1 = all.indexOf(mc1);
+		int low = i0>i1?i1:i0;
+		int high = i0>i1?i0:i1;
+
+		for(int i=0; i<all.size(); i++) {
+			if(i>=low && i<=high)
+				result.add(all.get(i));
 		}
 		return result;		
 	}
@@ -278,5 +301,11 @@ public class McViewSourceGroup extends McView {
 		// Return the choice.
 		return registry.getMartByName((String)martChoice.getSelectedItem());
 
+	}
+
+	public void unHighlightAllComponent() {
+		for(MartComponent mc: this.getAllMartComponents()) {
+			mc.setBackground(mc.getParent().getBackground());
+		}
 	}
 }

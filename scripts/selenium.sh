@@ -20,7 +20,6 @@ echo "TIMESTAMP=${TIMESTAMP?}"
 SELENIUM=selenium
 QUNIT=qunit
 CHANGE_DISPLAY=0
-TIMEOUT=180
 
 # arguments
 BIOMART_HOST=$1
@@ -115,7 +114,8 @@ for BROWSER in ${BROWSERS[*]?}; do
   echo "testing ${BROWSER?}"
 
   # test browser
-  JAVA_OPTIONS="-jar ${SELENIUM_SERVER_JAR?} -log ${TARGET_DIR_REMOTE?}/${BROWSER?}.log -timeout ${TIMEOUT?} -htmlSuite *${BROWSER?} ${BIOMART_SERVER?}/ ${TARGET_DIR_REMOTE?}/${HTML_SUITE?} ${TARGET_DIR_REMOTE?}/${BROWSER?}.html"
+  JAVA_OPTIONS="-jar ${SELENIUM_SERVER_JAR?} -log ${TARGET_DIR_REMOTE?}/${BROWSER?}.log -htmlSuite *${BROWSER?} ${BIOMART_SERVER?}/ ${TARGET_DIR_REMOTE?}/${HTML_SUITE?} ${TARGET_DIR_REMOTE?}/${BROWSER?}.html"
+
   if [ $CYGWIN == 0 ]; then
     java ${JAVA_OPTIONS?}
   else

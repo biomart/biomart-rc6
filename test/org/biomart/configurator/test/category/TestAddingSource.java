@@ -46,7 +46,7 @@ public class TestAddingSource extends McTestCategory {
 			UserGroup ug = SettingsForTest.getUserGroup(testcase);
 			ObjectController oc = new ObjectController();
 			try {
-				oc.initMarts(dli, ug, XMLElements.DEFAULT.toString(), false);
+				oc.initMarts(dli, ug, XMLElements.DEFAULT.toString());
 			} catch (MartBuilderException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -83,7 +83,7 @@ public class TestAddingSource extends McTestCategory {
 		Options.getInstance().setOptions(null);
 		McViews.getInstance().clean();
 		MartRegistry registry = McGuiUtils.INSTANCE.getRegistryObject();
-		String filePath = SettingsForTest.getSourceXMLPath(testcase);
+		String filePath = SettingsForTest.getBaseXMLPath(testcase);
 		File file = new File(filePath);
 		//set key file
 		String tmpName = file.getName();

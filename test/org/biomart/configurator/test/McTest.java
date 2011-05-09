@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import org.biomart.common.resources.Settings;
 import org.biomart.configurator.test.category.McTestCategory;
+import org.biomart.configurator.utils.McUtils;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -25,11 +26,11 @@ public class McTest {
 
     @BeforeClass
     public static void runBeforeClass() {
+    	System.setProperty("api","2");
     	//load the config xml and init for MC
     	MartConfigurator.initForWeb();
 		Settings.loadGUIConfigProperties();
-		SettingsForTest.loadConfigXML(configxml);
-		
+		SettingsForTest.loadConfigXML(configxml);		
     }
     
 	@Parameters

@@ -119,7 +119,7 @@ public class UserResource {
 
             StringBuilder html = new StringBuilder();
 
-            List discoveries = manager.discover(userSuppliedString);
+            List discoveries = manager.discover(userSuppliedString.trim());
 
             DiscoveryInformation discovered = manager.associate(discoveries);
 

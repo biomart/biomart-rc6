@@ -9,16 +9,23 @@
     results.table.parse = function(rows, writee) {
         var n = rows.length,
             arr = [],
-            currVal;
+            currVal,
+            className;
 
         while (n--) {
             var m = writee.data('numCols') || rows[n].length;
             arr[n] = [];
             while (m--) {
                 currVal = rows[n][m];
+                if (currVal) {
+                    className = '';
+                } else {
+                    currVal = _('empty_value')
+                    className = 'empty';
+                }
                 arr[n][m] = [
                     '<td', this._highlight==m? ' class="highlight"' : '', '>',
-                        '<p class="', currVal ? '' : 'empty' ,'">', currVal || _('empty_value'), '</p>',
+                        '<p class="', className ,'">', currVal, '</p>',
                     '</td>'
                 ].join('');
             }

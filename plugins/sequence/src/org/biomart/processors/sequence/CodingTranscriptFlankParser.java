@@ -3,12 +3,35 @@ package org.biomart.processors.sequence;
 import java.io.IOException;
 import java.util.List;
 import org.biomart.common.exceptions.ValidationException;
+import org.biomart.common.resources.Log;
 
 /**
  *
  * @author jhsu, jguberman
  */
 public class CodingTranscriptFlankParser extends SequenceParser {
+    // "Flank-coding region (Transcript)"
+    // The coding_start_offset and coding_end_offset are both given as a distance from
+    // the exon_chrom_start of the exon that has exon_id equal to start_exon_id or end_exon_id, respectively
+    private static final int transcriptIDField = 0;
+    private static final int chrField = 1;
+    private static final int startField = 2;
+    private static final int endField = 3;
+    private static int codingOffsetField; // set depending on flank
+    private static final int strandField = 6;
+    private static final int exonIDField = 7;
+
+    private int terminalExonField;
+
+    private String transcriptID = null;
+    private String chr = null;
+    private String strand = null;
+    private int start = 0;
+    private int end = 0;
+    private String terminalExonID = null;
+    private String exonID = null;
+    private int codingOffset = 0;
+
     public CodingTranscriptFlankParser() {
         super(11);
     }
@@ -16,6 +39,13 @@ public class CodingTranscriptFlankParser extends SequenceParser {
     @Override
     public SequenceParser validate() throws ValidationException {
 		checkFlank();
+        if (upstreamFlank >0 ){
+            terminalExonField = 9;
+            codingOffsetField = 4;
+        } else {
+            terminalExonField = 10;
+            codingOffsetField = 5;
+        }
         return this;
     }
 
@@ -26,66 +56,37 @@ public class CodingTranscriptFlankParser extends SequenceParser {
 	 * @throws IOException
 	 */
 	@Override
-    public void parse(List<List<String>> inputQuery) throws IOException {
-		// "Flank-coding region (Transcript)"
-		// The coding_start_offset and coding_end_offset are both given as a distance from
-		// the exon_chrom_start of the exon that has exon_id equal to start_exon_id or end_exon_id, respectively
-		final int transcriptIDField = 0;
-		final int chrField = 1;
-		final int startField = 2;
-		final int endField = 3;
-		int codingOffsetField; // set depending on flank
-		final int strandField = 6;
-		final int exonIDField = 7;
-		int terminalExonField;
+    public String parseLine(String[] line) {
+        String results = "";
 
-        boolean done = false;
-
-		if (upstreamFlank >0 ){
-			terminalExonField = 9;
-			codingOffsetField = 4;
-		} else {
-			terminalExonField = 10;
-			codingOffsetField = 5;
-		}
-        String transcriptID = null;
-        String chr = null;
-        String strand = null;
-		int start = 0;
-		int end = 0;
-		String terminalExonID = null;
-		String exonID = null;
-		int codingOffset = 0;
-
-		for (List<String> line : inputQuery){
-			exonID = line.get(exonIDField);
-			if (!line.get(transcriptIDField).equals(transcriptID)) {
-                if (transcriptID != null) {
-                    done = printCodingTranscriptFlank(getHeader(), chr, start, end, codingOffset, strand);
-                }
-				transcriptID = line.get(transcriptIDField);
-				terminalExonID = line.get(terminalExonField);
-				chr = "";
-				start = 0;
-				end = 0;
-				strand = line.get(strandField);
-                clearHeader();
-                if (done) {
-                    break;
-                }
-			}
-			if (exonID.equals(terminalExonID)){
-				chr = line.get(chrField);
-				start = Integer.parseInt(line.get(startField));
-				end = Integer.parseInt(line.get(endField));
-				codingOffset = Integer.parseInt(line.get(codingOffsetField));
-			}
-            storeHeaderInfo(line);
-		}
-        if (!done) {
-            printCodingTranscriptFlank(getHeader(), chr, start, end, codingOffset,strand);
+        exonID = line[exonIDField];
+        if (!line[transcriptIDField].equals(transcriptID)) {
+            if (transcriptID != null) {
+                results = getCodingTranscriptFlank(getHeader(), chr, start, end, codingOffset, strand);
+            }
+            transcriptID = line[transcriptIDField];
+            terminalExonID = line[terminalExonField];
+            chr = "";
+            start = 0;
+            end = 0;
+            strand = line[strandField];
+            clearHeader();
         }
+        if (exonID.equals(terminalExonID)){
+            chr = line[chrField];
+            start = Integer.parseInt(line[startField]);
+            end = Integer.parseInt(line[endField]);
+            codingOffset = Integer.parseInt(line[codingOffsetField]);
+        }
+        storeHeaderInfo(line);
+
+        return results;
 	}
+
+    @Override
+    public String parseLast() {
+        return getCodingTranscriptFlank(getHeader(), chr, start, end, codingOffset, strand);
+    }
 
 	/**
 	 * Retrieves and prints sequence for QueryType CODING_TRANSCRIPT_FLANK
@@ -98,8 +99,8 @@ public class CodingTranscriptFlankParser extends SequenceParser {
 	 * @param strand Sequence strand.
 	 * @throws IOException
 	 */
-	protected final boolean printCodingTranscriptFlank(String header,
-            String chr, int start, int end, int codingOffset,String strand) throws IOException {
+	protected final String getCodingTranscriptFlank(String header,
+            String chr, int start, int end, int codingOffset,String strand) {
         try {
             String sequence;
             // Check whether we're dealing with the 5' flank or the 3', and handle accordingly
@@ -118,10 +119,10 @@ public class CodingTranscriptFlankParser extends SequenceParser {
                     sequence = (getSequence(chr, start+codingOffset, start-1+codingOffset+downstreamFlank));
                 }
             }
-            return printFASTA(sequence, header);
+            return getFASTA(sequence, header);
         } catch (Exception e) {
-            e.printStackTrace();
-            return printFASTA(SEQUENCE_UNAVAILABLE, header);
+            Log.debug(e);
+            return getFASTA(SEQUENCE_ERROR_ENCOUNTERED, header);
         }
 	}
 

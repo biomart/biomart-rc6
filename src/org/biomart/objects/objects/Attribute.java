@@ -330,13 +330,7 @@ public class Attribute extends Element implements Comparable<Attribute> {
 	}
 
 	public String getLinkOutUrl() {
-		String tmpValue = this.getPropertyValue(XMLElements.LINKOUTURL);
-		if(McUtils.isStringEmpty(tmpValue)) {
-			if(this.isPointer() && this.getPointedAttribute()!=null) {
-				tmpValue =  this.getPointedAttribute().getLinkOutUrl();
-			} 
-		}
-		return tmpValue;
+		return this.getPropertyValue(XMLElements.LINKOUTURL);
 	}
 	
 	public String getName(Dataset ds) {

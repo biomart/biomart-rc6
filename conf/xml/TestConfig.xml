@@ -31,7 +31,7 @@
 		<sourcexml>source_mssql.xml</sourcexml>
 	</testcase>
 	
-	<testcase name="createsavexml_source_db2" category="TestAddingSource" ignore="false">
+	<testcase name="createsavexml_source_db2" category="TestAddingSource" ignore="true">
 		<usergroup>anonymous</usergroup>
 		<connection type="Source Schema">
 			<db type="DB2" jdbcurl="jdbc:db2://biomartdb-dev.res.oicr.on.ca:50000/" username="martadm" password="Bi0M4rt" 
@@ -44,7 +44,7 @@
 		<usergroup>anonymous</usergroup>
 		<connection type="Source Schema">
 			<db type="oracle" jdbcurl="jdbc:oracle:thin:@//biomartdb-dev.res.oicr.on.ca:1521/" username="martadmin" password="Bi0M4rt" 
-				database="vega58hs" schema="MARTADMIN" tables="G,CC,CQ"/>
+				database="vega58hsap" schema="MARTADMIN" tables="GENE,TRANSCRIPT,TRANSLATION"/>
 		</connection>
 		<sourcexml>source_oracle.xml</sourcexml>
 	</testcase>
@@ -69,7 +69,7 @@
 		<sourcexml>mart_naive_pg.xml</sourcexml>
 	</testcase>
 	
-	<testcase name="createsavexml_mart_naive_db2" category="TestAddingSource" ignore="false">
+	<testcase name="createsavexml_mart_naive_db2" category="TestAddingSource" ignore="true">
 		<usergroup>anonymous</usergroup>
 		<connection type="Relational Mart">
 			<db type="DB2" jdbcurl="jdbc:db2://biomartdb-dev.res.oicr.on.ca:50000/" username="martadm" password="Bi0M4rt" 
@@ -86,6 +86,16 @@
 				database="vega_mart_58" schema="vega_mart_58" tables="meta_conf__dataset__main, meta_conf__interface__dm, meta_conf__user__dm, meta_conf__xml__dm, meta_template__template__main, meta_template__xml__dm, meta_version__version__main" naive="false"/>
 		</connection>
 		<sourcexml>mart_bc_mysql.xml</sourcexml>		
+	</testcase>
+	
+		<!-- file -->
+	<testcase name="open_registry_file" category="TestAddConfig" ignore="false">
+		<usergroup>anonymous</usergroup>
+		<connection type="Registry File">
+			<file>test1544base.xml</file>
+		</connection>
+		<newconfig name="gene_vega_config"/>
+		<sourcexml>Test1544.xml</sourcexml>		
 	</testcase>
 	
 	<!-- add config -->
@@ -128,7 +138,7 @@
 		<sourcesql>mart_materialize_mssql.sql</sourcesql>
 	</testcase>
 	
-	<testcase name="mart_materialize_db2" category="TestMartMaterialize" ignore="false">
+	<testcase name="mart_materialize_db2" category="TestMartMaterialize" ignore="true">
 	<usergroup>anonymous</usergroup>
 		<connection type="Source Schema">
 			<db type="DB2" jdbcurl="jdbc:db2://biomartdb-dev.res.oicr.on.ca:50000/" username="martadm" password="Bi0M4rt" 
@@ -141,7 +151,7 @@
 	<usergroup>anonymous</usergroup>
 		<connection type="Source Schema">
 			<db type="oracle" jdbcurl="jdbc:oracle:thin:@//biomartdb-dev.res.oicr.on.ca:1521/" username="martadmin" password="Bi0M4rt" 
-				database="vega58hs" schema="MARTADMIN" tables="G,CC,CQ"/>
+				database="vega58hsap" schema="MARTADMIN" tables="GENE,TRANSCRIPT,TRANSLATION"/>
 		</connection>
 		<sourcesql>mart_materialize_oracle.sql</sourcesql>
 	</testcase>
@@ -181,7 +191,7 @@
 		<Query client="biomartclient" processor="TSV" limit="-1" header="1"><Dataset name="dbo" config="gene_config"><Filter name="gene__gene_id_1021" value="34336"/><Attribute name="gene__gene_id_1021"/></Dataset></Query>
 	</testcase>
 	
-	<testcase name="query_db2"  category="TestQuery" ignore="false">
+	<testcase name="query_db2"  category="TestQuery" ignore="true">
 		<usergroup>anonymous</usergroup>
 		<connection type="Source Schema">
 			<db type="DB2" jdbcurl="jdbc:db2://biomartdb-dev.res.oicr.on.ca:50000/" username="martadm" password="Bi0M4rt" 
@@ -196,11 +206,11 @@
 		<usergroup>anonymous</usergroup>
 		<connection type="Source Schema">
 			<db type="oracle" jdbcurl="jdbc:oracle:thin:@//biomartdb-dev.res.oicr.on.ca:1521/" username="martadmin" password="Bi0M4rt" 
-				database="vega58hs" schema="MARTADMIN" tables="G"/>
+				database="vega58hsap" schema="MARTADMIN" tables="GENE"/>
 		</connection>
 		<sourcexml>query_oracle.xml</sourcexml>
 		<sourcequery>query_oracle.txt</sourcequery>
-		<Query client="biomartclient" processor="TSV" limit="-1" header="1"><Dataset name="MARTADMIN" config="G_config"><Attribute name="G__CC__AC_AD_id_1024"/></Dataset></Query>
+		<Query client="biomartclient" processor="TSV" limit="-1" header="1"><Dataset name="MARTADMIN" config="GENE_config"><Attribute name="GENE__GENE_ID_1021"/></Dataset></Query>
 	</testcase>
 	
 	<!-- URL mart link test -->
@@ -251,6 +261,14 @@
 		<sourcequery>link_source_schema.txt</sourcequery>
 		<Query client="biomartclient" processor="TSV" limit="-1" header="1"><Processor></Processor><Dataset name="vega_mart_60" config="hsapiens_gene_vega__gene__main_config"><Attribute name="stableidentifier_identifier"/><Attribute name="hsapiens_gene_vega__gene__main__analysis_id_1020_102"/></Dataset></Query>
 	</testcase>
+	<!-- add naive report test -->
+	<testcase name="test_addreport" category="TestAddReport" ignore="false">
+		<usergroup>anonymous</usergroup>
+		<basexml>vega_report_base.xml</basexml>
+		<attribute name="vega_gene_id"/>
+		<newconfig name="hsapiens_gene_vega_report"/>
+		<sourcexml>vega_report.xml</sourcexml>		
+	</testcase>
 	<!-- relational mart link test -->
 	<testcase name="link_relational_mart"  category="TestLink" ignore="false">
 		<usergroup>anonymous</usergroup>
@@ -274,6 +292,31 @@
 		<sourcexml>link_relational_mart.xml</sourcexml>
 		<sourcequery>link_relational_mart.txt</sourcequery>
 		<Query client="biomartclient" processor="TSV" limit="-1" header="1"><Processor></Processor><Dataset name="hsapiens_gene_vega" config="gene_vega_config"><Filter name="vega_gene_id" value="OTTHUMG00000129537"/><Attribute name="vega_gene_id"/><Attribute name="stableidentifier_identifier"/></Dataset></Query>
+	</testcase>
+	
+	<testcase name="link_ensemble_core"  category="TestLink" ignore="false">
+		<usergroup>anonymous</usergroup>
+		<connection type="URL">
+			<url host="http://bm-test.res.oicr.on.ca" port="9002" path="/biomart/martservice">
+				<mart name="test_reactome_mart" datasets="all"/>
+			</url>
+		</connection>
+		<connection type="Source Schema">
+			<db type="mysql" jdbcurl="jdbc:mysql://biomartdb-dev.res.oicr.on.ca:3306/" username="martadmin" password="Bi0M4rt" 
+				database="homo_sapiens_core_61_37f" schema="homo_sapiens_core_61_37f" tables="gene"/>
+		</connection>
+		
+		<create type="link">
+			<source mart="pathway" attribute="referencedatabase_ensembl">
+					<attribute name="stableidentifier_identifier"></attribute>
+					<attribute name="_displayname"></attribute>
+			</source>
+			<target mart="gene" attribute="gene__stable_id_1024">
+			</target>
+		</create>	
+		<sourcexml>link_ensemble_core.xml</sourcexml>
+		<sourcequery>link_ensemble_core.txt</sourcequery>
+		<Query client="biomartclient" processor="TSV" limit="-1" header="1"><Dataset name="homo_sapiens_core_61_37f" config="gene_config"><Filter name="gene__analysis_id_1021" value="8071"/><Attribute name="gene__analysis_id_1021"/><Attribute name="stableidentifier_identifier"/><Attribute name="_displayname"/></Dataset></Query>
 	</testcase>
 	
 	<!-- update mart test -->

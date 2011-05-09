@@ -250,7 +250,7 @@ public class ConfigDialog extends JDialog {
 			tnh.requestSearchNode(mcObj,p,
 					sObj.getTypeStr(),sObj.getValue(), sObj.getSearchName(),
 					sObj.isCaseSensitive(), sObj.isLike(), sObj.getScopeStr(), this);
-
+			//dialog.dispose();
 		}
 	}
 	

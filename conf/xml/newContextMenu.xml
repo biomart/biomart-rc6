@@ -32,7 +32,7 @@
 		<menuItem name="copy" title="Copy" disabled="0" multiselect="true"/>
 		<menuItem name="paste" title="Paste" disabled="0"/>
 		<menuItem name="mpproperties" title="Properties" disabled="0" multiselect="false"/>
-		<menuItem name="rdf" title="Re-generate RDF" disable="0" multiselect="true"/>
+		<menuItem name="rdf" title="Generate Semantics" disable="0" multiselect="true"/>
 		<!-- <menuItem name="orderdsbydisplayname" title="order dataset by displayname" disabled="0"/> -->
 	</config>
 	<partitiontable>

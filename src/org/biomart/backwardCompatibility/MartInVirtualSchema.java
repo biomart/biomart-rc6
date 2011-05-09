@@ -8,7 +8,7 @@ public class MartInVirtualSchema {
 	private final String database;
 	private final String defaultStr;
 	private final String displayName;
-	private final String host;
+	private String host;
 	private final String includeDatasets;
 	private final String martUser;
 	private final String name;
@@ -249,6 +249,10 @@ public class MartInVirtualSchema {
 
 	public String getHost() {
 		return host;
+	}
+	
+	public void setHost(String host) {
+		this.host = host;
 	}
 
 	public String getIncludeDatasets() {

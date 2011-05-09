@@ -86,6 +86,7 @@ public class DataLinkDialog extends JDialog implements ItemListener{
 	private JButton cancel;
 	private DbDataLinkPanel dbLinkPanel;
 	private JButton execute;	
+	private JCheckBox rebuildLinkCB;
 	private JComboBox name;
 	private JComboBox type;	
 	private DataLinkInfo dlinkInfo = null;	
@@ -173,6 +174,7 @@ public class DataLinkDialog extends JDialog implements ItemListener{
 		// Create buttons in dialog.
 		this.cancel = new JButton(Resources.get("cancelButton"));
 		this.execute = new JButton(Resources.get("addButton"));
+		this.rebuildLinkCB = new JCheckBox("rebuild link");
 
 		// In the name field, also include the type label and field, to save
 		// space.
@@ -199,6 +201,7 @@ public class DataLinkDialog extends JDialog implements ItemListener{
 //		southPanel.add(this.test);
 		southPanel.add(this.cancel);
 		southPanel.add(this.execute);
+		southPanel.add(this.rebuildLinkCB);
 		//southPanel.add(this.includePortalCB);
 		// Intercept the cancel button, which closes the dialog
 		// without taking any action.
@@ -242,7 +245,6 @@ public class DataLinkDialog extends JDialog implements ItemListener{
 	}
 	
 	private void execute() {
-		
 		if(((DataLinkType)this.type.getSelectedItem()).equals(DataLinkType.RDBMS)) {
 			// Assume we've failed.
 			boolean passedTest = true;
@@ -265,6 +267,7 @@ public class DataLinkDialog extends JDialog implements ItemListener{
 				//this.dlinkInfo.setIncludePortal(this.includePortalCB.isSelected());
 				this.dlinkInfo.setIncludePortal(this.sourceGroupCB.isSelected());
 				this.dlinkInfo.setTargetTableNamePartitioned(this.dbLinkPanel.isTablePartitioned());
+				this.dlinkInfo.setRebuildLink(this.rebuildLinkCB.isSelected());
 				if(!isNameEmpty)
 					this.storeInHistory();
 			} else
@@ -290,6 +293,7 @@ public class DataLinkDialog extends JDialog implements ItemListener{
 			this.dlinkInfo.setUseOldConfigFlag(!this.version8);
 			//this.dlinkInfo.setIncludePortal(this.includePortalCB.isSelected());
 			this.dlinkInfo.setIncludePortal(this.sourceGroupCB.isSelected());
+			this.dlinkInfo.setRebuildLink(this.rebuildLinkCB.isSelected());
 			this.storeInHistory();
 			
 		} else if(((DataLinkType)this.type.getSelectedItem()).equals(DataLinkType.FILE)) {
@@ -300,6 +304,7 @@ public class DataLinkDialog extends JDialog implements ItemListener{
 			this.dlinkInfo.setSourceGrouped(this.sourceGroupCB.isSelected());
 			//this.dlinkInfo.setIncludePortal(this.includePortalCB.isSelected());
 			this.dlinkInfo.setIncludePortal(this.sourceGroupCB.isSelected());
+			this.dlinkInfo.setRebuildLink(this.rebuildLinkCB.isSelected());
 			this.setVisible(false);	
 		}
 	}	

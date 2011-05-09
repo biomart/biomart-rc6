@@ -30,6 +30,10 @@ public class ContainerComponent extends JPanel {
 	
 	private SourceGroupPanel actionPanel;
 	private final SourceContainer sourceContainer;
+	public SourceContainer getSourceContainer() {
+		return sourceContainer;
+	}
+
 	private ExpandingPanel expandingPanel;
 	private GridBagConstraints gbc;
 	

@@ -61,14 +61,12 @@ public class FilterDropDownDialog extends JDialog implements ListSelectionListen
 	private Filter filter;
 	private JList dsList;
 	private JList optionList;
-	private JButton saveButton;
 	private JButton updateButton;
 	private JButton removeButton;
 	private JButton upButton;
 	private JButton downButton;
 	private JButton sortButton;
 	private JButton addButton;
-	private boolean changed = false;
 	private Map<Dataset,List<FilterData>> optionDataMap;
 	
 	public FilterDropDownDialog(JDialog parent, Filter filter) {
@@ -87,7 +85,6 @@ public class FilterDropDownDialog extends JDialog implements ListSelectionListen
 		JPanel buttonPanel = new JPanel();
 		
 		updateButton = new JButton(Resources.get("UPDATE"));
-		saveButton = new JButton(Resources.get("SAVE"));
 		removeButton = new JButton(Resources.get("REMOVE"));
 		addButton = new JButton(Resources.get("ADD"));
 		
@@ -104,11 +101,6 @@ public class FilterDropDownDialog extends JDialog implements ListSelectionListen
 		buttonPanel.add(addButton);
 		addButton.setActionCommand(Resources.get("ADD"));
 		addButton.addActionListener(this);
-		
-		buttonPanel.add(saveButton);
-		saveButton.setActionCommand(Resources.get("SAVE"));
-		saveButton.addActionListener(this);
-		saveButton.setEnabled(false);
 		
 		buttonPanel.add(updateButton);
 		updateButton.setActionCommand(Resources.get("UPDATE"));
@@ -218,16 +210,10 @@ public class FilterDropDownDialog extends JDialog implements ListSelectionListen
 		if(evt.getActionCommand().equals(Resources.get("CANCEL"))) {
 			this.setVisible(false);
 			this.dispose();
-		}else if(evt.getActionCommand().equals(Resources.get("SAVE"))) {
-			if(this.save()) {
-				this.changed = false;
-				saveButton.setEnabled(false);
-			}
 		}else if(evt.getActionCommand().equals(Resources.get("UPDATE"))) {
 			if(this.update()) {
 				this.refreshDataList();
-				this.saveButton.setEnabled(true);
-				this.changed = true;
+				this.save();
 			}
 		}else if(evt.getActionCommand().equals(Resources.get("REMOVE"))) {
 			this.remove();
@@ -399,8 +385,7 @@ public class FilterDropDownDialog extends JDialog implements ListSelectionListen
 				datasetElement.setAttribute(XMLElements.NAME.toString(),dataset.getName());
 				for(FilterData fd: values) {
 					Element valueElement = new Element(XMLElements.ROW.toString());
-					String dataStr = fd.getName()+"|"+fd.getDisplayName()+"|"+((Boolean)fd.isSelected()).toString();
-					valueElement.setAttribute(XMLElements.DATA.toString(),dataStr);
+					valueElement.setAttribute(XMLElements.DATA.toString(),fd.toSavedFormat());
 					datasetElement.addContent(valueElement);
 				}
 				filterElement.addContent(datasetElement);
@@ -427,8 +412,6 @@ public class FilterDropDownDialog extends JDialog implements ListSelectionListen
 					datalist.add(fd);
 			}
 		}
-		this.saveButton.setEnabled(true);
-		this.changed = true;
 		this.optionList.setSelectedIndex(model.getSize()-1);
 		this.save();
 	}
@@ -470,7 +453,6 @@ public class FilterDropDownDialog extends JDialog implements ListSelectionListen
 			}	
 						
 			this.optionList.setSelectedIndices(newSelected);
-			this.changed = true;
 		} else {
 			int[] selected = this.optionList.getSelectedIndices();
 			DefaultListModel model = (DefaultListModel)this.optionList.getModel();
@@ -488,7 +470,6 @@ public class FilterDropDownDialog extends JDialog implements ListSelectionListen
 
 			
 			this.optionList.setSelectedIndices(newSelected);
-			this.changed = true;
 		}
 		
 		//update optionMap
@@ -499,7 +480,7 @@ public class FilterDropDownDialog extends JDialog implements ListSelectionListen
 			fdlist.add((FilterData)model.get(i));
 		}
 		this.optionDataMap.put((Dataset)dsObj, fdlist);
-		this.saveButton.setEnabled(true);
+		this.save();
 	}
 	
 	private void sort() {
@@ -538,13 +519,7 @@ public class FilterDropDownDialog extends JDialog implements ListSelectionListen
 	}
 
 	public void windowDeactivated(WindowEvent arg0) {
-		McEventBus.getInstance().removeListener(McEventProperty.FILTEROPTION_CHANGED.toString(), this);
-		if(this.changed) {
-			if (JOptionPane.showConfirmDialog(this,
-			        "Do you want to quit without saving?", "Save",
-			        JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION)
-				this.setVisible(true);
-		}	
+		McEventBus.getInstance().removeListener(McEventProperty.FILTEROPTION_CHANGED.toString(), this);	
 	}
 
 	public void windowDeiconified(WindowEvent arg0) {
@@ -566,7 +541,7 @@ public class FilterDropDownDialog extends JDialog implements ListSelectionListen
 	public void update(McEvent<?> event) {
 		String property = event.getProperty();
 		if(property.equals(McEventProperty.FILTEROPTION_CHANGED.toString())) {
-			
+			this.save();
 		}
 	}
 

@@ -3,7 +3,6 @@ package org.biomart.processors.sequence;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import org.biomart.common.resources.Log;
 import org.biomart.processors.JGUtils;
 
 /**

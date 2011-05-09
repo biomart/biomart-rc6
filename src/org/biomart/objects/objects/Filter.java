@@ -288,7 +288,7 @@ public class Filter extends Element	{
 //						Log.error("data is null ");
 						continue;
 					}
-					String[] dataArray = data.split("\\|",-1);
+					String[] dataArray = McUtils.getOptionsDataFromString(data);
 					//remove all legacy null row
 					if(dataArray[1].equals("null")|| dataArray[1].equals("NULL"))
 						continue;
@@ -750,7 +750,8 @@ public class Filter extends Element	{
 	}
 	
 	public boolean hasDropDown() {
-		return this.getFilterType() == FilterType.SINGLESELECT;
+		return (this.getFilterType() == FilterType.SINGLESELECT || 
+				this.getFilterType() == FilterType.MULTISELECT);
 	}
 	
 	public void updateDropDown(List<Dataset> dsList) throws MartBuilderException {
@@ -868,14 +869,6 @@ public class Filter extends Element	{
 		return result;
 	}
 
-	@Override
-	public String getDisplayName() {
-		if(this.isPointer() && this.getPointedFilter()!=null)
-			return this.getPointedFilter().getDisplayName();
-		else
-			return super.getDisplayName();
-	}
-
 	public Filter cloneMyself() {
 		org.jdom.Element e = this.generateXml();
 		return new Filter(e);
@@ -942,4 +935,13 @@ public class Filter extends Element	{
 		this.setProperty(XMLElements.ERROR, "");
 		return true;
 	}
+
+	@Override
+	public String getDisplayName() {
+		if(this.isPointer() && this.getPointedFilter()!=null)
+			return this.getPointedFilter().getDisplayName();
+		else
+			return super.getDisplayName();
+	}
+
 }

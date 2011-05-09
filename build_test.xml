@@ -74,6 +74,8 @@
       <formatter type="xml"/>
       <test name="org.biomart.api.PortalApiTest" outfile="${testoutput.dir}/TEST-PortalApiTest"/>
       <test name="org.biomart.api.QueryApiTest" outfile="${testoutput.dir}/TEST-QueryApiTest"/>
+      <test name="org.biomart.api.MartApiTest" outfile="${testoutput.dir}/TEST-MartApiTest"/>
+      <test name="org.biomart.api.SourceSchemaApiTest" outfile="${testoutput.dir}/TEST-SourceSchemaApiTest"/>
       <test name="org.biomart.api.rest.RestApplicationTest" outfile="${testoutput.dir}/TEST-RestApplicationTest"/>
       <!--<test name="org.biomart.api.rest.RestApplicationSPARQLTest" outfile="${testoutput.dir}/TEST-RestApplicationSPARQLTest"/>-->
     </junit>

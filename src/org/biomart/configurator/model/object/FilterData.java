@@ -10,7 +10,7 @@ public class FilterData implements Comparable<FilterData> {
 	
 	public FilterData(String name, String displayName, boolean isSelected) {
 		this.name = name;
-		this.displayName = name;
+		this.displayName = displayName;
 		this.isSelected = isSelected;
 	}
 
@@ -44,6 +44,17 @@ public class FilterData implements Comparable<FilterData> {
 		return this.displayName;
 	}
 
+	public String toSavedFormat() {
+		String tmpname = this.name;
+		String tmpdisplayname = this.displayName;
+		if(this.name.indexOf("|")>=0) {
+			tmpname = tmpname.replaceAll("\\|", "\\\\|");
+		}
+		if(this.displayName.indexOf("|")>=0) {
+			tmpdisplayname = tmpdisplayname.replaceAll("\\|", "\\\\|");
+		}
+		return tmpname+"|"+tmpdisplayname+"|"+Boolean.toString(isSelected);
+	}
 
 
 	public int compareTo(FilterData arg0) {

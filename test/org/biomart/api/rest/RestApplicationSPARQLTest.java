@@ -22,7 +22,7 @@ import org.biomart.configurator.test.SettingsForTest;
 import org.biomart.configurator.test.category.TestAddingSource;
 import org.biomart.processors.JSON;
 import org.biomart.processors.ProcessorRegistry;
-import org.biomart.processors.RDF;
+import org.biomart.processors.SPARQLXML;
 import org.biomart.processors.TSV;
 import org.biomart.processors.TSVX;
 import org.biomart.web.TestServletConfig;
@@ -67,8 +67,8 @@ public class RestApplicationSPARQLTest extends JerseyTest {
 
         ProcessorRegistry.register("TSV", TSV.class);
         ProcessorRegistry.register("TSVX", TSVX.class);
-        ProcessorRegistry.register("RDF", RDF.class);
-        ProcessorRegistry.register("CSV", RDF.class);
+        ProcessorRegistry.register("SPARQL", SPARQLXML.class);
+        ProcessorRegistry.register("CSV", SPARQLXML.class);
         ProcessorRegistry.register("JSON", JSON.class);
     }
 
@@ -94,7 +94,7 @@ public class RestApplicationSPARQLTest extends JerseyTest {
     	
     	//run SPARQL query
     	String sparqlMsg = webResource
-	        .path("/martsemantics/TSV/"+configName+"/get/")
+	        .path("/martsemantics/"+configName+"/TSV/get/")
 	        .queryParam("query", sparqlQuery)
 	        .accept("application/sparql-results+xml")
 	        .get(String.class);

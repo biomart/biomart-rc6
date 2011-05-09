@@ -22,6 +22,7 @@ import org.biomart.configurator.utils.McUtils;
 import org.biomart.objects.objects.Dataset;
 import org.biomart.objects.objects.Filter;
 import org.biomart.objects.objects.Link;
+import org.biomart.objects.objects.PartitionTable;
 import org.biomart.queryEngine.OperatorType;
 import org.biomart.queryEngine.QueryElement;
 import org.biomart.queryEngine.SubQuery;
@@ -107,8 +108,15 @@ public class LinkIndices {
 				Log.error("LinkIndices: results retrieved");
 				File registryIndiceFile = McGuiUtils.INSTANCE.getIndicesDirectory();
 				FileWriter registryWriter = null;
+				String pointeddsName = link.getPointedDataset();
+				String tmpName = pointeddsName;
+				if(McUtils.hasPartitionBinding(pointeddsName)) {
+					PartitionTable pt = link.getParentConfig().getMart().getSchemaPartitionTable();
+					int row = pt.getRowNumberByDatasetName(dataset);
+					tmpName = McUtils.getRealName(pt, row, pointeddsName);
+				}
 				String fileName = link.getParentConfig().getMart().getName() + "_" + dataset + "__"
-                + link.getPointedMart().getName() + "_" + link.getPointedDataset() + ".txt";
+					+ link.getPointedMart().getName() + "_" + tmpName + ".txt";
 				if(registryIndiceFile != null) {
 					System.out.println(registryIndiceFile.getName());
 					registryWriter = new FileWriter(registryIndiceFile+"/"+fileName);

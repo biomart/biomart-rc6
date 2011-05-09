@@ -15,7 +15,7 @@ import org.jdom.Comment;
  *
  */
 @ContentType("application/sparql-results+xml")
-public class RDF extends ProcessorImpl {
+public class SPARQLXML extends ProcessorImpl {
     @Override
     public void beforeQuery(Query query, OutputStream out) throws IOException {
         String prelude = null;

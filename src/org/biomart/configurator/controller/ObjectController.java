@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -33,18 +34,22 @@ import org.biomart.configurator.utils.FileLinkObject;
 import org.biomart.configurator.utils.JdbcLinkObject;
 import org.biomart.configurator.utils.McGuiUtils;
 import org.biomart.configurator.utils.McUtils;
+import org.biomart.configurator.utils.MessageConfig;
 import org.biomart.configurator.utils.UrlLinkObject;
 import org.biomart.configurator.utils.type.ComponentStatus;
 import org.biomart.configurator.utils.type.DataLinkType;
 import org.biomart.configurator.utils.type.DatasetTableType;
 import org.biomart.configurator.utils.type.IdwViewType;
 import org.biomart.configurator.utils.type.McEventProperty;
+import org.biomart.configurator.utils.type.MessageType;
 import org.biomart.configurator.utils.type.PartitionType;
 import org.biomart.configurator.utils.type.PortableType;
 import org.biomart.configurator.utils.type.ValidationStatus;
 import org.biomart.configurator.view.gui.dialogs.CreateLinkIndexDialog;
+import org.biomart.configurator.view.gui.dialogs.WarningDialog;
 import org.biomart.configurator.view.idwViews.McViewPortal;
 import org.biomart.configurator.view.idwViews.McViews;
+import org.biomart.objects.enums.FilterType;
 import org.biomart.objects.objects.Attribute;
 import org.biomart.objects.objects.Column;
 import org.biomart.objects.objects.Config;
@@ -75,47 +80,12 @@ import org.biomart.processors.Processor;
 import org.biomart.processors.ProcessorGroup;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
 public class ObjectController {
 	
-	private int showMessageForRebuildLink = 0; //0 show, 1 don't show, 2 don't show anymore for yes, 3 don't show anymore for no
-
-   	/*public boolean addMarts(final UserGroup user, final String group) {
-		final DataLinkInfo dlinkInfo = DataLinkDialog.showDialog();
-		if(dlinkInfo==null)
-			return false;
-	
-		final ProgressDialog progressMonitor = new ProgressDialog(null);				
-	
-		final SwingWorker worker = new SwingWorker() {
-			public Object construct() {
-				try {
-					initMarts(dlinkInfo,user,group);
-				} catch (final Throwable t) {
-					SwingUtilities.invokeLater(new Runnable() {
-						public void run() {
-							StackTrace.showStackTrace(t);
-						}
-					});
-				}finally {
-					progressMonitor.setVisible(false);
-				}
-				return null;
-			}
-	
-			public void finished() {
-				// Close the progress dialog.
-				progressMonitor.setVisible(false);
-			}
-		};
-		
-		worker.start();
-		progressMonitor.start("processing ...");
-		return true;
-	}
-   	*/
-    public void initMarts(DataLinkInfo dlinkInfo, UserGroup user, String group, boolean createLink) throws MartBuilderException {
+    public void initMarts(DataLinkInfo dlinkInfo, UserGroup user, String group) throws MartBuilderException {
     	/*
     	 * when the sourcegroup in dlinkInfo is true, it will override group
     	 */
@@ -147,7 +117,7 @@ public class ObjectController {
 	    	}
 	    }else if(dlinkInfo.getDataLinkType().equals(DataLinkType.TARGET)) {
     		if(dlinkInfo.getUseOldConfigFlag()) {
-    			this.createMartFromBC_db(dlinkInfo, null, user, group,createLink);
+    			this.createMartFromBC_db(dlinkInfo, null, user, group);
     		}else {
 	    		MartRegistry registry = McGuiUtils.INSTANCE.getRegistryObject(); 
 		    	Collection<Mart> dss = MartController.getInstance().requestCreateMartsFromTarget(registry,dlinkInfo);
@@ -174,18 +144,18 @@ public class ObjectController {
     		if(dlinkInfo.getUrlLinkObject().isVersion8())
     			createMartFromUrl8(dlinkInfo,user, group);
     		else
-    			createMartFromBC_Url(dlinkInfo,user, group, createLink);
+    			createMartFromBC_Url(dlinkInfo,user, group);
     	}else if(dlinkInfo.getDataLinkType().equals(DataLinkType.FILE)) {
     		FileLinkObject flinkObject = dlinkInfo.getFileLinkObject();
     		for(Map.Entry<MartInVirtualSchema, List<DatasetFromUrl>> entry: flinkObject.getDsInfoMap().entrySet()) {
     			MartInVirtualSchema martV = entry.getKey();
     			if(martV.isURLMart()) {
-    				createMartFromBC_Url(dlinkInfo,martV,user,group,createLink);
+    				createMartFromBC_Url(dlinkInfo,martV,user,group);
     			}else {
     				DataLinkInfo fakeDLinkInfo = new DataLinkInfo(DataLinkType.TARGET);
     				JdbcLinkObject fakeJdbcLinkObj = martV.getJdbcLinkObject();
     				fakeDLinkInfo.setJdbcLinkObject(fakeJdbcLinkObj);
-    				this.createMartFromBC_db(fakeDLinkInfo, fakeJdbcLinkObj.getSchemaName(), user, group,createLink);
+    				this.createMartFromBC_db(fakeDLinkInfo, fakeJdbcLinkObj.getSchemaName(), user, group);
     			}
     		}
     	}
@@ -199,7 +169,7 @@ public class ObjectController {
      * @param group
      * @param create 
      */
-    private void createMartFromBC_db(DataLinkInfo dlinkInfo, String schemaName, UserGroup user, String group, boolean create) {
+    private void createMartFromBC_db(DataLinkInfo dlinkInfo, String schemaName, UserGroup user, String group) {
     	boolean sourcegroup = dlinkInfo.isSourceGrouped();
     	boolean addDefaultPortal = dlinkInfo.isIncludePortal();
     	ProgressDialog dialog = ProgressDialog.getInstance();
@@ -239,15 +209,14 @@ public class ObjectController {
     		configList.add(config);
     	}
 		this.addOptions(bc.getOptions(), martList);
-    	//rebuild link
-    	this.rebuildBrokenLink(bc, create);
+    	this.afterBackwardCompatibility(bc,dlinkInfo.isRebuildLink());
 
     	if(addDefaultPortal) {
     		this.addMartPointers(martList, user, sourcegroup);
     	}
     }
     
-    private void createMartFromBC_Url(DataLinkInfo dlinkInfo, UserGroup user, String group, boolean create) {
+    private void createMartFromBC_Url(DataLinkInfo dlinkInfo, UserGroup user, String group) {
 		ProgressDialog dialog = ProgressDialog.getInstance();
 		dialog.setStatus(Resources.get("UPGRADINGMESSAGE"));
 		//when sourcegroup is true, it will override group
@@ -334,7 +303,7 @@ public class ObjectController {
 	    	}
 			this.addOptions(bc.getOptions(), martList);
 			//rebuild link
-			this.rebuildBrokenLink(bc,create);
+			this.afterBackwardCompatibility(bc,dlinkInfo.isRebuildLink());
 	    	if(dlinkInfo.isIncludePortal()) {
 	    		this.addMartPointers(newTotalMartList, user, sourcegroup);
 	    	}
@@ -362,7 +331,7 @@ public class ObjectController {
 	    	}
 			this.addOptions(bc.getOptions(), martList);
 			//rebuild link
-			this.rebuildBrokenLink(bc,create);
+			this.afterBackwardCompatibility(bc,dlinkInfo.isRebuildLink());
 	    	if(dlinkInfo.isIncludePortal()) {
 	    		this.addMartPointers(martList, user, sourcegroup);
 	    	}
@@ -399,7 +368,6 @@ public class ObjectController {
 				Element martElement = rootElement.getChild(XMLElements.MART.toString());
 				Element mpElement = rootElement.getChild(XMLElements.MARTPOINTER.toString());
 				Mart mart = new Mart(martElement);
-				mart.setGroupName(group);
 				//modify the partitiontable
 				PartitionTable pt = mart.getSchemaPartitionTable();
 				//replace the first 6 columns
@@ -440,6 +408,7 @@ public class ObjectController {
 				changedNameMap.put(oldName,martName);
 			}
 			registry.addMart(mart);
+			mart.setGroupName(group);
 		}
 		//add martpointer
 	   	GuiContainer gc = ((McViewPortal)(McViews.getInstance().getView(IdwViewType.PORTAL))).getSelectedGuiContainer();
@@ -480,7 +449,7 @@ public class ObjectController {
      * @param user
      * @param group
      */
-    private void createMartFromBC_Url(DataLinkInfo dlinkInfo, MartInVirtualSchema martV, UserGroup user, String group, boolean create) {
+    private void createMartFromBC_Url(DataLinkInfo dlinkInfo, MartInVirtualSchema martV, UserGroup user, String group) {
 		ProgressDialog dialog = ProgressDialog.getInstance();
 		dialog.setStatus(Resources.get("UPGRADINGMESSAGE"));
 		//when sourcegroup is true, it will override group
@@ -546,7 +515,7 @@ public class ObjectController {
     	}
 		this.addOptions(bc.getOptions(), martList);
 		//rebuild link
-		this.rebuildBrokenLink(bc,create);
+		this.afterBackwardCompatibility(bc,dlinkInfo.isRebuildLink());
     	if(dlinkInfo.isIncludePortal()) {
     		this.addMartPointers(martList, user, sourcegroup);
     	}
@@ -1169,6 +1138,112 @@ public class ObjectController {
     	return newConfig;
     }
     
+    public void initReportConfig(Config config, Attribute selectedAtt, GuiContainer gc) {
+		Container attrCon = config.getContainerByName("Attributes");
+		
+		//move the selected attribute to the first col
+		List<Attribute> attributes = attrCon.getAttributeList();
+		for(Attribute a: attributes){
+			if(a.getName().equals(selectedAtt.getName())){
+				Collections.swap(attributes, 0, attributes.indexOf(a));
+			}
+		}
+		
+		//add filter
+		Filter newfilter = null;
+		//if no filter, create a filter in master and copy to report config under root container
+		if(selectedAtt.getReferenceFilters().isEmpty()){
+			if(config.getMart().isURLbased()){
+				JOptionPane.showMessageDialog(null, "The chosen attribute can not be used as a filtering criterion for the report");
+				return;
+			}else{
+				String name = McGuiUtils.INSTANCE.getUniqueFilterName(config, selectedAtt.getName());
+				newfilter = new Filter(selectedAtt,name);
+				Container reportCon = config.getRootContainer().getContainerByNameResursively("report");
+				if(reportCon != null)
+					reportCon.addFilter(newfilter);
+			}
+		}
+		//if has filter found, copy it to report config
+		else{
+			for(Filter filter : selectedAtt.getReferenceFilters()){
+				if(filter.getFilterType().equals(FilterType.TEXT))
+					newfilter = new Filter(filter.generateXml());						
+			}
+			if(newfilter == null && !selectedAtt.getReferenceFilters().isEmpty()){
+				newfilter = new Filter(selectedAtt.getReferenceFilters().get(0).generateXml());						
+			}
+			//newConfig.getRootContainer().addFilter(newfilter);
+			Container reportCon = config.getRootContainer().getContainerByNameResursively("report");
+			if(reportCon != null)
+				reportCon.addFilter(newfilter);
+			
+			newfilter.synchronizedFromXML();
+		}
+		if(newfilter == null)
+			return;
+		else if(newfilter.isHidden())
+			newfilter.setHideValue(false);
+		//create meta info for report config
+		/*
+		{ 
+			"layout": {
+				"gene_info":{"rendering":"list","options":{"breakAt":2}}, 
+				"ped":{"rendering":"heatmap","options":{"heatColumn":0,"displayColumns":[2,3,4],"fallbackColumn":1}}, 
+				"prot_domain_1_gene_report":{"rendering":"list","options":{"grouped":false}}, 
+				"prot_family_1_gene_report":{"rendering":"list","options":{"grouped":false}}, 
+				"prot_interpro_1_gene_report":{"rendering":"list","options":{"grouped":false}}, 
+				"tm_and_signal_1_gene_report":{"rendering":"list"}, 
+				"go_biological_process_1_gene_report":{"rendering":"list","options":{"grouped":false}}, 
+				"go_cellular_component_1_gene_report":{"rendering":"list","options":{"grouped":false}}, 
+				"go_molecular_function_1_gene_report":{"rendering":"list","options":{"grouped":false}}, 
+				"xrefs_1_gene_report":{"rendering":"list","options":{"grouped":false}}, 
+				"microarray_1_gene_report":{"rendering":"list","options":{"grouped":false}}  
+				} 
+		}
+		*/
+		
+		if(attrCon != null){
+			StringBuilder metaInfo = new StringBuilder();
+			metaInfo.append("{"+'"'+"layout"+'"'+":");
+				metaInfo.append("{"+'"'+attrCon.getName()+'"'+":");
+					metaInfo.append("{"+'"'+"rendering"+'"'+":"+'"'+"list"+'"');
+					metaInfo.append("}");
+				metaInfo.append("}");
+			metaInfo.append("}");
+			config.setProperty(XMLElements.METAINFO, metaInfo.toString());
+		}
+		//create linkout url for that chosen attribute in all other configs
+		StringBuilder linkOutURL = new StringBuilder();
+		linkOutURL.append("/martreport/?report=");
+		linkOutURL.append(gc.getName());
+		linkOutURL.append("&");
+		linkOutURL.append("mart=");
+		linkOutURL.append(config.getName());
+		linkOutURL.append("&");
+		linkOutURL.append(newfilter.getName());
+		linkOutURL.append("=%s%");
+		linkOutURL.append("&datasets=%dataset%");
+		
+		ObjectController.addLinkURLtoAttribute(selectedAtt, linkOutURL.toString());
+		//create a container and copy all main table attributes from master to this container
+		Container container = new Container("mainTableAttributes");
+		for(Attribute attribute: ObjectController.getAttributesInMain(config.getMart().getMasterConfig())){
+			org.jdom.Element elem = attribute.generateXml();
+			Attribute newAtt = new Attribute(elem);
+			container.addAttribute(newAtt);
+		}
+		//create a datasets for link out url for all other configs
+		for(Config con: config.getMart().getConfigList()){
+			Attribute datasetAttr = new Attribute("dataset", "Dataset");
+			datasetAttr.setConfig(config);
+			datasetAttr.setHideValue(true);
+			datasetAttr.setProperty(XMLElements.VALUE, "(p0c5)");
+			con.getRootContainer().addAttribute(datasetAttr);
+		}
+	}		
+
+    
     public void importConfig(Mart mart) {
     	File loadFile = null;
 		final String currentDir = Settings.getProperty("currentOpenDir");
@@ -1382,6 +1457,12 @@ public class ObjectController {
 		}
 	}
 
+	private void afterBackwardCompatibility(BackwardCompatibility bc, boolean rebuildlink) {
+		if(rebuildlink)
+			this.rebuildBrokenLink(bc);
+		this.rebuildBrokenPointer(bc);		
+	}
+
 	/**
 	 * when a new mart is added from BC (either relational mart or url), scan the whole registry for the exsiting exportable/importable
 	 * (they are kept only for this reason), if matching pair found, restore a link (two direction) in master config. 
@@ -1389,9 +1470,8 @@ public class ObjectController {
 	 * For now, we recheck all mart combinations, to be more efficient, we can use the marts from bc only.
 	 * @param bc 
 	 */
-	private void rebuildBrokenLink(BackwardCompatibility bc, boolean create) {
+	private void rebuildBrokenLink(BackwardCompatibility bc) {
 		MartRegistry registry = McGuiUtils.INSTANCE.getRegistryObject();
-		Set<String> missingDatasets = new HashSet<String>();
 		//check all matched exp/imp in master config
 		for(Mart mart: registry.getMartList()) {
 			Config master = mart.getMasterConfig();
@@ -1449,6 +1529,24 @@ public class ObjectController {
 								}
 							
 							if(valid) {
+/*								MessageType value = MessageConfig.getInstance().showDialog("rebuildlink");
+								if(value == MessageType.NOFORALL) //no and don't warn me anymore
+									return;
+								boolean create = false;
+								if(value == MessageType.YESFORALL)
+									create = true; //yes and don't warn me anymore
+								else {
+									WarningDialog dialog = new WarningDialog("rebuildlink");
+									dialog.showDialogFor("rebuildlink",
+											"create link of "+linkName1);
+									value = dialog.getResult();
+									if(value == MessageType.YES || value == MessageType.YESFORALL)
+										create = true;
+									else
+										create = false;
+								}
+								*/
+								boolean create = true;
 								if(create) {
 									master.addLink(link1);
 									for(Filter fil: otherFilters){
@@ -1465,7 +1563,12 @@ public class ObjectController {
 				}
 			}
 		}
-
+		
+	}
+	
+	private void rebuildBrokenPointer(BackwardCompatibility bc) {
+		MartRegistry registry = McGuiUtils.INSTANCE.getRegistryObject();
+		Set<String> missingDatasets = new HashSet<String>();
 		//fix all broken pointer
 		for(Mart mart: registry.getMartList()) {
 			for(Config config: mart.getConfigList()) {
@@ -1549,13 +1652,8 @@ public class ObjectController {
 					}
 				}
 			}
-		}
-		//disable for now
-		//if(!missingDatasets.isEmpty())
-		//	new MissingDatasetsDialog(missingDatasets);
-		
+		}		
 	}
-
 	
 	private Map<String,Set<String>> getFilterDependents(org.jdom.Element martOption) {
 		Map<String,Set<String>> filterDependentMap = new HashMap<String,Set<String>>();
@@ -1723,4 +1821,66 @@ public class ObjectController {
 		}		
 	}
 
+	public List<MartInVirtualSchema> getURLMartFromFile(File file) throws JDOMException, IOException {
+		List<MartInVirtualSchema> result = new ArrayList<MartInVirtualSchema>();
+		Document document = null;
+		
+		SAXBuilder saxBuilder = new SAXBuilder("org.apache.xerces.parsers.SAXParser", false);
+		document = saxBuilder.build(file);
+
+		Element rootElement = document.getRootElement();
+		//has virtualschemas?
+		//get all real mart list
+		List<Element> martElementList = new ArrayList<Element>();
+		@SuppressWarnings("unchecked")
+		List<Element> virtuals = rootElement.getChildren();
+		for(Element vss: virtuals) {
+			//virtual schema?
+			if(vss.getName().equals("virtualSchema")) {
+				List<Element> subElements = vss.getChildren();
+				for(Element subE: subElements) {
+					martElementList.add(subE);
+				}
+			} else if(vss.getName().equals("MartURLLocation") || vss.getName().equals("MartDBLocation")){				
+				martElementList.add(vss);
+			}
+		}
+
+		for(Element virtualSchema: martElementList) {
+			//db or url
+			if(McUtils.isStringEmpty(virtualSchema.getAttributeValue("databaseType"))) {
+				MartInVirtualSchema mart = new MartInVirtualSchema.URLBuilder().database(virtualSchema.getAttributeValue("database"))
+				.defaultValue(virtualSchema.getAttributeValue("default"))
+				.displayName(virtualSchema.getAttributeValue("displayName"))
+				.host(virtualSchema.getAttributeValue("host"))
+				.includeDatasets(virtualSchema.getAttributeValue("includeDatasets"))
+				.martUser(virtualSchema.getAttributeValue("martUser"))
+				.name(virtualSchema.getAttributeValue("name"))
+				.path(virtualSchema.getAttributeValue("path"))
+				.port(virtualSchema.getAttributeValue("port"))
+				.serverVirtualSchema(virtualSchema.getAttributeValue("serverVirtualSchema"))
+				.visible(virtualSchema.getAttributeValue("visible"))
+				.build();
+				result.add(mart);
+			} else {
+				//db
+				MartInVirtualSchema mart = new MartInVirtualSchema.DBBuilder().database(virtualSchema.getAttributeValue("database"))
+				.defaultValue(virtualSchema.getAttributeValue("default"))
+				.displayName(virtualSchema.getAttributeValue("displayName"))
+				.host(virtualSchema.getAttributeValue("host"))
+				.includeDatasets(virtualSchema.getAttributeValue("includeDatasets"))
+				.martUser(virtualSchema.getAttributeValue("martUser"))
+				.name(virtualSchema.getAttributeValue("name"))
+				.port(virtualSchema.getAttributeValue("port"))
+				.visible(virtualSchema.getAttributeValue("visible"))
+				.schema(virtualSchema.getAttributeValue("schema"))
+				.username(virtualSchema.getAttributeValue("user"))
+				.password(virtualSchema.getAttributeValue("password"))
+				.type(virtualSchema.getAttributeValue("databaseType"))
+				.build();
+				result.add(mart);}
+		}
+		
+		return result;
+	}
 }

@@ -50,6 +50,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
+import org.python.modules.newmodule;
 import org.xml.sax.InputSource;
 
 
@@ -289,6 +290,7 @@ public class BackwardCompatibility {
 				}
 
 				Mart mart = new Mart(this.martRegistry,templateName,null);
+				
 				this.pointedDatasets.put(mart.getName(),new HashSet<String>());
 
 
@@ -367,6 +369,9 @@ public class BackwardCompatibility {
 						String tableName = attribute.getAttributeValue("tableConstraint");
 						String columnName = attribute.getAttributeValue("field");
 						String keyName = attribute.getAttributeValue("key");
+						if(columnName!=null && columnName.equals("orthologs_plant_genome_1_togo_bool")){
+							Log.error("Foudn one");
+						}
 						if(tableName!=null && columnName!=null && keyName!=null){
 							if(tableName.endsWith("__dm")){
 								if(tableName.split("__").length < 3)
@@ -402,7 +407,7 @@ public class BackwardCompatibility {
 										//pk.addRelation(relation);
 									}
 								}*/
-							} else if(tableName.equals("main")){
+							} else if(tableName.equals("main") || tableName.endsWith("__main")){
 								DatasetTable table = mainTableByKey.get(attribute.getAttributeValue("key"));
 								if(table!=null){
 									table.addInPartitions(webTemplateName);
@@ -918,8 +923,6 @@ public class BackwardCompatibility {
 										Iterator attributeDescriptionIterator = attributeDescriptions.iterator();
 										while(attributeDescriptionIterator.hasNext()){
 											Element attributeDescription = (Element) attributeDescriptionIterator.next();
-											if(attributeDescription.getAttributeValue("internalName","").equals("is_annotated"))
-												Log.error("found");
 											if(attributeDescription.getAttributeValue("hidden","false").equals("false")){
 
 												if(attributeDescription.getAttributeValue("pointerAttribute")==null){
@@ -927,7 +930,7 @@ public class BackwardCompatibility {
 													String keyName = attributeDescription.getAttributeValue("key");
 													String fieldName = attributeDescription.getAttributeValue("field");
 
-													if(tableName!=null && !(tableName.equalsIgnoreCase("main"))){
+													if(tableName!=null && !(tableName.equalsIgnoreCase("main") || tableName.endsWith("__main"))){
 														// Attribute is not a member of a DM partition, because it's "_" split only has one section
 														//String currentTableName = mainTableName + templateName + "__" + splitName[0] + "__dm";
 														String currentTableName = tableName;
@@ -952,7 +955,7 @@ public class BackwardCompatibility {
 																	attribute.setDisplayName(attributeDescription.getAttributeValue("displayName"));
 																}
 																attribute.setDescription(attributeDescription.getAttributeValue("description",""));
-																attribute.setLinkOutUrl(attributeDescription.getAttributeValue("linkoutURL","").replaceAll("%s", "%s%").replaceAll("exturl\\|",""));
+																attribute.setLinkOutUrl(processLinkoutURL(attributeDescription, config));
 
 																attribute.setName(attribute.getInternalName());
 
@@ -960,14 +963,14 @@ public class BackwardCompatibility {
 															}
 														}
 
-													} else if (tableName!=null && tableName.equalsIgnoreCase("main")){
+													} else if (tableName!=null && (tableName.equalsIgnoreCase("main") || tableName.endsWith("__main"))){
 														DatasetTable currentTable= mainTableByKey.get(attributeDescription.getAttributeValue("key"));
 														if (currentTable != null) {
 															DatasetColumn currentColumn = currentTable.getColumnByName(fieldName);
 															if (currentColumn == null) {
 																//System.err.println("Can't create attribute, because column " + attributeDescription.getAttributeValue("field") + " wasn't found in table " + currentTable.getName());
 															} else {
-																org.biomart.objects.objects.Attribute attribute = new org.biomart.objects.objects.Attribute(currentColumn,attributeDescription.getAttributeValue("internalName").toLowerCase());
+																org.biomart.objects.objects.Attribute attribute = new org.biomart.objects.objects.Attribute(currentColumn,attributeDescription.getAttributeValue("internalName","").toLowerCase());
 																attributeCollectionContainer.addAttribute(attribute);
 
 																attribute.setHideValue(attributeDescription.getAttributeValue("hideDisplay","false").equals("true"));
@@ -975,7 +978,7 @@ public class BackwardCompatibility {
 																	attribute.setDisplayName(attributeDescription.getAttributeValue("displayName"));
 																}
 																attribute.setDescription(attributeDescription.getAttributeValue("description",""));
-																attribute.setLinkOutUrl(attributeDescription.getAttributeValue("linkoutURL","").replaceAll("%s", "%s%").replaceAll("exturl\\|",""));
+																attribute.setLinkOutUrl(processLinkoutURL(attributeDescription, config));
 
 																attribute.setName(attribute.getInternalName());
 
@@ -988,17 +991,19 @@ public class BackwardCompatibility {
 													}
 												} else { // It's a pointer attribute
 													//TODO Pointer Attribute code
-													if(!(attributeDescription.getAttributeValue("pointerDataset","").endsWith(templateName))){ // It's a non-local pointer
+												
+													//if(!(attributeDescription.getAttributeValue("pointerDataset","").endsWith(templateName))){ // It's a non-local pointer
+													if(isRemotePointer(mart.getPartitionTableByName("p0"), internalNames, attributeDescription.getAttributeValue("pointerDataset",""), oldPartitionToColumn)){
 														String[] pointerDataset = attributeDescription.getAttributeValue("pointerDataset").split("\\*",-1);
 														if(pointerDataset.length <= 3){
 															org.biomart.objects.objects.Attribute pointerAttribute = new org.biomart.objects.objects.Attribute(attributeDescription.getAttributeValue("internalName").toLowerCase(),attributeDescription.getAttributeValue("pointerAttribute"),replaceAliases(attributeDescription.getAttributeValue("pointerDataset"),oldPartitionToColumn));
 															attributeCollectionContainer.addAttribute(pointerAttribute);
 
 															this.pointedDatasets.get(mart.getName()).add(pointerAttribute.getPointedDatasetName());
-															pointerAttribute.setInternalName(attributeDescription.getAttributeValue("pointerAttribute"));
+															//pointerAttribute.setInternalName(attributeDescription.getAttributeValue("pointerAttribute"));
 															//pointerAttribute.setConfigName("POINTER");
-															pointerAttribute.setName(pointerAttribute.getInternalName());
-															pointerAttribute.setLinkOutUrl(attributeDescription.getAttributeValue("linkoutURL","").replaceAll("%s", "%s%").replaceAll("exturl\\|",""));
+															//pointerAttribute.setName(pointerAttribute.getInternalName());
+															pointerAttribute.setLinkOutUrl(processLinkoutURL(attributeDescription, config));
 
 														} else if (pointerDataset.length > 3){
 															Log.error("Too many aliases in pointerDataset property!");
@@ -1009,10 +1014,10 @@ public class BackwardCompatibility {
 																org.biomart.objects.objects.Attribute pointerAttribute = new org.biomart.objects.objects.Attribute(attributeDescription.getAttributeValue("internalName").toLowerCase(),attributeDescription.getAttributeValue("pointerAttribute"), pointerDataset[0] + internalNameToValue.get(internalName) + pointerDataset[2]);
 																attributeCollectionContainer.addAttribute(pointerAttribute);
 																this.pointedDatasets.get(mart.getName()).add(pointerAttribute.getPointedDatasetName());
-																pointerAttribute.setInternalName(attributeDescription.getAttributeValue("pointerAttribute"));
+																//pointerAttribute.setInternalName(attributeDescription.getAttributeValue("pointerAttribute"));
 																//pointerAttribute.setConfigName("POINTER");
-																pointerAttribute.setName(pointerAttribute.getInternalName());
-																pointerAttribute.setLinkOutUrl(attributeDescription.getAttributeValue("linkoutURL","").replaceAll("%s", "%s%").replaceAll("exturl\\|",""));
+																//pointerAttribute.setName(pointerAttribute.getInternalName());
+																pointerAttribute.setLinkOutUrl(processLinkoutURL(attributeDescription, config));
 
 																int hideColumn = mainPartition.addColumn("true");
 																int row = mainPartition.getRowNumberByDatasetName(internalName);
@@ -1056,9 +1061,15 @@ public class BackwardCompatibility {
 										
 										//Container filterCollectionContainer = populateContainer(filterCollection);
 										List filterDescriptions = filterCollection.getChildren("FilterDescription");
+										
+										String filterCollectionName = filterCollection.getAttributeValue("displayName", "ERROR");
+										String filterCollectionPrefix = filterCollectionName + " - ";
+										
 										Iterator filterDescriptionIterator = filterDescriptions.iterator();
 										while(filterDescriptionIterator.hasNext()){
 											Element filterDescription = (Element) filterDescriptionIterator.next();
+											if(filterDescription.getAttributeValue("internalName","").equals("plant_genome_1_togo_bool"))
+												Log.error("Found");
 											if(filterDescription.getAttributeValue("hidden","false").equals("false") && filterDescription.getAttributeValue("pointerFilter")==null){
 												String displayType = filterDescription.getAttributeValue("displayType");
 												if(displayType==null){
@@ -1074,9 +1085,9 @@ public class BackwardCompatibility {
 														}
 														Filter filterList = new Filter(containerType, filterDescription.getAttributeValue("internalName").toLowerCase());
 														if(filterDescription.getAttributeValue("displayName")!=null){
-															filterList.setDisplayName(filterDescription.getAttributeValue("displayName"));
+															filterList.setDisplayName((filterDescriptions.size() == 1) ? filterCollectionName : filterCollectionPrefix +filterDescription.getAttributeValue("displayName"));
 														} else if (filterCollection.getChildren().size() == 1 && filterCollection.getAttributeValue("displayName")!=null ){
-															filterList.setDisplayName(filterCollection.getAttributeValue("displayName"));
+															filterList.setDisplayName((filterDescriptions.size() == 1) ? filterCollectionName : filterCollectionPrefix +filterCollection.getAttributeValue("displayName"));
 														}
 														filterGroupContainer.addFilter(filterList);
 
@@ -1134,7 +1145,7 @@ public class BackwardCompatibility {
 																	
 																	if(attribute==null) { // The attribute for this filter doesn't exist, so we need to create it and hide it
 																		//System.err.println("FilterListOption: no attribute for " + fieldName + " " + tableName + " " + keyName);
-																		if(tableName!=null && !(tableName.equalsIgnoreCase("main"))){
+																		if(tableName!=null && !(tableName.equalsIgnoreCase("main") || tableName.endsWith("__main"))){
 																			// Attribute is not a member of a DM partition, because it's "_" split only has one section
 																			//String currentTableName = mainTableName + templateName + "__" + splitName[0] + "__dm";
 																			String currentTableName = tableName;
@@ -1173,7 +1184,7 @@ public class BackwardCompatibility {
 																				}
 																			}
 
-																		} else if (tableName!=null && tableName.equalsIgnoreCase("main")){
+																		} else if (tableName!=null && (tableName.equalsIgnoreCase("main") || tableName.endsWith("__main"))){
 																			DatasetTable currentTable= mainTableByKey.get(filterListFilter.getAttributeValue("key"));
 
 																			if (currentTable != null) {
@@ -1216,7 +1227,7 @@ public class BackwardCompatibility {
 																			filter.setDisplayName(filterListFilter.getAttributeValue("displayName"));
 																		}
 																		// Need to set filter's hidden status to be the same as the attached attribute
-																		filter.setHideValueInString(attribute.getHideString());
+																		//filter.setHideValueInString(attribute.getHideString());
 																		filter.setFilterType(newType);
 																		if(newType==FilterType.BOOLEAN){
 																			filter.setOnlyValue("Only");
@@ -1292,7 +1303,7 @@ public class BackwardCompatibility {
 															attribute = config.getAttributeByName(filterDescription.getAttributeValue("internalName").toLowerCase(), null);
 
 														if(attribute==null) { // The attribute for this filter doesn't exist, so we need to create it and hide it
-															if(tableName!=null && !(tableName.equalsIgnoreCase("main"))){													
+															if(tableName!=null && !(tableName.equalsIgnoreCase("main") || tableName.endsWith("__main"))){													
 																{ // Attribute is not a member of a DM partition, because it's "_" split only has one section
 																	//String currentTableName = mainTableName + templateName + "__" + splitName[0] + "__dm";
 																	String currentTableName = tableName;
@@ -1329,7 +1340,7 @@ public class BackwardCompatibility {
 																		Log.error("Something's wrong");
 																	}
 																}
-															} else if (tableName!=null && tableName.equalsIgnoreCase("main")){
+															} else if (tableName!=null && (tableName.equalsIgnoreCase("main") || tableName.endsWith("__main") )){
 																DatasetTable currentTable= mainTableByKey.get(filterDescription.getAttributeValue("key"));
 
 																if (currentTable != null) {
@@ -1373,7 +1384,7 @@ public class BackwardCompatibility {
 
 															if(filterDescription.getAttributeValue("displayName")!=null){
 
-																filter.setDisplayName(filterDescription.getAttributeValue("displayName"));
+																filter.setDisplayName((filterDescriptions.size() == 1) ? filterCollectionName : filterCollectionPrefix + filterDescription.getAttributeValue("displayName"));
 
 															}
 															filter.setDescription(filterDescription.getAttributeValue("description", ""));
@@ -1397,7 +1408,7 @@ public class BackwardCompatibility {
 																}
 															}
 															// Need to set filter's hidden status to be the same as the attached attribute
-															filter.setHideValueInString(attribute.getHideString());
+															//filter.setHideValueInString(attribute.getHideString());
 															filter.setFilterType(newType);
 															if(newType==FilterType.BOOLEAN){
 																filter.setOnlyValue("Only");
@@ -1417,16 +1428,16 @@ public class BackwardCompatibility {
 											} else if(filterDescription.getAttributeValue("hidden","false").equals("false")){ //TODO add in Filter Pointers
 												if(filterDescription.getAttributeValue("pointerDataset") == null){
 													Log.error("Invalid pointer filter: " + config.getName() + " " + filterDescription.getAttributeValue("internalName"));
-												} else if(!(filterDescription.getAttributeValue("pointerDataset","").endsWith(templateName))){ // It's a non-local pointer
+												} else if(isRemotePointer(mart.getPartitionTableByName("p0"), internalNames, filterDescription.getAttributeValue("pointerDataset",""), oldPartitionToColumn)){ // It's a non-local pointer
 													String[] pointerDataset = filterDescription.getAttributeValue("pointerDataset").split("\\*",-1);
 													if(pointerDataset.length <= 3){
 														Filter pointerFilter = new Filter(filterDescription.getAttributeValue("internalName").toLowerCase(), filterDescription.getAttributeValue("pointerFilter"), replaceAliases(filterDescription.getAttributeValue("pointerDataset"),oldPartitionToColumn));
 														filterGroupContainer.addFilter(pointerFilter);
 														this.pointedDatasets.get(mart.getName()).add(pointerFilter.getPointedDatasetName());
-														pointerFilter.setInternalName(filterDescription.getAttributeValue("pointerFilter"));
+														//pointerFilter.setInternalName(filterDescription.getAttributeValue("pointerFilter"));
 														//pointerAttribute.setConfigName("POINTER");
 
-														pointerFilter.setName(pointerFilter.getInternalName());
+														//pointerFilter.setName(pointerFilter.getInternalName());
 
 
 													} else if (pointerDataset.length > 3){
@@ -1437,7 +1448,7 @@ public class BackwardCompatibility {
 														for(String internalName : internalNameToValue.keySet()){
 															Filter pointerFilter = new Filter(filterDescription.getAttributeValue("internalName").toLowerCase(), filterDescription.getAttributeValue("pointerFilter"),  pointerDataset[0] + internalNameToValue.get(internalName) + pointerDataset[2]);
 															filterGroupContainer.addFilter(pointerFilter);
-															pointerFilter.setInternalName(filterDescription.getAttributeValue("pointerFilter"));
+															//pointerFilter.setInternalName(filterDescription.getAttributeValue("pointerFilter"));
 															this.pointedDatasets.get(mart.getName()).add(pointerFilter.getPointedDatasetName());
 
 															//pointerAttribute.setConfigName("POINTER");
@@ -1554,6 +1565,43 @@ public class BackwardCompatibility {
 		return martList;
 	}
 
+	private String processLinkoutURL(Element attributeDescription, Config config) {
+		String linkOut = attributeDescription.getAttributeValue("linkoutURL","").replaceAll("%s", "%s%");
+		String attributeName = attributeDescription.getAttributeValue("internalName");
+		
+		if(linkOut.startsWith("exturl|http://") || linkOut.startsWith("exturl|https://") || linkOut.startsWith("exturl|ftp://"))
+			linkOut = linkOut.replaceFirst("exturl\\|","");
+		linkOut = linkOut.replaceFirst("exturl\\|","%exturl%");
+		if(linkOut.startsWith("%exturl%") && (config.getAttributeByName("exturl", null) == null)){
+			
+			org.biomart.objects.objects.Attribute exturl = new org.biomart.objects.objects.Attribute("exturl", "External URL prefix");
+			exturl.setHideValue(true);
+			exturl.setDescription("This pseudoattribute is created by Backwards compatibility to allow linkOutURLs to function. Please manually check that the value is correct.");
+			if(isWebService){
+				exturl.setValue(this.dataLinkInfo.getUrlLinkObject().getFullHost());
+			} else {
+				exturl.setValue("");
+			}
+			config.getRootContainer().addAttribute(exturl);
+			
+		}
+				
+		String[] splitLink = linkOut.split("\\|+",0);
+		if(splitLink.length > 1){
+			String[] splitURL = splitLink[0].split("%s%",-1);
+			StringBuilder tempURL = new StringBuilder(splitURL[0]);
+			for(int i = 1; i < splitLink.length; ++i){
+				if(splitLink[i].equals(attributeName))
+					splitLink[i] = "s";
+				tempURL.append("%" + splitLink[i] + "%");
+				tempURL.append(splitURL[i]);
+			}
+			linkOut = tempURL.toString();
+		}
+			
+		return linkOut;
+	}
+
 	private HashSet<String> getColumns(String tableName) {
 		HashSet<String> currentColumns = new HashSet<String>();
 		try {
@@ -1625,7 +1673,7 @@ public class BackwardCompatibility {
 		Iterator optionListIterator = optionList.iterator();
 		while(optionListIterator.hasNext()){
 			Element currentOption = (Element) optionListIterator.next();
-			String optionData = currentOption.getAttributeValue("value","NULL") + separator + currentOption.getAttributeValue("displayName","NULL") + separator + currentOption.getAttributeValue("default","false");
+			String optionData = currentOption.getAttributeValue("value","NULL").replace("|", "\\|") + separator + currentOption.getAttributeValue("displayName","NULL").replace("|", "\\|") + separator + currentOption.getAttributeValue("default","false");
 			Element newRow = new Element("row").setAttribute(new Attribute("data",optionData));
 			parseFilterOptionsRecursive(currentOption, newRow);
 			rowNode.addContent(newRow);
@@ -1729,6 +1777,20 @@ public class BackwardCompatibility {
 		return newText;
 	}
 
+	private boolean isRemotePointer(PartitionTable partitionTable, HashSet<String> internalNames, String templateName, HashMap<String, Integer> map){
+		if(templateName.contains("*")){
+			String[] splitName = templateName.split("\\*");
+			for(String prefix : partitionTable.getCol(map.get(splitName[1]))){
+			if(internalNames.contains((splitName[0] + prefix + splitName[2])))
+				return false;
+			}
+			return true;
+		} else {
+			if(internalNames.contains(templateName))
+				return false;
+			return true;
+		}
+	}
 	private String separator = Resources.get("COLUMNSEPARATOR");
 
 	private boolean isWebService = false;
@@ -1758,6 +1820,8 @@ public class BackwardCompatibility {
 	public void setConnectionObject(Connection conObj) {
 		this.databaseConnection = conObj;
 	}
+	
+	
 	
 	public void setSchema(String schema) {
 		this.schema = schema;

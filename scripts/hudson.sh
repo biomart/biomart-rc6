@@ -11,7 +11,7 @@ TIMESTAMP=`date '+%y%m%d%H%M'` # [cBM1102021507]
 echo "TIMESTAMP=${TIMESTAMP?}"
 
 # initialization
-export BIOMART_HOST=10.0.3.110 # = odl-acros (temporarily, see DCCTEST-1044); though biomart server is actually *started* on 0.0.0.0 (so it's accessible from outside too)
+export BIOMART_HOST=10.0.3.30 # for windows; = odl-acros (temporarily, see DCCTEST-1044); though biomart server is actually *started* on 0.0.0.0 (so it's accessible from outside too)
 export BIOMART_PORT=9001
 
 export LINUX=linux
@@ -21,6 +21,7 @@ export WINDOWS=windows
 export LINUX_BROWSERS="firefox googlechrome"
 #export WINDOWS_BROWSERS="${LINUX_BROWSERS?}"
 export WINDOWS_BROWSERS="iexplore ${LINUX_BROWSERS?}"
+#export WINDOWS_BROWSERS="iexplore"
 
 # test linux
 ./dist/scripts/slave.sh ${BIOMART_HOST?} ${BIOMART_PORT?} "${LINUX_BROWSERS?}" ${LINUX?}

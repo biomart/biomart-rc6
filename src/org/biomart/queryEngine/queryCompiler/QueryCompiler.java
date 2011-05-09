@@ -824,7 +824,10 @@ public class QueryCompiler {
 //		queryElement.setAttribute("processor", subQuery.getProcessor());
 //		queryElement.setAttribute("limit", Integer.toString(subQuery.getLimit()));
 		queryElement.setAttribute("client", subQuery.getClient());
-
+		String virtualSchema = subQuery.getDataset().getValueForColumn(11);
+		if(virtualSchema != null && !virtualSchema.equals(""))
+			queryElement.setAttribute("virtualSchemaName",virtualSchema);
+		
 		org.jdom.Element datasetElement = new org.jdom.Element("Dataset");
 		datasetElement.setAttribute("name", subQuery.getDataset().getName());
 		if(subQuery.getConfig().getName()==null)

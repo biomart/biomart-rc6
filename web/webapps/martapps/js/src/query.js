@@ -244,7 +244,7 @@ $.namespace('biomart.query', function(self) {
         arr.push('PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n');
         arr.push('PREFIX owl: <http://www.w3.org/2002/07/owl#>\n');
         arr.push('\n');
-        arr.push('PREFIX config: <' + BIOMART_CONFIG.siteURL + 'martsemantics/' + config + '/ontology#>\n');
+        arr.push('PREFIX accesspoint: <' + BIOMART_CONFIG.siteURL + 'martsemantics/' + config + '/ontology#>\n');
         arr.push('PREFIX class: <' + site2reference(BIOMART_CONFIG.siteURL) + 'martsemantics/' + config + '/ontology/class#>\n');
         arr.push('PREFIX dataset: <' + site2reference(BIOMART_CONFIG.siteURL) + 'martsemantics/' + config + '/ontology/dataset#>\n');
         arr.push('PREFIX attribute: <' + site2reference(BIOMART_CONFIG.siteURL) + 'martsemantics/' + config + '/ontology/attribute#>\n\n');

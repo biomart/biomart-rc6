@@ -306,4 +306,8 @@ public class Dataset extends MartConfiguratorObject implements Serializable, Com
 		return dli;
 	}
 
+	public String getValueForColumn(int col) {
+		int row = this.getParentMart().getDatasetRowNumber(this);
+		return this.getParentMart().getSchemaPartitionTable().getValue(row, col);
+	}
 }

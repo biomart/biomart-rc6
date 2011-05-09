@@ -45,4 +45,6 @@ public interface SequenceConstants {
 
     public static final String SEQUENCE_UNAVAILABLE = "Sequence unavailable";
     public static final byte[] SEQUENCE_UNAVAILABLE_BYTES = SEQUENCE_UNAVAILABLE.getBytes();
+
+    public static final String SEQUENCE_ERROR_ENCOUNTERED = "Error encountered";
 }

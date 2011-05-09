@@ -3,15 +3,13 @@ package org.biomart.configurator.view.gui.dialogs;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
-import java.util.Map;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
 import org.biomart.configurator.utils.MessageConfig;
+import org.biomart.configurator.utils.type.MessageType;
 
 
 public class WarningDialog extends JDialog implements ActionListener {
@@ -32,7 +30,7 @@ public class WarningDialog extends JDialog implements ActionListener {
 	public void showDialogFor(String messageType, String message) {
 		//default is 1
 		this.messageType = messageType;
-		MessageConfig.getInstance().put(messageType, 1);
+		MessageConfig.getInstance().put(messageType, MessageType.NO);
 		this.setLayout(new BorderLayout());
 		JPanel centralPanel = new JPanel();
 		JPanel buttonPanel = new JPanel();
@@ -59,7 +57,7 @@ public class WarningDialog extends JDialog implements ActionListener {
 		this.setVisible(true);
 	}
 	
-	public int getResult() {
+	public MessageType getResult() {
 		return MessageConfig.getInstance().get(messageType);
 	}
 
@@ -67,14 +65,14 @@ public class WarningDialog extends JDialog implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if(e.getActionCommand().equals("yes")) {
 			if(cb.isSelected())
-				MessageConfig.getInstance().put(this.messageType, 2);
+				MessageConfig.getInstance().put(this.messageType, MessageType.YESFORALL);
 			else
-				MessageConfig.getInstance().put(this.messageType, 0);
+				MessageConfig.getInstance().put(this.messageType, MessageType.YES);
 		}else if(e.getActionCommand().equals("no")) {
 			if(cb.isSelected())
-				MessageConfig.getInstance().put(this.messageType, 3);
+				MessageConfig.getInstance().put(this.messageType, MessageType.NOFORALL);
 			else
-				MessageConfig.getInstance().put(this.messageType, 1);			
+				MessageConfig.getInstance().put(this.messageType, MessageType.NO);			
 		}	
 		this.setVisible(false);
 		this.dispose();

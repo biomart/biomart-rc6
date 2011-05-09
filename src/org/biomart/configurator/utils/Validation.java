@@ -28,13 +28,7 @@ import org.biomart.objects.portal.Portal;
 import org.biomart.processors.Processor;
 import org.biomart.processors.ProcessorGroup;
 
-/**
- *  a full validation need to traverse the object tree structure twice (may be more).
- * 	first round set the result for the basic objects, second round set the result for the objects
- *  on top of the basic objects.
- *  
- *  validation is a time consuming operation.
- */
+
 public class Validation {
 	private static Validation instance;
 	

@@ -1,6 +1,7 @@
 package org.biomart.queryEngine;
 
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
@@ -805,6 +806,8 @@ public final class SubQuery {
                 }
                 throw new BioMartException(String.format("HTTP Error %s - %s",
                         e.getResponse().getStatus(), msg));
+            } catch(Exception e) {
+                throw new BioMartException("Error while connection to HTTP source", e);
             }
         }
 	}

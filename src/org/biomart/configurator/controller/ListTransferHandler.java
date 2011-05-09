@@ -11,6 +11,7 @@ import javax.swing.TransferHandler;
 
 import org.biomart.common.utils.McEventBus;
 import org.biomart.configurator.model.object.FilterData;
+import org.biomart.configurator.utils.McUtils;
 import org.biomart.configurator.utils.type.McEventProperty;
 
 public class ListTransferHandler extends TransferHandler {
@@ -44,7 +45,8 @@ public class ListTransferHandler extends TransferHandler {
         
         try {
         	String fdName = (String)t.getTransferData(DataFlavor.stringFlavor);
-        	FilterData data = new FilterData(fdName, fdName,false);
+        	String[] _data = McUtils.getOptionsDataFromString(fdName);
+        	FilterData data = new FilterData(_data[0], _data[1],Boolean.parseBoolean(_data[2]));
         	listModel.add(index, data);
         } 
         catch (Exception e) { 
@@ -74,8 +76,8 @@ public class ListTransferHandler extends TransferHandler {
 	public Transferable createTransferable(JComponent c) {
 		String selValue = "";
 		if(c instanceof JList){
-			selValue = ((FilterData)((JList) c).getSelectedValue()).getName();
-			
+			//selValue = ((FilterData)((JList) c).getSelectedValue()).getName();
+			selValue = ((FilterData)((JList) c).getSelectedValue()).toSavedFormat();
 		}
 		return new StringSelection(selValue);
 	}

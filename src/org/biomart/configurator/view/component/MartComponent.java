@@ -38,6 +38,7 @@ import org.biomart.configurator.model.SourceTransferable;
 import org.biomart.configurator.utils.McGuiUtils;
 import org.biomart.configurator.utils.McUtils;
 import org.biomart.configurator.utils.type.IdwViewType;
+import org.biomart.configurator.view.component.container.GuiContainerPanel;
 import org.biomart.configurator.view.gui.dialogs.DatasourceDialog;
 import org.biomart.configurator.view.idwViews.McViewPortal;
 import org.biomart.configurator.view.idwViews.McViewSourceGroup;
@@ -108,6 +109,9 @@ public class MartComponent extends JPanel implements MouseListener, Transferable
 				.getInstance().getView(IdwViewType.PORTAL));
 		this.setBackground(Color.YELLOW);
 
+		GuiContainerPanel gcp = portalView.getSelectedGcPanel();
+		gcp.setHighlight(this.getMart());
+		/*
 		this.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		Set<ConfigComponent> cclist = portalView
 				.getComponentListByMart(this.getMart());
@@ -120,7 +124,7 @@ public class MartComponent extends JPanel implements MouseListener, Transferable
 				ConfigComponent cc = portalView.getComponentByMartPointer(entry.getKey());
 				cc.setBackground(Color.CYAN);
 			}
-		}
+		}*/
 	}
 
 	@Override
@@ -128,7 +132,7 @@ public class MartComponent extends JPanel implements MouseListener, Transferable
 		McViewPortal portalView = ((McViewPortal) McViews
 				.getInstance().getView(IdwViewType.PORTAL));
 		this.setBackground(this.getParent().getBackground());
-		this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		/*this.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		Set<ConfigComponent> cclist = portalView
 				.getComponentListByMart(this.getMart());
 		for (ConfigComponent cc : cclist) {
@@ -140,17 +144,26 @@ public class MartComponent extends JPanel implements MouseListener, Transferable
 				ConfigComponent cc = portalView.getComponentByMartPointer(entry.getKey());
 				cc.setBackground(this.getParent().getBackground());
 			}
-		}
-		
+		}*/
+		GuiContainerPanel gcp = portalView.getSelectedGcPanel();
+		gcp.setHighlight(null);
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {	
+		/* clear all when 1. not meta down
+		 * 2. popup
+		 * 3. already selected
+		 * 
+		 */
+		if(!(e.isMetaDown() || (e.isPopupTrigger() && this.isSelected()) || e.isShiftDown() || ((MartComponent)e.getSource()).isSelected())) {
+			this.clearOthers((Component)e.getSource());
+		}
+
 		McViewSourceGroup groupview = (McViewSourceGroup)McViews.getInstance().getView(IdwViewType.SOURCEGROUP);
 		if(e.isShiftDown() && groupview.getLastpoint()!=null) {
 			this.clearOthers(this);
-			double y = this.getLocationOnScreen().getY();
-			List<MartComponent> mcs = groupview.getComponentsBetween(groupview.getLastpoint().getLocationOnScreen().getY(),y);
+			List<MartComponent> mcs = groupview.getComponentsBetween(groupview.getLastpoint(),this);
 			for(MartComponent mc: mcs) {
 				mc.setSelected(true);
 				mc.setBorder(BorderFactory.createLineBorder(Color.RED));
@@ -190,7 +203,7 @@ public class MartComponent extends JPanel implements MouseListener, Transferable
 		 * 3. already selected
 		 * 
 		 */
-		if(!(e.isMetaDown() || e.isPopupTrigger() || e.isShiftDown())) {
+		if(!(e.isMetaDown() || (e.isPopupTrigger() && this.isSelected()) || e.isShiftDown())) {
 			this.clearOthers((Component)e.getSource());
 		}
 		if(e.isPopupTrigger())

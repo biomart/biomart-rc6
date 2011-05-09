@@ -34,7 +34,7 @@ public enum ConnectionPool {
 	 * if cannot find a connection object, create a new one and put it in pool
 	 * if the conObject has databasename, the url will include it.
 	 */
-	public Connection getConnection(JdbcLinkObject conObject) {
+	public Connection getConnection(JdbcLinkObject conObject) throws MartBuilderException {
 		Connection con = this.connections.get(conObject);
 		if(con==null) {
 			try {
@@ -43,11 +43,13 @@ public enum ConnectionPool {
 						conObject.getUserName(),conObject.getPassword());			
 			} catch(java.lang.ClassNotFoundException e) {
 				Log.error("database error");
-				JOptionPane.showMessageDialog(null, "database connection error");				
+				throw new MartBuilderException("database connection error",e);
+				//JOptionPane.showMessageDialog(null, "database connection error");				
 			} catch (SQLException e) {
 				e.printStackTrace();
 				Log.error("database error");
-				JOptionPane.showMessageDialog(null, "database connection error");
+				throw new MartBuilderException("database connection error",e);
+				//JOptionPane.showMessageDialog(null, "database connection error");
 			}
 			this.connections.put(conObject, con);
 		}

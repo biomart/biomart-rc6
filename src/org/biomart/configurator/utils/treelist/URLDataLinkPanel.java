@@ -36,6 +36,10 @@ public class URLDataLinkPanel extends JPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 	private JTextField urlTF;
+	public JTextField getUrlTF() {
+		return urlTF;
+	}
+
 	private JTextField portTF;
 	private JTextField pathTF;
 	private JTextField keyTF;
@@ -138,7 +142,7 @@ public class URLDataLinkPanel extends JPanel {
 		n3panel.add(fetchButton);
 		this.add(northPanel, BorderLayout.NORTH);
 
-		this.urlMetaPanel = new URLMetaPanel();
+		this.urlMetaPanel = new URLMetaPanel(this);
 		this.add(urlMetaPanel,BorderLayout.CENTER);
 	}
 	

@@ -64,6 +64,7 @@ import org.biomart.objects.objects.Config;
 import org.biomart.objects.objects.Mart;
 import org.biomart.objects.objects.MartConfiguratorObject;
 import org.biomart.objects.objects.MartRegistry;
+import org.biomart.objects.objects.Options;
 import org.biomart.objects.objects.SourceContainer;
 import org.biomart.objects.objects.SourceContainers;
 import org.biomart.objects.portal.GuiContainer;
@@ -711,6 +712,11 @@ public class ContextMenuConstructor implements ActionListener {
 				for (MartConfiguratorObject mcObj : references) {
 					MartPointer mp = (MartPointer) mcObj;
 					mp.getGuiContainer().removeMartPointer(mp);
+				}
+				//remove options
+				Element element = Options.getInstance().getMartElement(mart);
+				if(element!=null) {
+					Options.getInstance().getOptionRootElement().removeContent(element);
 				}
 				mr.removeMart(mart);
 			}

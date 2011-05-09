@@ -1,7 +1,6 @@
 package org.biomart.processors.sequence;
 
 import java.io.IOException;
-import java.util.List;
 import org.biomart.common.exceptions.ValidationException;
 
 /**
@@ -9,6 +8,23 @@ import org.biomart.common.exceptions.ValidationException;
  * @author jhsu, jguberman
  */
 public class TranscriptExonIntronParser extends SequenceParser {
+    // "Unspliced (Transcript)"
+    // Doesn't yet handle flank
+
+    // Set up the fields
+    private static final int transcriptIDfield = 0;
+    private static final int chrField = 1;
+    private static final int startField = 2;
+    private static final int endField = 3;
+    private static final int strandField = 4;
+
+    // Read the first line of the input and initialize the variables
+    private String transcriptID = null;
+    private String chr = null;
+    private String strand = null;
+    private int start = 0;
+    private int end = 0;
+
     public TranscriptExonIntronParser() {
         super(5);
     }
@@ -29,57 +45,38 @@ public class TranscriptExonIntronParser extends SequenceParser {
 	 * @throws IOException
 	 */
 	@Override
-    public void parse(List<List<String>> inputQuery) throws IOException {
-		// "Unspliced (Transcript)"
-		// Doesn't yet handle flank
+    public String parseLine(String[] line) {
+        String results = "";
 
-		// Set up the fields
-		final int transcriptIDfield = 0;
-		final int chrField = 1;
-		final int startField = 2;
-		final int endField = 3;
-		final int strandField = 4;
+        // Check if the current row belongs to the same transcript
+        if (line[transcriptIDfield].equals(transcriptID)) {
+            // If it does, adjust the start and end positions if needed
+            start = Math.min(start, Integer.parseInt(line[startField]));
+            end = Math.max(end, Integer.parseInt(line[endField]));
+            // Update header as necessary
+        } else {
+            if (transcriptID != null) {
+                results = getTranscriptExonIntron(getHeader(), chr, start, end, strand);
+            }
 
-		// Read the first line of the input and initialize the variables
-        String transcriptID = null;
-        String chr = null;
-        String strand = null;
-		int start = 0;
-		int end = 0;
-
-        boolean done = false;
-
-		for(List<String> line : inputQuery){
-			// Check if the current row belongs to the same transcript
-			if (line.get(transcriptIDfield).equals(transcriptID)) {
-				// If it does, adjust the start and end positions if needed
-				start = Math.min(start, Integer.parseInt(line.get(startField)));
-				end = Math.max(end, Integer.parseInt(line.get(endField)));
-				// Update header as necessary
-			} else {
-                if (transcriptID != null) {
-                    done = printTranscriptExonIntron(getHeader(), chr, start, end, strand);
-                }
-
-				// Initialize for the next transcript ID, and re-enter the loop
-				transcriptID = line.get(transcriptIDfield);
-				chr = line.get(chrField);
-				start = Integer.parseInt(line.get(startField));
-				end = Integer.parseInt(line.get(endField));
-				strand = line.get(strandField);
-				// Re-initialize header
-                clearHeader();
-
-                if (done) {
-                    break;
-                }
-			}
-            storeHeaderInfo(line);
-		}
-        if (!done) {
-            printTranscriptExonIntron(getHeader(), chr, start, end, strand);
+            // Initialize for the next transcript ID, and re-enter the loop
+            transcriptID = line[transcriptIDfield];
+            chr = line[chrField];
+            start = Integer.parseInt(line[startField]);
+            end = Integer.parseInt(line[endField]);
+            strand = line[strandField];
+            // Re-initialize header
+            clearHeader();
         }
+        storeHeaderInfo(line);
+
+        return results;
 	}
+
+    @Override
+    public String parseLast() {
+        return getTranscriptExonIntron(getHeader(), chr, start, end, strand);
+    }
 
 	/**
 	 * Retrieves and prints sequence for QueryType TRANSCRIPT_EXON_INTRON
@@ -90,20 +87,15 @@ public class TranscriptExonIntronParser extends SequenceParser {
 	 * @param strand	Sequence strand.
 	 * @throws IOException
 	 */
-	protected final boolean printTranscriptExonIntron(String header,
-			String chr, int start, int end, String strand) throws IOException {
-        try {
-            String sequence;
-            // Take the reverse complement if necessary
-            if (strand.equals("-1")){
-                sequence = reverseComplement(getSequence(chr, start-downstreamFlank, end+upstreamFlank));
-            } else {
-                sequence = getSequence(chr, start-upstreamFlank, end+downstreamFlank);
-            }
-            return printFASTA(sequence, header);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return printFASTA(SEQUENCE_UNAVAILABLE, header);
+	protected final String getTranscriptExonIntron(String header,
+			String chr, int start, int end, String strand) {
+        String sequence;
+        // Take the reverse complement if necessary
+        if (strand.equals("-1")){
+            sequence = reverseComplement(getSequence(chr, start-downstreamFlank, end+upstreamFlank));
+        } else {
+            sequence = getSequence(chr, start-upstreamFlank, end+downstreamFlank);
         }
+        return getFASTA(sequence, header);
 	}
 }

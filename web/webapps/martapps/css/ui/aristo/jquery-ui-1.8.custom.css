@@ -424,7 +424,17 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 /* Dialog
 ----------------------------------*/
 .ui-dialog { position: absolute; padding: 0; width: 300px; overflow: hidden; background: #FFFFFF; -moz-box-shadow: 0px 5px 8px rgba(0,0,0,0.8); -webkit-box-shadow: 0px 5px 8px rgba(0,0,0,0.8); box-shadow: 0px 5px 8px rgba(0,0,0,0.8); }
-.ui-dialog .ui-dialog-titlebar { padding: .5em 1em .3em; position: relative; border-width: 0px 0px 1px 0px; border-color: #979797; background: url(images/the_gradient.gif) 0px 0px repeat-x; -moz-border-radius: 0px; -webkit-border-radius: 0px; border-radius: 0px; }
+.ui-dialog .ui-dialog-titlebar { 
+    padding: .5em 1em .3em;
+    position: relative;
+    border-width: 0px 0px 1px 0px;
+    border-color: #979797; 
+    background-color: #ccc;
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr='#eeeeee', endColorstr='#cccccc');
+    background: -moz-linear-gradient(top, #eee 0%, #ccc 100%);
+    background: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#ccc));
+    -moz-border-radius: 0px; -webkit-border-radius: 0px; border-radius: 0px;
+}
 .ui-dialog .ui-dialog-title { float: left; margin: .1em 16px .2em 0; font-size: 13px; color: #000000; text-shadow: 0px 1px 0px rgba(255,255,255,0.8); } 
 .ui-dialog .ui-dialog-titlebar-close { position: absolute; right: 6px; top: 50%; width: 16px; margin: -9px 0 0 0; height: 16px; }
 .ui-dialog .ui-dialog-titlebar-close span { display: block; margin: 1px; background: url(images/icon_sprite.png) 0px -16px no-repeat; }

@@ -9,6 +9,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.biomart.backwardCompatibility.DatasetFromUrl;
+import org.biomart.backwardCompatibility.MartInVirtualSchema;
 import org.biomart.common.resources.Resources;
 import org.biomart.configurator.utils.McGuiUtils;
 
@@ -53,6 +54,11 @@ public class URLMetaList extends LeafCheckBoxList implements ListSelectionListen
 		List<LeafCheckBoxNode> dsList = new ArrayList<LeafCheckBoxNode>();
 		List<DatasetFromUrl> dss;
 		try {
+			MartInVirtualSchema vm = this.parentPanel.getMartInVirtualSchema(martName);
+			if(vm.getHost().contains("ankara")){
+				String host = this.parentPanel.getParentPanel().getUrlTF().getText();
+				vm.setHost(host);
+			}
 			dss = McGuiUtils.INSTANCE.getDatasetsFromUrlForMart(this.parentPanel.getMartInVirtualSchema(martName));
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(this, Resources.get("NODATASETS"), "error", JOptionPane.ERROR_MESSAGE);

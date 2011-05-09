@@ -134,7 +134,15 @@ public abstract class MartConfiguratorObject extends AbstractModel {
 			List<Element> properties = propertyElement.getChildren("item");
 			for(Element property: properties) {
 				XMLElements p = XMLElements.valueFrom(property.getAttributeValue("name"));
-				this.setProperty(p, element.getAttributeValue(p.toString()));
+				//hardcode for now
+				if(p.toString().equals("uniqueid")) {
+					if(element.getAttribute("uniqueid")!=null) {
+						this.setProperty(p, element.getAttributeValue(p.toString()));
+					} else
+						this.setProperty(p, element.getAttributeValue("uniqueId"));
+				}
+				else 
+					this.setProperty(p, element.getAttributeValue(p.toString()));
 			}
 		}
 	}

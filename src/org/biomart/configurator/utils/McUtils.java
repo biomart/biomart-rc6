@@ -17,6 +17,7 @@ import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -32,7 +33,10 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import javax.swing.ImageIcon;
 
@@ -90,6 +94,16 @@ public class McUtils {
 	//private static Calendar calendar = new GregorianCalendar();
 	private static int containerId = 0;
 	private static String key;
+	private static boolean testingMode = false; 
+	
+	public static void setTestingMode(boolean b) {
+		testingMode = b;
+	}
+	
+	public static boolean isTestingMode() {
+		return testingMode;
+	}
+
 	public static String getKey() {
 		return key;
 	}
@@ -366,7 +380,7 @@ public class McUtils {
     	return asHex(encrypted);
     }
     
-    public static String decrypt(String encrypted) throws Exception {
+    public static String decrypt(String encrypted) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
     	if(McUtils.isStringEmpty(key))
     		return encrypted;
     	byte[] raw = hexStringToByteArray(key);
@@ -375,8 +389,7 @@ public class McUtils {
 		cipher = Cipher.getInstance("AES");
        
 		cipher.init(Cipher.DECRYPT_MODE, skeySpec);
-		byte[] source =
-			     cipher.doFinal(hexStringToByteArray(encrypted));		
+		byte[] source = cipher.doFinal(hexStringToByteArray(encrypted));		
     	return new String(source);    	
     }
     
@@ -867,7 +880,7 @@ public class McUtils {
 //					Log.error("data is null ");
 				continue;
 			}
-			String[] dataArray = data.split("\\|",-1);
+			String[] dataArray = McUtils.getOptionsDataFromString(data);
 			//remove all legacy null row
 			if(dataArray[1].equals("null")|| dataArray[1].equals("NULL"))
 				continue;
@@ -961,5 +974,15 @@ public class McUtils {
 			}
 		}
 		return result;
+	}
+
+	public static String[] getOptionsDataFromString(String value) {
+		String[] tmp =  value.split("(?<!\\\\)\\|",-1);
+		for(int i=0; i<tmp.length; i++) {
+			if(tmp[i].indexOf("\\|")>=0) {
+				tmp[i]= tmp[i].replaceAll("\\\\\\|", "\\|");
+			}
+		}
+		return tmp;
 	}
 }

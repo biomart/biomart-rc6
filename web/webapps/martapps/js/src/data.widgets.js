@@ -71,7 +71,7 @@
                 var self = this;
                 if (biomart.errorRegex.test(s)) {
                     self.error(s);
-                    return;
+                    return false;
                 }
                 if (s) {
                     if (typeof s == 'string') s = s.split('\t');
@@ -176,10 +176,7 @@
         },
         _create: function() {
             var self = this,
-                o = self.options,
-                SUCCESS = 'datasource.success',
-                ERROR  = 'datasource.error',
-                COMPLETE = 'datasource.complete';
+                o = self.options;
 
             self._signal = o.namespace ? 'datasource.' + o.namespace : 'datasource';
 
@@ -246,6 +243,12 @@
                     url = options.url,
                     data;
 
+                self.hasLoaded = false;
+
+                self.done = function() {
+                    self.hasLoaded = true;
+                }
+
                 self._iframe = options.iframe || $(['<iframe class="streaming" name="', biomart.uuid(), '"/>'].join('')).appendTo(document.body);
 
                 // Allow iframe access to this object for streaming
@@ -253,6 +256,9 @@
                 biomart.datasource.streamers[self._uuid] = self;
 
                 self._iframe.one('load', function() {
+                    if (!self.hasLoaded) {
+                        self.error('Failed to load');
+                    }
                     self.complete();
                 });
 
@@ -288,7 +294,7 @@
             $.Widget.prototype.destroy.apply(this, arguments);
             this.xhr_abort();
             if (this._iframe) {
-                this._iframe.stopIframeLoading();
+                this._iframe.unbind('load').stopIframeLoading();
                 if (!this.options.iframe) {
                     this._iframe.remove();
                 }
@@ -306,9 +312,9 @@
         exports.write = function(uuid, s) {
             exports.streamers[uuid].success(s);
         };
-        // exports.done = function(uuid) {
-        //     exports.streamers[uuid].complete();
-        // }
+        exports.done = function(uuid) {
+            exports.streamers[uuid].done();
+        };
     });
 
 })(jQuery);

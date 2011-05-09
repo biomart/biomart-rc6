@@ -10,6 +10,28 @@ import java.util.List;
  * @author jhsu, jguberman
  */
 public class GeneFlankParser extends TranscriptFlankParser {
+    // "Unspliced (Gene)"
+    /* Exactly the same as parseGeneIntronExon, except it calls
+     * printTranscriptFlank instead of printTranscriptExonIntron, and it checks
+     * for reasonable flank input.
+     */
+    // TODO Optimize by using the transcript_count info when initializing lists? (Except transcript_count seems to be empty)
+
+    // Set up the fields
+    private static final int transcriptIDField = 0;
+    private static final int chrField = 1;
+    private static final int startField = 2;
+    private static final int endField = 3;
+    private static final int strandField = 4;
+    private static final int geneIDfield = 5;
+
+    private String chr = null;
+    private Integer start = null;
+    private Integer end = null;
+    private String strand = null;
+
+    private String currGeneID = null;
+
     public GeneFlankParser() {
         super(6);
     }
@@ -21,56 +43,33 @@ public class GeneFlankParser extends TranscriptFlankParser {
 	 * @throws IOException
 	 */
 	@Override
-    public void parse(List<List<String>> inputQuery) throws IOException {
-		// "Unspliced (Gene)"
-		/* Exactly the same as parseGeneIntronExon, except it calls
-		 * printTranscriptFlank instead of printTranscriptExonIntron, and it checks
-		 * for reasonable flank input.
-		 */
-		// TODO Optimize by using the transcript_count info when initializing lists? (Except transcript_count seems to be empty)
+    public String parseLine(String[] line) {
+        String results = "";
 
-		// Set up the fields
-		final int transcriptIDField = 0;
-		final int chrField = 1;
-		final int startField = 2;
-		final int endField = 3;
-		final int strandField = 4;
-		final int geneIDfield = 5;
+        String geneID = line[geneIDfield];
 
-        boolean done = false;
+        if (!geneID.equals(currGeneID)) {
+			chr = line[chrField];
+			start = Integer.MAX_VALUE;
+			end = Integer.MIN_VALUE;
+			strand = line[strandField];
 
-		// Initialize hashmap mapping geneIDs to input lines, so we don't need to worry about the order of the input
-		HashMap<String, List<List<String>>> geneMap = new HashMap<String,List<List<String>>>();
-		String currentGeneID;
-		List<List<String>> appendedList = null;
-		for(List<String> line : inputQuery){
-			currentGeneID = line.get(geneIDfield);
-			appendedList = geneMap.get(currentGeneID);
-			if(null==appendedList) {
-				appendedList = new ArrayList<List<String>>();
-			}
-			appendedList.add(line);
-			geneMap.put(currentGeneID, appendedList);
-		}
-		List<List<String>> currentGene = null;
-		List<String> firstLine = null;
-		for(String geneID : geneMap.keySet()){
-			currentGene = geneMap.get(geneID);
-			firstLine = currentGene.get(0);
-			String chr = firstLine.get(chrField);
-			int start = Integer.parseInt(firstLine.get(startField));
-			int end = Integer.parseInt(firstLine.get(endField));
-			String strand = firstLine.get(strandField);
-			for(List<String> line : currentGene){
-                storeHeaderInfo(line);
-				start = Math.min(start, Integer.parseInt(line.get(startField)));
-				end = Math.max(end, Integer.parseInt(line.get(endField)));
-			}
-			done = printTranscriptFlank(getHeader(), chr, start, end, strand);
-            clearHeader();
-            if (done) {
-                break;
+            if (currGeneID != null) {
+                results = getTranscriptFlank(getHeader(), chr, start, end, strand);
             }
-		}
+
+            clearHeader();
+        }
+
+        storeHeaderInfo(line);
+        start = Math.min(start, Integer.parseInt(line[startField]));
+        end = Math.max(end, Integer.parseInt(line[endField]));
+
+        return results;
+    }
+
+    @Override
+    public String parseLast() {
+        return getTranscriptFlank(getHeader(), chr, start, end, strand);
     }
 }

@@ -376,12 +376,14 @@ public class DefaultTreeTransferHandler extends AbstractTreeTransferHandler {
 	    	}
 	    	else if(draggedNodes.get(0).getObject() instanceof Filter){
 	       		//get unique name
+	    		Filter filter = (Filter)draggedNodes.get(0).getObject();
 	    		baseName = McGuiUtils.INSTANCE.getUniqueFilterName(config, baseName);
 	    		Filter filPointer = new Filter(baseName,draggedNodes.get(0).getObject().getName(),leftDs.getName());
 	    		//filPointer.setPointedInfo(draggedNodes.get(0).getObject().getName(), 
 	    			//	leftDs.getName(), config.getName(), config.getMart().getName());
-	    		filPointer.setDisplayName(draggedNodes.get(0).getObject().getDisplayName());
-	    		filPointer.setPointedElement((Filter)draggedNodes.get(0).getObject());
+	    		filPointer.setDisplayName(filter.getDisplayName());
+	    		filPointer.setPointedElement(filter);
+	    		filPointer.setFilterType(filter.getFilterType());
 	    		((Container)newParentNode.getObject()).addFilter(childIndex, filPointer);
 	    	}
 		}
@@ -666,12 +668,34 @@ public class DefaultTreeTransferHandler extends AbstractTreeTransferHandler {
 			    		attPointer.setDisplayName(node.getObject().getDisplayName());
 			    		((Container)newParentNode.getObject()).addAttribute(attPointer);
 			    		attPointer.setPointedConfigName(sourceConfig.getName());
+			    		attPointer.setLinkOutUrl(attr.getLinkOutUrl());
 			    		//set pointed dataset
 			    		if(link != null)
 			    			attPointer.addPointedDataset(pointedDataset);
 			    			//attPointer.setPointedDatasetName(link.getPointedDataset());
 			    		
 			    		attPointer.synchronizedFromXML();
+			    		// copy linkouturl reference attributes as well 
+						if(!attr.getLinkOutUrl().isEmpty()){
+							String linkOutUrl = attr.getLinkOutUrl();
+							List<Attribute> attributes = McGuiUtils.INSTANCE.getAttributesFromLinkOutUrl(linkOutUrl, sourceConfig);
+							for(Attribute att: attributes) {
+								if(targetConfig.containAttributebyName(att))
+									continue;
+								baseName = McUtils.getUniqueAttributeName((Config)tconfig, att.getName());
+								Attribute newAttPointer = new Attribute(baseName , att);
+								//set new att to have the target config
+								//newAttPointer.setConfig(targetConfig);
+								newAttPointer.setDisplayName(att.getDisplayName());
+					    		newAttPointer.setPointedConfigName(sourceConfig.getName());
+					    		newAttPointer.setLinkOutUrl(attr.getLinkOutUrl());
+								//oc.generateAttributeRDF(newAttPointer, targetConfig);
+					    		if(link != null)
+					    			newAttPointer.addPointedDataset(pointedDataset);
+								((Container)newParentNode.getObject()).addAttribute(newAttPointer);
+								newAttPointer.synchronizedFromXML();
+							}
+						}
 			    		
 					}else if(node.getUserObject() instanceof Filter) {
 						Filter filter = (Filter)node.getUserObject();
@@ -689,6 +713,7 @@ public class DefaultTreeTransferHandler extends AbstractTreeTransferHandler {
 			    			//	leftDs.getName(), config.getName(), config.getMart().getName());
 			    		filPointer.setDisplayName(node.getObject().getDisplayName());
 			    		filPointer.setPointedElement((Filter)node.getObject());
+			    		filPointer.setFilterType(filter.getFilterType());
 			    		((Container)newParentNode.getObject()).addFilter(filPointer);
 			    		filPointer.setPointedConfigName(sourceConfig.getName());
 			    		if(link != null)

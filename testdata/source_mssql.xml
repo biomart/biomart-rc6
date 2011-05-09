@@ -32,735 +32,735 @@
   </sourcecontainers>
   <mart name="gene" internalname="gene" displayname="gene" description="gene" hide="false" id="1" group="default" optimiser="NONE" indexoptimised="false" virtual="true" searchfromtarget="" centraltable="gene" selectedtables="gene,transcript,translation">
     <partitiontable name="p0" internalname="p0" displayname="p0" description="p0" rows="1" cols="15" type="SCHEMA">
-      <row id="0">jdbc:sqlserver://arektest.res.oicr.on.ca:1509|homo_sapiens_vega_58_37c|dbo|martadmin|18f7c91e647fdb2e3b7b2c09ee22034f|dbo|false|dbo|0.8||0|homo_sapiens_vega_58_37c|dbo|martadmin|Bi0M4rt</row>
+      <row id="0">jdbc:sqlserver://arektest.res.oicr.on.ca:1509|homo_sapiens_vega_58_37c|dbo|martadmin|39dfec028bd22d544afb62afcf3c1a5b|dbo|false|dbo|0.8||0|homo_sapiens_vega_58_37c|dbo|martadmin|Bi0M4rt</row>
     </partitiontable>
     <sourceschema name="homo_sapiens_vega_58_37c" internalname="homo_sapiens_vega_58_37c" displayname="homo_sapiens_vega_58_37c" description="homo_sapiens_vega_58_37c" id="1">
       <table name="alt_allele" internalname="alt_allele" displayname="alt_allele" description="alt_allele" id="1" hide="false">
-        <column name="alt_allele_id" inpartitions="" />
-        <column name="gene_id" inpartitions="" />
+        <column name="alt_allele_id" hide="false" inpartitions="" />
+        <column name="gene_id" hide="false" inpartitions="" />
         <primarykey name="gene_id_pk" internalname="gene_id_pk" displayname="gene_id_pk" description="gene_id_pk" column="gene_id" />
         <foreignkey name="gene_id_fk" internalname="gene_id_fk" displayname="gene_id_fk" description="gene_id_fk" column="gene_id" />
       </table>
       <table name="analysis" internalname="analysis" displayname="analysis" description="analysis" id="2" hide="false">
-        <column name="analysis_id" inpartitions="" />
-        <column name="created" inpartitions="" />
-        <column name="db" inpartitions="" />
-        <column name="db_file" inpartitions="" />
-        <column name="db_version" inpartitions="" />
-        <column name="gff_feature" inpartitions="" />
-        <column name="gff_source" inpartitions="" />
-        <column name="logic_name" inpartitions="" />
-        <column name="module" inpartitions="" />
-        <column name="module_version" inpartitions="" />
-        <column name="parameters" inpartitions="" />
-        <column name="program" inpartitions="" />
-        <column name="program_file" inpartitions="" />
-        <column name="program_version" inpartitions="" />
+        <column name="analysis_id" hide="false" inpartitions="" />
+        <column name="created" hide="false" inpartitions="" />
+        <column name="db" hide="false" inpartitions="" />
+        <column name="db_file" hide="false" inpartitions="" />
+        <column name="db_version" hide="false" inpartitions="" />
+        <column name="gff_feature" hide="false" inpartitions="" />
+        <column name="gff_source" hide="false" inpartitions="" />
+        <column name="logic_name" hide="false" inpartitions="" />
+        <column name="module" hide="false" inpartitions="" />
+        <column name="module_version" hide="false" inpartitions="" />
+        <column name="parameters" hide="false" inpartitions="" />
+        <column name="program" hide="false" inpartitions="" />
+        <column name="program_file" hide="false" inpartitions="" />
+        <column name="program_version" hide="false" inpartitions="" />
         <primarykey name="analysis_id_pk" internalname="analysis_id_pk" displayname="analysis_id_pk" description="analysis_id_pk" column="analysis_id" />
       </table>
       <table name="analysis_description" internalname="analysis_description" displayname="analysis_description" description="analysis_description" id="3" hide="false">
-        <column name="analysis_id" inpartitions="" />
-        <column name="description" inpartitions="" />
-        <column name="display_label" inpartitions="" />
-        <column name="displayable" inpartitions="" />
-        <column name="web_data" inpartitions="" />
+        <column name="analysis_id" hide="false" inpartitions="" />
+        <column name="description" hide="false" inpartitions="" />
+        <column name="display_label" hide="false" inpartitions="" />
+        <column name="displayable" hide="false" inpartitions="" />
+        <column name="web_data" hide="false" inpartitions="" />
         <primarykey name="analysis_id_pk" internalname="analysis_id_pk" displayname="analysis_id_pk" description="analysis_id_pk" column="analysis_id" />
         <foreignkey name="analysis_id_fk" internalname="analysis_id_fk" displayname="analysis_id_fk" description="analysis_id_fk" column="analysis_id" />
       </table>
       <table name="assembly" internalname="assembly" displayname="assembly" description="assembly" id="4" hide="false">
-        <column name="asm_end" inpartitions="" />
-        <column name="asm_seq_region_id" inpartitions="" />
-        <column name="asm_start" inpartitions="" />
-        <column name="cmp_end" inpartitions="" />
-        <column name="cmp_seq_region_id" inpartitions="" />
-        <column name="cmp_start" inpartitions="" />
-        <column name="ori" inpartitions="" />
+        <column name="asm_end" hide="false" inpartitions="" />
+        <column name="asm_seq_region_id" hide="false" inpartitions="" />
+        <column name="asm_start" hide="false" inpartitions="" />
+        <column name="cmp_end" hide="false" inpartitions="" />
+        <column name="cmp_seq_region_id" hide="false" inpartitions="" />
+        <column name="cmp_start" hide="false" inpartitions="" />
+        <column name="ori" hide="false" inpartitions="" />
         <primarykey name="asm_end,asm_seq_region_id,asm_start,cmp_end,cmp_seq_region_id,cmp_start,ori_pk" internalname="asm_end,asm_seq_region_id,asm_start,cmp_end,cmp_seq_region_id,cmp_start,ori_pk" displayname="asm_end,asm_seq_region_id,asm_start,cmp_end,cmp_seq_region_id,cmp_start,ori_pk" description="asm_end,asm_seq_region_id,asm_start,cmp_end,cmp_seq_region_id,cmp_start,ori_pk" column="asm_end,asm_seq_region_id,asm_start,cmp_end,cmp_seq_region_id,cmp_start,ori" />
       </table>
       <table name="assembly_exception" internalname="assembly_exception" displayname="assembly_exception" description="assembly_exception" id="5" hide="false">
-        <column name="assembly_exception_id" inpartitions="" />
-        <column name="exc_seq_region_end" inpartitions="" />
-        <column name="exc_seq_region_id" inpartitions="" />
-        <column name="exc_seq_region_start" inpartitions="" />
-        <column name="exc_type" inpartitions="" />
-        <column name="ori" inpartitions="" />
-        <column name="seq_region_end" inpartitions="" />
-        <column name="seq_region_id" inpartitions="" />
-        <column name="seq_region_start" inpartitions="" />
+        <column name="assembly_exception_id" hide="false" inpartitions="" />
+        <column name="exc_seq_region_end" hide="false" inpartitions="" />
+        <column name="exc_seq_region_id" hide="false" inpartitions="" />
+        <column name="exc_seq_region_start" hide="false" inpartitions="" />
+        <column name="exc_type" hide="false" inpartitions="" />
+        <column name="ori" hide="false" inpartitions="" />
+        <column name="seq_region_end" hide="false" inpartitions="" />
+        <column name="seq_region_id" hide="false" inpartitions="" />
+        <column name="seq_region_start" hide="false" inpartitions="" />
         <primarykey name="assembly_exception_id_pk" internalname="assembly_exception_id_pk" displayname="assembly_exception_id_pk" description="assembly_exception_id_pk" column="assembly_exception_id" />
         <foreignkey name="seq_region_id_fk" internalname="seq_region_id_fk" displayname="seq_region_id_fk" description="seq_region_id_fk" column="seq_region_id" />
       </table>
       <table name="attrib_type" internalname="attrib_type" displayname="attrib_type" description="attrib_type" id="6" hide="false">
-        <column name="attrib_type_id" inpartitions="" />
-        <column name="code" inpartitions="" />
-        <column name="description" inpartitions="" />
-        <column name="name" inpartitions="" />
+        <column name="attrib_type_id" hide="false" inpartitions="" />
+        <column name="code" hide="false" inpartitions="" />
+        <column name="description" hide="false" inpartitions="" />
+        <column name="name" hide="false" inpartitions="" />
         <primarykey name="attrib_type_id_pk" internalname="attrib_type_id_pk" displayname="attrib_type_id_pk" description="attrib_type_id_pk" column="attrib_type_id" />
       </table>
       <table name="coord_system" internalname="coord_system" displayname="coord_system" description="coord_system" id="7" hide="false">
-        <column name="attrib" inpartitions="" />
-        <column name="coord_system_id" inpartitions="" />
-        <column name="name" inpartitions="" />
-        <column name="rank" inpartitions="" />
-        <column name="species_id" inpartitions="" />
-        <column name="version" inpartitions="" />
+        <column name="attrib" hide="false" inpartitions="" />
+        <column name="coord_system_id" hide="false" inpartitions="" />
+        <column name="name" hide="false" inpartitions="" />
+        <column name="rank" hide="false" inpartitions="" />
+        <column name="species_id" hide="false" inpartitions="" />
+        <column name="version" hide="false" inpartitions="" />
         <primarykey name="coord_system_id_pk" internalname="coord_system_id_pk" displayname="coord_system_id_pk" description="coord_system_id_pk" column="coord_system_id" />
       </table>
       <table name="density_feature" internalname="density_feature" displayname="density_feature" description="density_feature" id="8" hide="false">
-        <column name="density_feature_id" inpartitions="" />
-        <column name="density_type_id" inpartitions="" />
-        <column name="density_value" inpartitions="" />
-        <column name="seq_region_end" inpartitions="" />
-        <column name="seq_region_id" inpartitions="" />
-        <column name="seq_region_start" inpartitions="" />
+        <column name="density_feature_id" hide="false" inpartitions="" />
+        <column name="density_type_id" hide="false" inpartitions="" />
+        <column name="density_value" hide="false" inpartitions="" />
+        <column name="seq_region_end" hide="false" inpartitions="" />
+        <column name="seq_region_id" hide="false" inpartitions="" />
+        <column name="seq_region_start" hide="false" inpartitions="" />
         <primarykey name="density_feature_id_pk" internalname="density_feature_id_pk" displayname="density_feature_id_pk" description="density_feature_id_pk" column="density_feature_id" />
         <foreignkey name="density_type_id_fk" internalname="density_type_id_fk" displayname="density_type_id_fk" description="density_type_id_fk" column="density_type_id" />
         <foreignkey name="seq_region_id_fk" internalname="seq_region_id_fk" displayname="seq_region_id_fk" description="seq_region_id_fk" column="seq_region_id" />
       </table>
       <table name="density_type" internalname="density_type" displayname="density_type" description="density_type" id="9" hide="false">
-        <column name="analysis_id" inpartitions="" />
-        <column name="block_size" inpartitions="" />
-        <column name="density_type_id" inpartitions="" />
-        <column name="region_features" inpartitions="" />
-        <column name="value_type" inpartitions="" />
+        <column name="analysis_id" hide="false" inpartitions="" />
+        <column name="block_size" hide="false" inpartitions="" />
+        <column name="density_type_id" hide="false" inpartitions="" />
+        <column name="region_features" hide="false" inpartitions="" />
+        <column name="value_type" hide="false" inpartitions="" />
         <primarykey name="density_type_id_pk" internalname="density_type_id_pk" displayname="density_type_id_pk" description="density_type_id_pk" column="density_type_id" />
         <foreignkey name="analysis_id_fk" internalname="analysis_id_fk" displayname="analysis_id_fk" description="analysis_id_fk" column="analysis_id" />
       </table>
       <table name="dependent_xref" internalname="dependent_xref" displayname="dependent_xref" description="dependent_xref" id="10" hide="false">
-        <column name="dependent_xref_id" inpartitions="" />
-        <column name="master_xref_id" inpartitions="" />
-        <column name="object_xref_id" inpartitions="" />
+        <column name="dependent_xref_id" hide="false" inpartitions="" />
+        <column name="master_xref_id" hide="false" inpartitions="" />
+        <column name="object_xref_id" hide="false" inpartitions="" />
         <primarykey name="object_xref_id_pk" internalname="object_xref_id_pk" displayname="object_xref_id_pk" description="object_xref_id_pk" column="object_xref_id" />
       </table>
       <table name="ditag" internalname="ditag" displayname="ditag" description="ditag" id="11" hide="false">
-        <column name="ditag_id" inpartitions="" />
-        <column name="name" inpartitions="" />
-        <column name="sequence" inpartitions="" />
-        <column name="tag_count" inpartitions="" />
-        <column name="type" inpartitions="" />
+        <column name="ditag_id" hide="false" inpartitions="" />
+        <column name="name" hide="false" inpartitions="" />
+        <column name="sequence" hide="false" inpartitions="" />
+        <column name="tag_count" hide="false" inpartitions="" />
+        <column name="type" hide="false" inpartitions="" />
         <primarykey name="ditag_id_pk" internalname="ditag_id_pk" displayname="ditag_id_pk" description="ditag_id_pk" column="ditag_id" />
       </table>
       <table name="ditag_feature" internalname="ditag_feature" displayname="ditag_feature" description="ditag_feature" id="12" hide="false">
-        <column name="analysis_id" inpartitions="" />
-        <column name="cigar_line" inpartitions="" />
-        <column name="ditag_feature_id" inpartitions="" />
-        <column name="ditag_id" inpartitions="" />
-        <column name="ditag_pair_id" inpartitions="" />
-        <column name="ditag_side" inpartitions="" />
-        <column name="hit_end" inpartitions="" />
-        <column name="hit_start" inpartitions="" />
-        <column name="hit_strand" inpartitions="" />
-        <column name="seq_region_end" inpartitions="" />
-        <column name="seq_region_id" inpartitions="" />
-        <column name="seq_region_start" inpartitions="" />
-        <column name="seq_region_strand" inpartitions="" />
+        <column name="analysis_id" hide="false" inpartitions="" />
+        <column name="cigar_line" hide="false" inpartitions="" />
+        <column name="ditag_feature_id" hide="false" inpartitions="" />
+        <column name="ditag_id" hide="false" inpartitions="" />
+        <column name="ditag_pair_id" hide="false" inpartitions="" />
+        <column name="ditag_side" hide="false" inpartitions="" />
+        <column name="hit_end" hide="false" inpartitions="" />
+        <column name="hit_start" hide="false" inpartitions="" />
+        <column name="hit_strand" hide="false" inpartitions="" />
+        <column name="seq_region_end" hide="false" inpartitions="" />
+        <column name="seq_region_id" hide="false" inpartitions="" />
+        <column name="seq_region_start" hide="false" inpartitions="" />
+        <column name="seq_region_strand" hide="false" inpartitions="" />
         <primarykey name="ditag_feature_id_pk" internalname="ditag_feature_id_pk" displayname="ditag_feature_id_pk" description="ditag_feature_id_pk" column="ditag_feature_id" />
         <foreignkey name="analysis_id_fk" internalname="analysis_id_fk" displayname="analysis_id_fk" description="analysis_id_fk" column="analysis_id" />
         <foreignkey name="ditag_id_fk" internalname="ditag_id_fk" displayname="ditag_id_fk" description="ditag_id_fk" column="ditag_id" />
         <foreignkey name="seq_region_id_fk" internalname="seq_region_id_fk" displayname="seq_region_id_fk" description="seq_region_id_fk" column="seq_region_id" />
       </table>
       <table name="dna" internalname="dna" displayname="dna" description="dna" id="13" hide="false">
-        <column name="seq_region_id" inpartitions="" />
-        <column name="sequence" inpartitions="" />
+        <column name="seq_region_id" hide="false" inpartitions="" />
+        <column name="sequence" hide="false" inpartitions="" />
         <primarykey name="seq_region_id_pk" internalname="seq_region_id_pk" displayname="seq_region_id_pk" description="seq_region_id_pk" column="seq_region_id" />
         <foreignkey name="seq_region_id_fk" internalname="seq_region_id_fk" displayname="seq_region_id_fk" description="seq_region_id_fk" column="seq_region_id" />
       </table>
       <table name="dna_align_feature" internalname="dna_align_feature" displayname="dna_align_feature" description="dna_align_feature" id="14" hide="false">
-        <column name="analysis_id" inpartitions="" />
-        <column name="cigar_line" inpartitions="" />
-        <column name="dna_align_feature_id" inpartitions="" />
-        <column name="evalue" inpartitions="" />
-        <column name="external_data" inpartitions="" />
-        <column name="external_db_id" inpartitions="" />
-        <column name="hcoverage" inpartitions="" />
-        <column name="hit_end" inpartitions="" />
-        <column name="hit_name" inpartitions="" />
-        <column name="hit_start" inpartitions="" />
-        <column name="hit_strand" inpartitions="" />
-        <column name="pair_dna_align_feature_id" inpartitions="" />
-        <column name="perc_ident" inpartitions="" />
-        <column name="score" inpartitions="" />
-        <column name="seq_region_end" inpartitions="" />
-        <column name="seq_region_id" inpartitions="" />
-        <column name="seq_region_start" inpartitions="" />
-        <column name="seq_region_strand" inpartitions="" />
+        <column name="analysis_id" hide="false" inpartitions="" />
+        <column name="cigar_line" hide="false" inpartitions="" />
+        <column name="dna_align_feature_id" hide="false" inpartitions="" />
+        <column name="evalue" hide="false" inpartitions="" />
+        <column name="external_data" hide="false" inpartitions="" />
+        <column name="external_db_id" hide="false" inpartitions="" />
+        <column name="hcoverage" hide="false" inpartitions="" />
+        <column name="hit_end" hide="false" inpartitions="" />
+        <column name="hit_name" hide="false" inpartitions="" />
+        <column name="hit_start" hide="false" inpartitions="" />
+        <column name="hit_strand" hide="false" inpartitions="" />
+        <column name="pair_dna_align_feature_id" hide="false" inpartitions="" />
+        <column name="perc_ident" hide="false" inpartitions="" />
+        <column name="score" hide="false" inpartitions="" />
+        <column name="seq_region_end" hide="false" inpartitions="" />
+        <column name="seq_region_id" hide="false" inpartitions="" />
+        <column name="seq_region_start" hide="false" inpartitions="" />
+        <column name="seq_region_strand" hide="false" inpartitions="" />
         <primarykey name="dna_align_feature_id_pk" internalname="dna_align_feature_id_pk" displayname="dna_align_feature_id_pk" description="dna_align_feature_id_pk" column="dna_align_feature_id" />
         <foreignkey name="analysis_id_fk" internalname="analysis_id_fk" displayname="analysis_id_fk" description="analysis_id_fk" column="analysis_id" />
         <foreignkey name="external_db_id_fk" internalname="external_db_id_fk" displayname="external_db_id_fk" description="external_db_id_fk" column="external_db_id" />
         <foreignkey name="seq_region_id_fk" internalname="seq_region_id_fk" displayname="seq_region_id_fk" description="seq_region_id_fk" column="seq_region_id" />
       </table>
       <table name="dnac" internalname="dnac" displayname="dnac" description="dnac" id="15" hide="false">
-        <column name="n_line" inpartitions="" />
-        <column name="seq_region_id" inpartitions="" />
-        <column name="sequence" inpartitions="" />
+        <column name="n_line" hide="false" inpartitions="" />
+        <column name="seq_region_id" hide="false" inpartitions="" />
+        <column name="sequence" hide="false" inpartitions="" />
         <primarykey name="seq_region_id_pk" internalname="seq_region_id_pk" displayname="seq_region_id_pk" description="seq_region_id_pk" column="seq_region_id" />
         <foreignkey name="seq_region_id_fk" internalname="seq_region_id_fk" displayname="seq_region_id_fk" description="seq_region_id_fk" column="seq_region_id" />
       </table>
       <table name="exon" internalname="exon" displayname="exon" description="exon" id="16" hide="false">
-        <column name="end_phase" inpartitions="" />
-        <column name="exon_id" inpartitions="" />
-        <column name="is_constitutive" inpartitions="" />
-        <column name="is_current" inpartitions="" />
-        <column name="phase" inpartitions="" />
-        <column name="seq_region_end" inpartitions="" />
-        <column name="seq_region_id" inpartitions="" />
-        <column name="seq_region_start" inpartitions="" />
-        <column name="seq_region_strand" inpartitions="" />
+        <column name="end_phase" hide="false" inpartitions="" />
+        <column name="exon_id" hide="false" inpartitions="" />
+        <column name="is_constitutive" hide="false" inpartitions="" />
+        <column name="is_current" hide="false" inpartitions="" />
+        <column name="phase" hide="false" inpartitions="" />
+        <column name="seq_region_end" hide="false" inpartitions="" />
+        <column name="seq_region_id" hide="false" inpartitions="" />
+        <column name="seq_region_start" hide="false" inpartitions="" />
+        <column name="seq_region_strand" hide="false" inpartitions="" />
         <primarykey name="exon_id_pk" internalname="exon_id_pk" displayname="exon_id_pk" description="exon_id_pk" column="exon_id" />
         <foreignkey name="seq_region_id_fk" internalname="seq_region_id_fk" displayname="seq_region_id_fk" description="seq_region_id_fk" column="seq_region_id" />
       </table>
       <table name="exon_stable_id" internalname="exon_stable_id" displayname="exon_stable_id" description="exon_stable_id" id="17" hide="false">
-        <column name="created_date" inpartitions="" />
-        <column name="exon_id" inpartitions="" />
-        <column name="modified_date" inpartitions="" />
-        <column name="stable_id" inpartitions="" />
-        <column name="version" inpartitions="" />
+        <column name="created_date" hide="false" inpartitions="" />
+        <column name="exon_id" hide="false" inpartitions="" />
+        <column name="modified_date" hide="false" inpartitions="" />
+        <column name="stable_id" hide="false" inpartitions="" />
+        <column name="version" hide="false" inpartitions="" />
         <primarykey name="exon_id_pk" internalname="exon_id_pk" displayname="exon_id_pk" description="exon_id_pk" column="exon_id" />
         <foreignkey name="exon_id_fk" internalname="exon_id_fk" displayname="exon_id_fk" description="exon_id_fk" column="exon_id" />
       </table>
       <table name="exon_transcript" internalname="exon_transcript" displayname="exon_transcript" description="exon_transcript" id="18" hide="false">
-        <column name="exon_id" inpartitions="" />
-        <column name="rank" inpartitions="" />
-        <column name="transcript_id" inpartitions="" />
+        <column name="exon_id" hide="false" inpartitions="" />
+        <column name="rank" hide="false" inpartitions="" />
+        <column name="transcript_id" hide="false" inpartitions="" />
         <primarykey name="exon_id,rank,transcript_id_pk" internalname="exon_id,rank,transcript_id_pk" displayname="exon_id,rank,transcript_id_pk" description="exon_id,rank,transcript_id_pk" column="exon_id,rank,transcript_id" />
         <foreignkey name="exon_id_fk" internalname="exon_id_fk" displayname="exon_id_fk" description="exon_id_fk" column="exon_id" />
         <foreignkey name="transcript_id_fk" internalname="transcript_id_fk" displayname="transcript_id_fk" description="transcript_id_fk" column="transcript_id" />
       </table>
       <table name="external_db" internalname="external_db" displayname="external_db" description="external_db" id="19" hide="false">
-        <column name="db_display_name" inpartitions="" />
-        <column name="db_name" inpartitions="" />
-        <column name="db_release" inpartitions="" />
-        <column name="dbprimary_acc_linkable" inpartitions="" />
-        <column name="description" inpartitions="" />
-        <column name="display_label_linkable" inpartitions="" />
-        <column name="external_db_id" inpartitions="" />
-        <column name="priority" inpartitions="" />
-        <column name="secondary_db_name" inpartitions="" />
-        <column name="secondary_db_table" inpartitions="" />
-        <column name="status" inpartitions="" />
-        <column name="type" inpartitions="" />
+        <column name="db_display_name" hide="false" inpartitions="" />
+        <column name="db_name" hide="false" inpartitions="" />
+        <column name="db_release" hide="false" inpartitions="" />
+        <column name="dbprimary_acc_linkable" hide="false" inpartitions="" />
+        <column name="description" hide="false" inpartitions="" />
+        <column name="display_label_linkable" hide="false" inpartitions="" />
+        <column name="external_db_id" hide="false" inpartitions="" />
+        <column name="priority" hide="false" inpartitions="" />
+        <column name="secondary_db_name" hide="false" inpartitions="" />
+        <column name="secondary_db_table" hide="false" inpartitions="" />
+        <column name="status" hide="false" inpartitions="" />
+        <column name="type" hide="false" inpartitions="" />
         <primarykey name="external_db_id_pk" internalname="external_db_id_pk" displayname="external_db_id_pk" description="external_db_id_pk" column="external_db_id" />
       </table>
       <table name="external_synonym" internalname="external_synonym" displayname="external_synonym" description="external_synonym" id="20" hide="false">
-        <column name="synonym" inpartitions="" />
-        <column name="xref_id" inpartitions="" />
+        <column name="synonym" hide="false" inpartitions="" />
+        <column name="xref_id" hide="false" inpartitions="" />
         <primarykey name="synonym,xref_id_pk" internalname="synonym,xref_id_pk" displayname="synonym,xref_id_pk" description="synonym,xref_id_pk" column="synonym,xref_id" />
         <foreignkey name="xref_id_fk" internalname="xref_id_fk" displayname="xref_id_fk" description="xref_id_fk" column="xref_id" />
       </table>
       <table name="gene" internalname="gene" displayname="gene" description="gene" id="21" hide="false">
-        <column name="analysis_id" inpartitions="" />
-        <column name="biotype" inpartitions="" />
-        <column name="canonical_annotation" inpartitions="" />
-        <column name="canonical_transcript_id" inpartitions="" />
-        <column name="description" inpartitions="" />
-        <column name="display_xref_id" inpartitions="" />
-        <column name="gene_id" inpartitions="" />
-        <column name="is_current" inpartitions="" />
-        <column name="seq_region_end" inpartitions="" />
-        <column name="seq_region_id" inpartitions="" />
-        <column name="seq_region_start" inpartitions="" />
-        <column name="seq_region_strand" inpartitions="" />
-        <column name="source" inpartitions="" />
-        <column name="status" inpartitions="" />
+        <column name="analysis_id" hide="false" inpartitions="" />
+        <column name="biotype" hide="false" inpartitions="" />
+        <column name="canonical_annotation" hide="false" inpartitions="" />
+        <column name="canonical_transcript_id" hide="false" inpartitions="" />
+        <column name="description" hide="false" inpartitions="" />
+        <column name="display_xref_id" hide="false" inpartitions="" />
+        <column name="gene_id" hide="false" inpartitions="" />
+        <column name="is_current" hide="false" inpartitions="" />
+        <column name="seq_region_end" hide="false" inpartitions="" />
+        <column name="seq_region_id" hide="false" inpartitions="" />
+        <column name="seq_region_start" hide="false" inpartitions="" />
+        <column name="seq_region_strand" hide="false" inpartitions="" />
+        <column name="source" hide="false" inpartitions="" />
+        <column name="status" hide="false" inpartitions="" />
         <primarykey name="gene_id_pk" internalname="gene_id_pk" displayname="gene_id_pk" description="gene_id_pk" column="gene_id" />
         <foreignkey name="analysis_id_fk" internalname="analysis_id_fk" displayname="analysis_id_fk" description="analysis_id_fk" column="analysis_id" />
         <foreignkey name="seq_region_id_fk" internalname="seq_region_id_fk" displayname="seq_region_id_fk" description="seq_region_id_fk" column="seq_region_id" />
       </table>
       <table name="gene_archive" internalname="gene_archive" displayname="gene_archive" description="gene_archive" id="22" hide="false">
-        <column name="gene_stable_id" inpartitions="" />
-        <column name="gene_version" inpartitions="" />
-        <column name="mapping_session_id" inpartitions="" />
-        <column name="peptide_archive_id" inpartitions="" />
-        <column name="transcript_stable_id" inpartitions="" />
-        <column name="transcript_version" inpartitions="" />
-        <column name="translation_stable_id" inpartitions="" />
-        <column name="translation_version" inpartitions="" />
+        <column name="gene_stable_id" hide="false" inpartitions="" />
+        <column name="gene_version" hide="false" inpartitions="" />
+        <column name="mapping_session_id" hide="false" inpartitions="" />
+        <column name="peptide_archive_id" hide="false" inpartitions="" />
+        <column name="transcript_stable_id" hide="false" inpartitions="" />
+        <column name="transcript_version" hide="false" inpartitions="" />
+        <column name="translation_stable_id" hide="false" inpartitions="" />
+        <column name="translation_version" hide="false" inpartitions="" />
         <foreignkey name="mapping_session_id_fk" internalname="mapping_session_id_fk" displayname="mapping_session_id_fk" description="mapping_session_id_fk" column="mapping_session_id" />
         <foreignkey name="peptide_archive_id_fk" internalname="peptide_archive_id_fk" displayname="peptide_archive_id_fk" description="peptide_archive_id_fk" column="peptide_archive_id" />
       </table>
       <table name="gene_attrib" internalname="gene_attrib" displayname="gene_attrib" description="gene_attrib" id="23" hide="false">
-        <column name="attrib_type_id" inpartitions="" />
-        <column name="gene_id" inpartitions="" />
-        <column name="value" inpartitions="" />
+        <column name="attrib_type_id" hide="false" inpartitions="" />
+        <column name="gene_id" hide="false" inpartitions="" />
+        <column name="value" hide="false" inpartitions="" />
         <foreignkey name="attrib_type_id_fk" internalname="attrib_type_id_fk" displayname="attrib_type_id_fk" description="attrib_type_id_fk" column="attrib_type_id" />
         <foreignkey name="gene_id_fk" internalname="gene_id_fk" displayname="gene_id_fk" description="gene_id_fk" column="gene_id" />
       </table>
       <table name="gene_stable_id" internalname="gene_stable_id" displayname="gene_stable_id" description="gene_stable_id" id="24" hide="false">
-        <column name="created_date" inpartitions="" />
-        <column name="gene_id" inpartitions="" />
-        <column name="modified_date" inpartitions="" />
-        <column name="stable_id" inpartitions="" />
-        <column name="version" inpartitions="" />
+        <column name="created_date" hide="false" inpartitions="" />
+        <column name="gene_id" hide="false" inpartitions="" />
+        <column name="modified_date" hide="false" inpartitions="" />
+        <column name="stable_id" hide="false" inpartitions="" />
+        <column name="version" hide="false" inpartitions="" />
         <primarykey name="gene_id_pk" internalname="gene_id_pk" displayname="gene_id_pk" description="gene_id_pk" column="gene_id" />
         <foreignkey name="gene_id_fk" internalname="gene_id_fk" displayname="gene_id_fk" description="gene_id_fk" column="gene_id" />
       </table>
       <table name="go_xref" internalname="go_xref" displayname="go_xref" description="go_xref" id="25" hide="false">
-        <column name="linkage_type" inpartitions="" />
-        <column name="object_xref_id" inpartitions="" />
-        <column name="source_xref_id" inpartitions="" />
+        <column name="linkage_type" hide="false" inpartitions="" />
+        <column name="object_xref_id" hide="false" inpartitions="" />
+        <column name="source_xref_id" hide="false" inpartitions="" />
       </table>
       <table name="identity_xref" internalname="identity_xref" displayname="identity_xref" description="identity_xref" id="26" hide="false">
-        <column name="cigar_line" inpartitions="" />
-        <column name="ensembl_end" inpartitions="" />
-        <column name="ensembl_identity" inpartitions="" />
-        <column name="ensembl_start" inpartitions="" />
-        <column name="evalue" inpartitions="" />
-        <column name="object_xref_id" inpartitions="" />
-        <column name="score" inpartitions="" />
-        <column name="xref_end" inpartitions="" />
-        <column name="xref_identity" inpartitions="" />
-        <column name="xref_start" inpartitions="" />
+        <column name="cigar_line" hide="false" inpartitions="" />
+        <column name="ensembl_end" hide="false" inpartitions="" />
+        <column name="ensembl_identity" hide="false" inpartitions="" />
+        <column name="ensembl_start" hide="false" inpartitions="" />
+        <column name="evalue" hide="false" inpartitions="" />
+        <column name="object_xref_id" hide="false" inpartitions="" />
+        <column name="score" hide="false" inpartitions="" />
+        <column name="xref_end" hide="false" inpartitions="" />
+        <column name="xref_identity" hide="false" inpartitions="" />
+        <column name="xref_start" hide="false" inpartitions="" />
         <primarykey name="object_xref_id_pk" internalname="object_xref_id_pk" displayname="object_xref_id_pk" description="object_xref_id_pk" column="object_xref_id" />
       </table>
       <table name="interpro" internalname="interpro" displayname="interpro" description="interpro" id="27" hide="false">
-        <column name="id" inpartitions="" />
-        <column name="interpro_ac" inpartitions="" />
+        <column name="id" hide="false" inpartitions="" />
+        <column name="interpro_ac" hide="false" inpartitions="" />
         <primarykey name="id,interpro_ac_pk" internalname="id,interpro_ac_pk" displayname="id,interpro_ac_pk" description="id,interpro_ac_pk" column="id,interpro_ac" />
       </table>
       <table name="karyotype" internalname="karyotype" displayname="karyotype" description="karyotype" id="28" hide="false">
-        <column name="band" inpartitions="" />
-        <column name="karyotype_id" inpartitions="" />
-        <column name="seq_region_end" inpartitions="" />
-        <column name="seq_region_id" inpartitions="" />
-        <column name="seq_region_start" inpartitions="" />
-        <column name="stain" inpartitions="" />
+        <column name="band" hide="false" inpartitions="" />
+        <column name="karyotype_id" hide="false" inpartitions="" />
+        <column name="seq_region_end" hide="false" inpartitions="" />
+        <column name="seq_region_id" hide="false" inpartitions="" />
+        <column name="seq_region_start" hide="false" inpartitions="" />
+        <column name="stain" hide="false" inpartitions="" />
         <primarykey name="karyotype_id_pk" internalname="karyotype_id_pk" displayname="karyotype_id_pk" description="karyotype_id_pk" column="karyotype_id" />
         <foreignkey name="seq_region_id_fk" internalname="seq_region_id_fk" displayname="seq_region_id_fk" description="seq_region_id_fk" column="seq_region_id" />
       </table>
       <table name="map" internalname="map" displayname="map" description="map" id="29" hide="false">
-        <column name="map_id" inpartitions="" />
-        <column name="map_name" inpartitions="" />
+        <column name="map_id" hide="false" inpartitions="" />
+        <column name="map_name" hide="false" inpartitions="" />
         <primarykey name="map_id_pk" internalname="map_id_pk" displayname="map_id_pk" description="map_id_pk" column="map_id" />
       </table>
       <table name="mapping_session" internalname="mapping_session" displayname="mapping_session" description="mapping_session" id="30" hide="false">
-        <column name="created" inpartitions="" />
-        <column name="mapping_session_id" inpartitions="" />
-        <column name="new_assembly" inpartitions="" />
-        <column name="new_db_name" inpartitions="" />
-        <column name="new_release" inpartitions="" />
-        <column name="old_assembly" inpartitions="" />
-        <column name="old_db_name" inpartitions="" />
-        <column name="old_release" inpartitions="" />
+        <column name="created" hide="false" inpartitions="" />
+        <column name="mapping_session_id" hide="false" inpartitions="" />
+        <column name="new_assembly" hide="false" inpartitions="" />
+        <column name="new_db_name" hide="false" inpartitions="" />
+        <column name="new_release" hide="false" inpartitions="" />
+        <column name="old_assembly" hide="false" inpartitions="" />
+        <column name="old_db_name" hide="false" inpartitions="" />
+        <column name="old_release" hide="false" inpartitions="" />
         <primarykey name="mapping_session_id_pk" internalname="mapping_session_id_pk" displayname="mapping_session_id_pk" description="mapping_session_id_pk" column="mapping_session_id" />
       </table>
       <table name="mapping_set" internalname="mapping_set" displayname="mapping_set" description="mapping_set" id="31" hide="false">
-        <column name="mapping_set_id" inpartitions="" />
-        <column name="schema_build" inpartitions="" />
+        <column name="mapping_set_id" hide="false" inpartitions="" />
+        <column name="schema_build" hide="false" inpartitions="" />
         <primarykey name="schema_build_pk" internalname="schema_build_pk" displayname="schema_build_pk" description="schema_build_pk" column="schema_build" />
       </table>
       <table name="marker" internalname="marker" displayname="marker" description="marker" id="32" hide="false">
-        <column name="display_marker_synonym_id" inpartitions="" />
-        <column name="left_primer" inpartitions="" />
-        <column name="marker_id" inpartitions="" />
-        <column name="max_primer_dist" inpartitions="" />
-        <column name="min_primer_dist" inpartitions="" />
-        <column name="priority" inpartitions="" />
-        <column name="right_primer" inpartitions="" />
-        <column name="type" inpartitions="" />
+        <column name="display_marker_synonym_id" hide="false" inpartitions="" />
+        <column name="left_primer" hide="false" inpartitions="" />
+        <column name="marker_id" hide="false" inpartitions="" />
+        <column name="max_primer_dist" hide="false" inpartitions="" />
+        <column name="min_primer_dist" hide="false" inpartitions="" />
+        <column name="priority" hide="false" inpartitions="" />
+        <column name="right_primer" hide="false" inpartitions="" />
+        <column name="type" hide="false" inpartitions="" />
         <primarykey name="marker_id_pk" internalname="marker_id_pk" displayname="marker_id_pk" description="marker_id_pk" column="marker_id" />
       </table>
       <table name="marker_feature" internalname="marker_feature" displayname="marker_feature" description="marker_feature" id="33" hide="false">
-        <column name="analysis_id" inpartitions="" />
-        <column name="map_weight" inpartitions="" />
-        <column name="marker_feature_id" inpartitions="" />
-        <column name="marker_id" inpartitions="" />
-        <column name="seq_region_end" inpartitions="" />
-        <column name="seq_region_id" inpartitions="" />
-        <column name="seq_region_start" inpartitions="" />
+        <column name="analysis_id" hide="false" inpartitions="" />
+        <column name="map_weight" hide="false" inpartitions="" />
+        <column name="marker_feature_id" hide="false" inpartitions="" />
+        <column name="marker_id" hide="false" inpartitions="" />
+        <column name="seq_region_end" hide="false" inpartitions="" />
+        <column name="seq_region_id" hide="false" inpartitions="" />
+        <column name="seq_region_start" hide="false" inpartitions="" />
         <primarykey name="marker_feature_id_pk" internalname="marker_feature_id_pk" displayname="marker_feature_id_pk" description="marker_feature_id_pk" column="marker_feature_id" />
         <foreignkey name="analysis_id_fk" internalname="analysis_id_fk" displayname="analysis_id_fk" description="analysis_id_fk" column="analysis_id" />
         <foreignkey name="marker_id_fk" internalname="marker_id_fk" displayname="marker_id_fk" description="marker_id_fk" column="marker_id" />
         <foreignkey name="seq_region_id_fk" internalname="seq_region_id_fk" displayname="seq_region_id_fk" description="seq_region_id_fk" column="seq_region_id" />
       </table>
       <table name="marker_map_location" internalname="marker_map_location" displayname="marker_map_location" description="marker_map_location" id="34" hide="false">
-        <column name="chromosome_name" inpartitions="" />
-        <column name="lod_score" inpartitions="" />
-        <column name="map_id" inpartitions="" />
-        <column name="marker_id" inpartitions="" />
-        <column name="marker_synonym_id" inpartitions="" />
-        <column name="position" inpartitions="" />
+        <column name="chromosome_name" hide="false" inpartitions="" />
+        <column name="lod_score" hide="false" inpartitions="" />
+        <column name="map_id" hide="false" inpartitions="" />
+        <column name="marker_id" hide="false" inpartitions="" />
+        <column name="marker_synonym_id" hide="false" inpartitions="" />
+        <column name="position" hide="false" inpartitions="" />
         <primarykey name="map_id,marker_id_pk" internalname="map_id,marker_id_pk" displayname="map_id,marker_id_pk" description="map_id,marker_id_pk" column="map_id,marker_id" />
         <foreignkey name="map_id_fk" internalname="map_id_fk" displayname="map_id_fk" description="map_id_fk" column="map_id" />
         <foreignkey name="marker_id_fk" internalname="marker_id_fk" displayname="marker_id_fk" description="marker_id_fk" column="marker_id" />
         <foreignkey name="marker_synonym_id_fk" internalname="marker_synonym_id_fk" displayname="marker_synonym_id_fk" description="marker_synonym_id_fk" column="marker_synonym_id" />
       </table>
       <table name="marker_synonym" internalname="marker_synonym" displayname="marker_synonym" description="marker_synonym" id="35" hide="false">
-        <column name="marker_id" inpartitions="" />
-        <column name="marker_synonym_id" inpartitions="" />
-        <column name="name" inpartitions="" />
-        <column name="source" inpartitions="" />
+        <column name="marker_id" hide="false" inpartitions="" />
+        <column name="marker_synonym_id" hide="false" inpartitions="" />
+        <column name="name" hide="false" inpartitions="" />
+        <column name="source" hide="false" inpartitions="" />
         <primarykey name="marker_synonym_id_pk" internalname="marker_synonym_id_pk" displayname="marker_synonym_id_pk" description="marker_synonym_id_pk" column="marker_synonym_id" />
         <foreignkey name="marker_id_fk" internalname="marker_id_fk" displayname="marker_id_fk" description="marker_id_fk" column="marker_id" />
       </table>
       <table name="meta" internalname="meta" displayname="meta" description="meta" id="36" hide="false">
-        <column name="meta_id" inpartitions="" />
-        <column name="meta_key" inpartitions="" />
-        <column name="meta_value" inpartitions="" />
-        <column name="species_id" inpartitions="" />
+        <column name="meta_id" hide="false" inpartitions="" />
+        <column name="meta_key" hide="false" inpartitions="" />
+        <column name="meta_value" hide="false" inpartitions="" />
+        <column name="species_id" hide="false" inpartitions="" />
         <primarykey name="meta_id_pk" internalname="meta_id_pk" displayname="meta_id_pk" description="meta_id_pk" column="meta_id" />
       </table>
       <table name="meta_coord" internalname="meta_coord" displayname="meta_coord" description="meta_coord" id="37" hide="false">
-        <column name="coord_system_id" inpartitions="" />
-        <column name="max_length" inpartitions="" />
-        <column name="table_name" inpartitions="" />
+        <column name="coord_system_id" hide="false" inpartitions="" />
+        <column name="max_length" hide="false" inpartitions="" />
+        <column name="table_name" hide="false" inpartitions="" />
         <primarykey name="coord_system_id,table_name_pk" internalname="coord_system_id,table_name_pk" displayname="coord_system_id,table_name_pk" description="coord_system_id,table_name_pk" column="coord_system_id,table_name" />
         <foreignkey name="coord_system_id_fk" internalname="coord_system_id_fk" displayname="coord_system_id_fk" description="coord_system_id_fk" column="coord_system_id" />
       </table>
       <table name="misc_attrib" internalname="misc_attrib" displayname="misc_attrib" description="misc_attrib" id="38" hide="false">
-        <column name="attrib_type_id" inpartitions="" />
-        <column name="misc_feature_id" inpartitions="" />
-        <column name="value" inpartitions="" />
+        <column name="attrib_type_id" hide="false" inpartitions="" />
+        <column name="misc_feature_id" hide="false" inpartitions="" />
+        <column name="value" hide="false" inpartitions="" />
         <foreignkey name="attrib_type_id_fk" internalname="attrib_type_id_fk" displayname="attrib_type_id_fk" description="attrib_type_id_fk" column="attrib_type_id" />
         <foreignkey name="misc_feature_id_fk" internalname="misc_feature_id_fk" displayname="misc_feature_id_fk" description="misc_feature_id_fk" column="misc_feature_id" />
       </table>
       <table name="misc_feature" internalname="misc_feature" displayname="misc_feature" description="misc_feature" id="39" hide="false">
-        <column name="misc_feature_id" inpartitions="" />
-        <column name="seq_region_end" inpartitions="" />
-        <column name="seq_region_id" inpartitions="" />
-        <column name="seq_region_start" inpartitions="" />
-        <column name="seq_region_strand" inpartitions="" />
+        <column name="misc_feature_id" hide="false" inpartitions="" />
+        <column name="seq_region_end" hide="false" inpartitions="" />
+        <column name="seq_region_id" hide="false" inpartitions="" />
+        <column name="seq_region_start" hide="false" inpartitions="" />
+        <column name="seq_region_strand" hide="false" inpartitions="" />
         <primarykey name="misc_feature_id_pk" internalname="misc_feature_id_pk" displayname="misc_feature_id_pk" description="misc_feature_id_pk" column="misc_feature_id" />
         <foreignkey name="seq_region_id_fk" internalname="seq_region_id_fk" displayname="seq_region_id_fk" description="seq_region_id_fk" column="seq_region_id" />
       </table>
       <table name="misc_feature_misc_set" internalname="misc_feature_misc_set" displayname="misc_feature_misc_set" description="misc_feature_misc_set" id="40" hide="false">
-        <column name="misc_feature_id" inpartitions="" />
-        <column name="misc_set_id" inpartitions="" />
+        <column name="misc_feature_id" hide="false" inpartitions="" />
+        <column name="misc_set_id" hide="false" inpartitions="" />
         <primarykey name="misc_feature_id,misc_set_id_pk" internalname="misc_feature_id,misc_set_id_pk" displayname="misc_feature_id,misc_set_id_pk" description="misc_feature_id,misc_set_id_pk" column="misc_feature_id,misc_set_id" />
         <foreignkey name="misc_feature_id_fk" internalname="misc_feature_id_fk" displayname="misc_feature_id_fk" description="misc_feature_id_fk" column="misc_feature_id" />
         <foreignkey name="misc_set_id_fk" internalname="misc_set_id_fk" displayname="misc_set_id_fk" description="misc_set_id_fk" column="misc_set_id" />
       </table>
       <table name="misc_set" internalname="misc_set" displayname="misc_set" description="misc_set" id="41" hide="false">
-        <column name="code" inpartitions="" />
-        <column name="description" inpartitions="" />
-        <column name="max_length" inpartitions="" />
-        <column name="misc_set_id" inpartitions="" />
-        <column name="name" inpartitions="" />
+        <column name="code" hide="false" inpartitions="" />
+        <column name="description" hide="false" inpartitions="" />
+        <column name="max_length" hide="false" inpartitions="" />
+        <column name="misc_set_id" hide="false" inpartitions="" />
+        <column name="name" hide="false" inpartitions="" />
         <primarykey name="misc_set_id_pk" internalname="misc_set_id_pk" displayname="misc_set_id_pk" description="misc_set_id_pk" column="misc_set_id" />
       </table>
       <table name="object_xref" internalname="object_xref" displayname="object_xref" description="object_xref" id="42" hide="false">
-        <column name="analysis_id" inpartitions="" />
-        <column name="ensembl_id" inpartitions="" />
-        <column name="ensembl_object_type" inpartitions="" />
-        <column name="linkage_annotation" inpartitions="" />
-        <column name="object_xref_id" inpartitions="" />
-        <column name="xref_id" inpartitions="" />
+        <column name="analysis_id" hide="false" inpartitions="" />
+        <column name="ensembl_id" hide="false" inpartitions="" />
+        <column name="ensembl_object_type" hide="false" inpartitions="" />
+        <column name="linkage_annotation" hide="false" inpartitions="" />
+        <column name="object_xref_id" hide="false" inpartitions="" />
+        <column name="xref_id" hide="false" inpartitions="" />
         <primarykey name="ensembl_id,ensembl_object_type,xref_id_pk" internalname="ensembl_id,ensembl_object_type,xref_id_pk" displayname="ensembl_id,ensembl_object_type,xref_id_pk" description="ensembl_id,ensembl_object_type,xref_id_pk" column="ensembl_id,ensembl_object_type,xref_id" />
         <foreignkey name="analysis_id_fk" internalname="analysis_id_fk" displayname="analysis_id_fk" description="analysis_id_fk" column="analysis_id" />
         <foreignkey name="xref_id_fk" internalname="xref_id_fk" displayname="xref_id_fk" description="xref_id_fk" column="xref_id" />
       </table>
       <table name="peptide_archive" internalname="peptide_archive" displayname="peptide_archive" description="peptide_archive" id="43" hide="false">
-        <column name="md5_checksum" inpartitions="" />
-        <column name="peptide_archive_id" inpartitions="" />
-        <column name="peptide_seq" inpartitions="" />
+        <column name="md5_checksum" hide="false" inpartitions="" />
+        <column name="peptide_archive_id" hide="false" inpartitions="" />
+        <column name="peptide_seq" hide="false" inpartitions="" />
         <primarykey name="peptide_archive_id_pk" internalname="peptide_archive_id_pk" displayname="peptide_archive_id_pk" description="peptide_archive_id_pk" column="peptide_archive_id" />
       </table>
       <table name="prediction_exon" internalname="prediction_exon" displayname="prediction_exon" description="prediction_exon" id="44" hide="false">
-        <column name="exon_rank" inpartitions="" />
-        <column name="p_value" inpartitions="" />
-        <column name="prediction_exon_id" inpartitions="" />
-        <column name="prediction_transcript_id" inpartitions="" />
-        <column name="score" inpartitions="" />
-        <column name="seq_region_end" inpartitions="" />
-        <column name="seq_region_id" inpartitions="" />
-        <column name="seq_region_start" inpartitions="" />
-        <column name="seq_region_strand" inpartitions="" />
-        <column name="start_phase" inpartitions="" />
+        <column name="exon_rank" hide="false" inpartitions="" />
+        <column name="p_value" hide="false" inpartitions="" />
+        <column name="prediction_exon_id" hide="false" inpartitions="" />
+        <column name="prediction_transcript_id" hide="false" inpartitions="" />
+        <column name="score" hide="false" inpartitions="" />
+        <column name="seq_region_end" hide="false" inpartitions="" />
+        <column name="seq_region_id" hide="false" inpartitions="" />
+        <column name="seq_region_start" hide="false" inpartitions="" />
+        <column name="seq_region_strand" hide="false" inpartitions="" />
+        <column name="start_phase" hide="false" inpartitions="" />
         <primarykey name="prediction_exon_id_pk" internalname="prediction_exon_id_pk" displayname="prediction_exon_id_pk" description="prediction_exon_id_pk" column="prediction_exon_id" />
         <foreignkey name="prediction_transcript_id_fk" internalname="prediction_transcript_id_fk" displayname="prediction_transcript_id_fk" description="prediction_transcript_id_fk" column="prediction_transcript_id" />
         <foreignkey name="seq_region_id_fk" internalname="seq_region_id_fk" displayname="seq_region_id_fk" description="seq_region_id_fk" column="seq_region_id" />
       </table>
       <table name="prediction_transcript" internalname="prediction_transcript" displayname="prediction_transcript" description="prediction_transcript" id="45" hide="false">
-        <column name="analysis_id" inpartitions="" />
-        <column name="display_label" inpartitions="" />
-        <column name="prediction_transcript_id" inpartitions="" />
-        <column name="seq_region_end" inpartitions="" />
-        <column name="seq_region_id" inpartitions="" />
-        <column name="seq_region_start" inpartitions="" />
-        <column name="seq_region_strand" inpartitions="" />
+        <column name="analysis_id" hide="false" inpartitions="" />
+        <column name="display_label" hide="false" inpartitions="" />
+        <column name="prediction_transcript_id" hide="false" inpartitions="" />
+        <column name="seq_region_end" hide="false" inpartitions="" />
+        <column name="seq_region_id" hide="false" inpartitions="" />
+        <column name="seq_region_start" hide="false" inpartitions="" />
+        <column name="seq_region_strand" hide="false" inpartitions="" />
         <primarykey name="prediction_transcript_id_pk" internalname="prediction_transcript_id_pk" displayname="prediction_transcript_id_pk" description="prediction_transcript_id_pk" column="prediction_transcript_id" />
         <foreignkey name="analysis_id_fk" internalname="analysis_id_fk" displayname="analysis_id_fk" description="analysis_id_fk" column="analysis_id" />
         <foreignkey name="seq_region_id_fk" internalname="seq_region_id_fk" displayname="seq_region_id_fk" description="seq_region_id_fk" column="seq_region_id" />
       </table>
       <table name="protein_align_feature" internalname="protein_align_feature" displayname="protein_align_feature" description="protein_align_feature" id="46" hide="false">
-        <column name="analysis_id" inpartitions="" />
-        <column name="cigar_line" inpartitions="" />
-        <column name="evalue" inpartitions="" />
-        <column name="external_db_id" inpartitions="" />
-        <column name="hcoverage" inpartitions="" />
-        <column name="hit_end" inpartitions="" />
-        <column name="hit_name" inpartitions="" />
-        <column name="hit_start" inpartitions="" />
-        <column name="perc_ident" inpartitions="" />
-        <column name="protein_align_feature_id" inpartitions="" />
-        <column name="score" inpartitions="" />
-        <column name="seq_region_end" inpartitions="" />
-        <column name="seq_region_id" inpartitions="" />
-        <column name="seq_region_start" inpartitions="" />
-        <column name="seq_region_strand" inpartitions="" />
+        <column name="analysis_id" hide="false" inpartitions="" />
+        <column name="cigar_line" hide="false" inpartitions="" />
+        <column name="evalue" hide="false" inpartitions="" />
+        <column name="external_db_id" hide="false" inpartitions="" />
+        <column name="hcoverage" hide="false" inpartitions="" />
+        <column name="hit_end" hide="false" inpartitions="" />
+        <column name="hit_name" hide="false" inpartitions="" />
+        <column name="hit_start" hide="false" inpartitions="" />
+        <column name="perc_ident" hide="false" inpartitions="" />
+        <column name="protein_align_feature_id" hide="false" inpartitions="" />
+        <column name="score" hide="false" inpartitions="" />
+        <column name="seq_region_end" hide="false" inpartitions="" />
+        <column name="seq_region_id" hide="false" inpartitions="" />
+        <column name="seq_region_start" hide="false" inpartitions="" />
+        <column name="seq_region_strand" hide="false" inpartitions="" />
         <primarykey name="protein_align_feature_id_pk" internalname="protein_align_feature_id_pk" displayname="protein_align_feature_id_pk" description="protein_align_feature_id_pk" column="protein_align_feature_id" />
         <foreignkey name="analysis_id_fk" internalname="analysis_id_fk" displayname="analysis_id_fk" description="analysis_id_fk" column="analysis_id" />
         <foreignkey name="external_db_id_fk" internalname="external_db_id_fk" displayname="external_db_id_fk" description="external_db_id_fk" column="external_db_id" />
         <foreignkey name="seq_region_id_fk" internalname="seq_region_id_fk" displayname="seq_region_id_fk" description="seq_region_id_fk" column="seq_region_id" />
       </table>
       <table name="protein_feature" internalname="protein_feature" displayname="protein_feature" description="protein_feature" id="47" hide="false">
-        <column name="analysis_id" inpartitions="" />
-        <column name="evalue" inpartitions="" />
-        <column name="external_data" inpartitions="" />
-        <column name="hit_end" inpartitions="" />
-        <column name="hit_name" inpartitions="" />
-        <column name="hit_start" inpartitions="" />
-        <column name="perc_ident" inpartitions="" />
-        <column name="protein_feature_id" inpartitions="" />
-        <column name="score" inpartitions="" />
-        <column name="seq_end" inpartitions="" />
-        <column name="seq_start" inpartitions="" />
-        <column name="translation_id" inpartitions="" />
+        <column name="analysis_id" hide="false" inpartitions="" />
+        <column name="evalue" hide="false" inpartitions="" />
+        <column name="external_data" hide="false" inpartitions="" />
+        <column name="hit_end" hide="false" inpartitions="" />
+        <column name="hit_name" hide="false" inpartitions="" />
+        <column name="hit_start" hide="false" inpartitions="" />
+        <column name="perc_ident" hide="false" inpartitions="" />
+        <column name="protein_feature_id" hide="false" inpartitions="" />
+        <column name="score" hide="false" inpartitions="" />
+        <column name="seq_end" hide="false" inpartitions="" />
+        <column name="seq_start" hide="false" inpartitions="" />
+        <column name="translation_id" hide="false" inpartitions="" />
         <primarykey name="protein_feature_id_pk" internalname="protein_feature_id_pk" displayname="protein_feature_id_pk" description="protein_feature_id_pk" column="protein_feature_id" />
         <foreignkey name="analysis_id_fk" internalname="analysis_id_fk" displayname="analysis_id_fk" description="analysis_id_fk" column="analysis_id" />
         <foreignkey name="translation_id_fk" internalname="translation_id_fk" displayname="translation_id_fk" description="translation_id_fk" column="translation_id" />
       </table>
       <table name="qtl" internalname="qtl" displayname="qtl" description="qtl" id="48" hide="false">
-        <column name="flank_marker_id_1" inpartitions="" />
-        <column name="flank_marker_id_2" inpartitions="" />
-        <column name="lod_score" inpartitions="" />
-        <column name="peak_marker_id" inpartitions="" />
-        <column name="qtl_id" inpartitions="" />
-        <column name="trait" inpartitions="" />
+        <column name="flank_marker_id_1" hide="false" inpartitions="" />
+        <column name="flank_marker_id_2" hide="false" inpartitions="" />
+        <column name="lod_score" hide="false" inpartitions="" />
+        <column name="peak_marker_id" hide="false" inpartitions="" />
+        <column name="qtl_id" hide="false" inpartitions="" />
+        <column name="trait" hide="false" inpartitions="" />
         <primarykey name="qtl_id_pk" internalname="qtl_id_pk" displayname="qtl_id_pk" description="qtl_id_pk" column="qtl_id" />
       </table>
       <table name="qtl_feature" internalname="qtl_feature" displayname="qtl_feature" description="qtl_feature" id="49" hide="false">
-        <column name="analysis_id" inpartitions="" />
-        <column name="qtl_id" inpartitions="" />
-        <column name="seq_region_end" inpartitions="" />
-        <column name="seq_region_id" inpartitions="" />
-        <column name="seq_region_start" inpartitions="" />
+        <column name="analysis_id" hide="false" inpartitions="" />
+        <column name="qtl_id" hide="false" inpartitions="" />
+        <column name="seq_region_end" hide="false" inpartitions="" />
+        <column name="seq_region_id" hide="false" inpartitions="" />
+        <column name="seq_region_start" hide="false" inpartitions="" />
         <foreignkey name="analysis_id_fk" internalname="analysis_id_fk" displayname="analysis_id_fk" description="analysis_id_fk" column="analysis_id" />
         <foreignkey name="qtl_id_fk" internalname="qtl_id_fk" displayname="qtl_id_fk" description="qtl_id_fk" column="qtl_id" />
         <foreignkey name="seq_region_id_fk" internalname="seq_region_id_fk" displayname="seq_region_id_fk" description="seq_region_id_fk" column="seq_region_id" />
       </table>
       <table name="qtl_synonym" internalname="qtl_synonym" displayname="qtl_synonym" description="qtl_synonym" id="50" hide="false">
-        <column name="qtl_id" inpartitions="" />
-        <column name="qtl_synonym_id" inpartitions="" />
-        <column name="source_database" inpartitions="" />
-        <column name="source_primary_id" inpartitions="" />
+        <column name="qtl_id" hide="false" inpartitions="" />
+        <column name="qtl_synonym_id" hide="false" inpartitions="" />
+        <column name="source_database" hide="false" inpartitions="" />
+        <column name="source_primary_id" hide="false" inpartitions="" />
         <primarykey name="qtl_synonym_id_pk" internalname="qtl_synonym_id_pk" displayname="qtl_synonym_id_pk" description="qtl_synonym_id_pk" column="qtl_synonym_id" />
         <foreignkey name="qtl_id_fk" internalname="qtl_id_fk" displayname="qtl_id_fk" description="qtl_id_fk" column="qtl_id" />
       </table>
       <table name="repeat_consensus" internalname="repeat_consensus" displayname="repeat_consensus" description="repeat_consensus" id="51" hide="false">
-        <column name="repeat_class" inpartitions="" />
-        <column name="repeat_consensus" inpartitions="" />
-        <column name="repeat_consensus_id" inpartitions="" />
-        <column name="repeat_name" inpartitions="" />
-        <column name="repeat_type" inpartitions="" />
+        <column name="repeat_class" hide="false" inpartitions="" />
+        <column name="repeat_consensus" hide="false" inpartitions="" />
+        <column name="repeat_consensus_id" hide="false" inpartitions="" />
+        <column name="repeat_name" hide="false" inpartitions="" />
+        <column name="repeat_type" hide="false" inpartitions="" />
         <primarykey name="repeat_consensus_id_pk" internalname="repeat_consensus_id_pk" displayname="repeat_consensus_id_pk" description="repeat_consensus_id_pk" column="repeat_consensus_id" />
       </table>
       <table name="repeat_feature" internalname="repeat_feature" displayname="repeat_feature" description="repeat_feature" id="52" hide="false">
-        <column name="analysis_id" inpartitions="" />
-        <column name="repeat_consensus_id" inpartitions="" />
-        <column name="repeat_end" inpartitions="" />
-        <column name="repeat_feature_id" inpartitions="" />
-        <column name="repeat_start" inpartitions="" />
-        <column name="score" inpartitions="" />
-        <column name="seq_region_end" inpartitions="" />
-        <column name="seq_region_id" inpartitions="" />
-        <column name="seq_region_start" inpartitions="" />
-        <column name="seq_region_strand" inpartitions="" />
+        <column name="analysis_id" hide="false" inpartitions="" />
+        <column name="repeat_consensus_id" hide="false" inpartitions="" />
+        <column name="repeat_end" hide="false" inpartitions="" />
+        <column name="repeat_feature_id" hide="false" inpartitions="" />
+        <column name="repeat_start" hide="false" inpartitions="" />
+        <column name="score" hide="false" inpartitions="" />
+        <column name="seq_region_end" hide="false" inpartitions="" />
+        <column name="seq_region_id" hide="false" inpartitions="" />
+        <column name="seq_region_start" hide="false" inpartitions="" />
+        <column name="seq_region_strand" hide="false" inpartitions="" />
         <primarykey name="repeat_feature_id_pk" internalname="repeat_feature_id_pk" displayname="repeat_feature_id_pk" description="repeat_feature_id_pk" column="repeat_feature_id" />
         <foreignkey name="analysis_id_fk" internalname="analysis_id_fk" displayname="analysis_id_fk" description="analysis_id_fk" column="analysis_id" />
         <foreignkey name="repeat_consensus_id_fk" internalname="repeat_consensus_id_fk" displayname="repeat_consensus_id_fk" description="repeat_consensus_id_fk" column="repeat_consensus_id" />
         <foreignkey name="seq_region_id_fk" internalname="seq_region_id_fk" displayname="seq_region_id_fk" description="seq_region_id_fk" column="seq_region_id" />
       </table>
       <table name="seq_region" internalname="seq_region" displayname="seq_region" description="seq_region" id="53" hide="false">
-        <column name="coord_system_id" inpartitions="" />
-        <column name="length" inpartitions="" />
-        <column name="name" inpartitions="" />
-        <column name="seq_region_id" inpartitions="" />
+        <column name="coord_system_id" hide="false" inpartitions="" />
+        <column name="length" hide="false" inpartitions="" />
+        <column name="name" hide="false" inpartitions="" />
+        <column name="seq_region_id" hide="false" inpartitions="" />
         <primarykey name="seq_region_id_pk" internalname="seq_region_id_pk" displayname="seq_region_id_pk" description="seq_region_id_pk" column="seq_region_id" />
         <foreignkey name="coord_system_id_fk" internalname="coord_system_id_fk" displayname="coord_system_id_fk" description="coord_system_id_fk" column="coord_system_id" />
       </table>
       <table name="seq_region_attrib" internalname="seq_region_attrib" displayname="seq_region_attrib" description="seq_region_attrib" id="54" hide="false">
-        <column name="attrib_type_id" inpartitions="" />
-        <column name="seq_region_id" inpartitions="" />
-        <column name="value" inpartitions="" />
+        <column name="attrib_type_id" hide="false" inpartitions="" />
+        <column name="seq_region_id" hide="false" inpartitions="" />
+        <column name="value" hide="false" inpartitions="" />
         <foreignkey name="attrib_type_id_fk" internalname="attrib_type_id_fk" displayname="attrib_type_id_fk" description="attrib_type_id_fk" column="attrib_type_id" />
         <foreignkey name="seq_region_id_fk" internalname="seq_region_id_fk" displayname="seq_region_id_fk" description="seq_region_id_fk" column="seq_region_id" />
       </table>
       <table name="seq_region_mapping" internalname="seq_region_mapping" displayname="seq_region_mapping" description="seq_region_mapping" id="55" hide="false">
-        <column name="external_seq_region_id" inpartitions="" />
-        <column name="internal_seq_region_id" inpartitions="" />
-        <column name="mapping_set_id" inpartitions="" />
+        <column name="external_seq_region_id" hide="false" inpartitions="" />
+        <column name="internal_seq_region_id" hide="false" inpartitions="" />
+        <column name="mapping_set_id" hide="false" inpartitions="" />
       </table>
       <table name="simple_feature" internalname="simple_feature" displayname="simple_feature" description="simple_feature" id="56" hide="false">
-        <column name="analysis_id" inpartitions="" />
-        <column name="display_label" inpartitions="" />
-        <column name="score" inpartitions="" />
-        <column name="seq_region_end" inpartitions="" />
-        <column name="seq_region_id" inpartitions="" />
-        <column name="seq_region_start" inpartitions="" />
-        <column name="seq_region_strand" inpartitions="" />
-        <column name="simple_feature_id" inpartitions="" />
+        <column name="analysis_id" hide="false" inpartitions="" />
+        <column name="display_label" hide="false" inpartitions="" />
+        <column name="score" hide="false" inpartitions="" />
+        <column name="seq_region_end" hide="false" inpartitions="" />
+        <column name="seq_region_id" hide="false" inpartitions="" />
+        <column name="seq_region_start" hide="false" inpartitions="" />
+        <column name="seq_region_strand" hide="false" inpartitions="" />
+        <column name="simple_feature_id" hide="false" inpartitions="" />
         <primarykey name="simple_feature_id_pk" internalname="simple_feature_id_pk" displayname="simple_feature_id_pk" description="simple_feature_id_pk" column="simple_feature_id" />
         <foreignkey name="analysis_id_fk" internalname="analysis_id_fk" displayname="analysis_id_fk" description="analysis_id_fk" column="analysis_id" />
         <foreignkey name="seq_region_id_fk" internalname="seq_region_id_fk" displayname="seq_region_id_fk" description="seq_region_id_fk" column="seq_region_id" />
       </table>
       <table name="splicing_event" internalname="splicing_event" displayname="splicing_event" description="splicing_event" id="57" hide="false">
-        <column name="gene_id" inpartitions="" />
-        <column name="name" inpartitions="" />
-        <column name="seq_region_end" inpartitions="" />
-        <column name="seq_region_id" inpartitions="" />
-        <column name="seq_region_start" inpartitions="" />
-        <column name="seq_region_strand" inpartitions="" />
-        <column name="splicing_event_id" inpartitions="" />
-        <column name="type" inpartitions="" />
+        <column name="gene_id" hide="false" inpartitions="" />
+        <column name="name" hide="false" inpartitions="" />
+        <column name="seq_region_end" hide="false" inpartitions="" />
+        <column name="seq_region_id" hide="false" inpartitions="" />
+        <column name="seq_region_start" hide="false" inpartitions="" />
+        <column name="seq_region_strand" hide="false" inpartitions="" />
+        <column name="splicing_event_id" hide="false" inpartitions="" />
+        <column name="type" hide="false" inpartitions="" />
         <primarykey name="splicing_event_id_pk" internalname="splicing_event_id_pk" displayname="splicing_event_id_pk" description="splicing_event_id_pk" column="splicing_event_id" />
         <foreignkey name="gene_id_fk" internalname="gene_id_fk" displayname="gene_id_fk" description="gene_id_fk" column="gene_id" />
         <foreignkey name="seq_region_id_fk" internalname="seq_region_id_fk" displayname="seq_region_id_fk" description="seq_region_id_fk" column="seq_region_id" />
       </table>
       <table name="splicing_event_feature" internalname="splicing_event_feature" displayname="splicing_event_feature" description="splicing_event_feature" id="58" hide="false">
-        <column name="end2" inpartitions="" />
-        <column name="exon_id" inpartitions="" />
-        <column name="feature_order" inpartitions="" />
-        <column name="splicing_event_feature_id" inpartitions="" />
-        <column name="splicing_event_id" inpartitions="" />
-        <column name="start2" inpartitions="" />
-        <column name="transcript_association" inpartitions="" />
-        <column name="transcript_id" inpartitions="" />
-        <column name="type" inpartitions="" />
+        <column name="end2" hide="false" inpartitions="" />
+        <column name="exon_id" hide="false" inpartitions="" />
+        <column name="feature_order" hide="false" inpartitions="" />
+        <column name="splicing_event_feature_id" hide="false" inpartitions="" />
+        <column name="splicing_event_id" hide="false" inpartitions="" />
+        <column name="start2" hide="false" inpartitions="" />
+        <column name="transcript_association" hide="false" inpartitions="" />
+        <column name="transcript_id" hide="false" inpartitions="" />
+        <column name="type" hide="false" inpartitions="" />
         <primarykey name="exon_id,splicing_event_feature_id,transcript_id_pk" internalname="exon_id,splicing_event_feature_id,transcript_id_pk" displayname="exon_id,splicing_event_feature_id,transcript_id_pk" description="exon_id,splicing_event_feature_id,transcript_id_pk" column="exon_id,splicing_event_feature_id,transcript_id" />
         <foreignkey name="exon_id_fk" internalname="exon_id_fk" displayname="exon_id_fk" description="exon_id_fk" column="exon_id" />
         <foreignkey name="splicing_event_id_fk" internalname="splicing_event_id_fk" displayname="splicing_event_id_fk" description="splicing_event_id_fk" column="splicing_event_id" />
         <foreignkey name="transcript_id_fk" internalname="transcript_id_fk" displayname="transcript_id_fk" description="transcript_id_fk" column="transcript_id" />
       </table>
       <table name="splicing_transcript_pair" internalname="splicing_transcript_pair" displayname="splicing_transcript_pair" description="splicing_transcript_pair" id="59" hide="false">
-        <column name="splicing_event_id" inpartitions="" />
-        <column name="splicing_transcript_pair_id" inpartitions="" />
-        <column name="transcript_id_1" inpartitions="" />
-        <column name="transcript_id_2" inpartitions="" />
+        <column name="splicing_event_id" hide="false" inpartitions="" />
+        <column name="splicing_transcript_pair_id" hide="false" inpartitions="" />
+        <column name="transcript_id_1" hide="false" inpartitions="" />
+        <column name="transcript_id_2" hide="false" inpartitions="" />
         <primarykey name="splicing_transcript_pair_id_pk" internalname="splicing_transcript_pair_id_pk" displayname="splicing_transcript_pair_id_pk" description="splicing_transcript_pair_id_pk" column="splicing_transcript_pair_id" />
         <foreignkey name="splicing_event_id_fk" internalname="splicing_event_id_fk" displayname="splicing_event_id_fk" description="splicing_event_id_fk" column="splicing_event_id" />
       </table>
       <table name="stable_id_event" internalname="stable_id_event" displayname="stable_id_event" description="stable_id_event" id="60" hide="false">
-        <column name="mapping_session_id" inpartitions="" />
-        <column name="new_stable_id" inpartitions="" />
-        <column name="new_version" inpartitions="" />
-        <column name="old_stable_id" inpartitions="" />
-        <column name="old_version" inpartitions="" />
-        <column name="score" inpartitions="" />
-        <column name="type" inpartitions="" />
+        <column name="mapping_session_id" hide="false" inpartitions="" />
+        <column name="new_stable_id" hide="false" inpartitions="" />
+        <column name="new_version" hide="false" inpartitions="" />
+        <column name="old_stable_id" hide="false" inpartitions="" />
+        <column name="old_version" hide="false" inpartitions="" />
+        <column name="score" hide="false" inpartitions="" />
+        <column name="type" hide="false" inpartitions="" />
         <foreignkey name="mapping_session_id_fk" internalname="mapping_session_id_fk" displayname="mapping_session_id_fk" description="mapping_session_id_fk" column="mapping_session_id" />
       </table>
       <table name="supporting_feature" internalname="supporting_feature" displayname="supporting_feature" description="supporting_feature" id="61" hide="false">
-        <column name="exon_id" inpartitions="" />
-        <column name="feature_id" inpartitions="" />
-        <column name="feature_type" inpartitions="" />
+        <column name="exon_id" hide="false" inpartitions="" />
+        <column name="feature_id" hide="false" inpartitions="" />
+        <column name="feature_type" hide="false" inpartitions="" />
         <foreignkey name="exon_id_fk" internalname="exon_id_fk" displayname="exon_id_fk" description="exon_id_fk" column="exon_id" />
       </table>
       <table name="transcript" internalname="transcript" displayname="transcript" description="transcript" id="62" hide="false">
-        <column name="analysis_id" inpartitions="" />
-        <column name="biotype" inpartitions="" />
-        <column name="canonical_translation_id" inpartitions="" />
-        <column name="description" inpartitions="" />
-        <column name="display_xref_id" inpartitions="" />
-        <column name="gene_id" inpartitions="" />
-        <column name="is_current" inpartitions="" />
-        <column name="seq_region_end" inpartitions="" />
-        <column name="seq_region_id" inpartitions="" />
-        <column name="seq_region_start" inpartitions="" />
-        <column name="seq_region_strand" inpartitions="" />
-        <column name="status" inpartitions="" />
-        <column name="transcript_id" inpartitions="" />
+        <column name="analysis_id" hide="false" inpartitions="" />
+        <column name="biotype" hide="false" inpartitions="" />
+        <column name="canonical_translation_id" hide="false" inpartitions="" />
+        <column name="description" hide="false" inpartitions="" />
+        <column name="display_xref_id" hide="false" inpartitions="" />
+        <column name="gene_id" hide="false" inpartitions="" />
+        <column name="is_current" hide="false" inpartitions="" />
+        <column name="seq_region_end" hide="false" inpartitions="" />
+        <column name="seq_region_id" hide="false" inpartitions="" />
+        <column name="seq_region_start" hide="false" inpartitions="" />
+        <column name="seq_region_strand" hide="false" inpartitions="" />
+        <column name="status" hide="false" inpartitions="" />
+        <column name="transcript_id" hide="false" inpartitions="" />
         <primarykey name="transcript_id_pk" internalname="transcript_id_pk" displayname="transcript_id_pk" description="transcript_id_pk" column="transcript_id" />
         <foreignkey name="analysis_id_fk" internalname="analysis_id_fk" displayname="analysis_id_fk" description="analysis_id_fk" column="analysis_id" />
         <foreignkey name="gene_id_fk" internalname="gene_id_fk" displayname="gene_id_fk" description="gene_id_fk" column="gene_id" />
         <foreignkey name="seq_region_id_fk" internalname="seq_region_id_fk" displayname="seq_region_id_fk" description="seq_region_id_fk" column="seq_region_id" />
       </table>
       <table name="transcript_attrib" internalname="transcript_attrib" displayname="transcript_attrib" description="transcript_attrib" id="63" hide="false">
-        <column name="attrib_type_id" inpartitions="" />
-        <column name="transcript_id" inpartitions="" />
-        <column name="value" inpartitions="" />
+        <column name="attrib_type_id" hide="false" inpartitions="" />
+        <column name="transcript_id" hide="false" inpartitions="" />
+        <column name="value" hide="false" inpartitions="" />
         <foreignkey name="attrib_type_id_fk" internalname="attrib_type_id_fk" displayname="attrib_type_id_fk" description="attrib_type_id_fk" column="attrib_type_id" />
         <foreignkey name="transcript_id_fk" internalname="transcript_id_fk" displayname="transcript_id_fk" description="transcript_id_fk" column="transcript_id" />
       </table>
       <table name="transcript_stable_id" internalname="transcript_stable_id" displayname="transcript_stable_id" description="transcript_stable_id" id="64" hide="false">
-        <column name="created_date" inpartitions="" />
-        <column name="modified_date" inpartitions="" />
-        <column name="stable_id" inpartitions="" />
-        <column name="transcript_id" inpartitions="" />
-        <column name="version" inpartitions="" />
+        <column name="created_date" hide="false" inpartitions="" />
+        <column name="modified_date" hide="false" inpartitions="" />
+        <column name="stable_id" hide="false" inpartitions="" />
+        <column name="transcript_id" hide="false" inpartitions="" />
+        <column name="version" hide="false" inpartitions="" />
         <primarykey name="transcript_id_pk" internalname="transcript_id_pk" displayname="transcript_id_pk" description="transcript_id_pk" column="transcript_id" />
         <foreignkey name="transcript_id_fk" internalname="transcript_id_fk" displayname="transcript_id_fk" description="transcript_id_fk" column="transcript_id" />
       </table>
       <table name="transcript_supporting_feature" internalname="transcript_supporting_feature" displayname="transcript_supporting_feature" description="transcript_supporting_feature" id="65" hide="false">
-        <column name="feature_id" inpartitions="" />
-        <column name="feature_type" inpartitions="" />
-        <column name="transcript_id" inpartitions="" />
+        <column name="feature_id" hide="false" inpartitions="" />
+        <column name="feature_type" hide="false" inpartitions="" />
+        <column name="transcript_id" hide="false" inpartitions="" />
         <foreignkey name="transcript_id_fk" internalname="transcript_id_fk" displayname="transcript_id_fk" description="transcript_id_fk" column="transcript_id" />
       </table>
       <table name="translation" internalname="translation" displayname="translation" description="translation" id="66" hide="false">
-        <column name="end_exon_id" inpartitions="" />
-        <column name="seq_end" inpartitions="" />
-        <column name="seq_start" inpartitions="" />
-        <column name="start_exon_id" inpartitions="" />
-        <column name="transcript_id" inpartitions="" />
-        <column name="translation_id" inpartitions="" />
+        <column name="end_exon_id" hide="false" inpartitions="" />
+        <column name="seq_end" hide="false" inpartitions="" />
+        <column name="seq_start" hide="false" inpartitions="" />
+        <column name="start_exon_id" hide="false" inpartitions="" />
+        <column name="transcript_id" hide="false" inpartitions="" />
+        <column name="translation_id" hide="false" inpartitions="" />
         <primarykey name="translation_id_pk" internalname="translation_id_pk" displayname="translation_id_pk" description="translation_id_pk" column="translation_id" />
         <foreignkey name="transcript_id_fk" internalname="transcript_id_fk" displayname="transcript_id_fk" description="transcript_id_fk" column="transcript_id" />
       </table>
       <table name="translation_attrib" internalname="translation_attrib" displayname="translation_attrib" description="translation_attrib" id="67" hide="false">
-        <column name="attrib_type_id" inpartitions="" />
-        <column name="translation_id" inpartitions="" />
-        <column name="value" inpartitions="" />
+        <column name="attrib_type_id" hide="false" inpartitions="" />
+        <column name="translation_id" hide="false" inpartitions="" />
+        <column name="value" hide="false" inpartitions="" />
         <foreignkey name="attrib_type_id_fk" internalname="attrib_type_id_fk" displayname="attrib_type_id_fk" description="attrib_type_id_fk" column="attrib_type_id" />
         <foreignkey name="translation_id_fk" internalname="translation_id_fk" displayname="translation_id_fk" description="translation_id_fk" column="translation_id" />
       </table>
       <table name="translation_stable_id" internalname="translation_stable_id" displayname="translation_stable_id" description="translation_stable_id" id="68" hide="false">
-        <column name="created_date" inpartitions="" />
-        <column name="modified_date" inpartitions="" />
-        <column name="stable_id" inpartitions="" />
-        <column name="translation_id" inpartitions="" />
-        <column name="version" inpartitions="" />
+        <column name="created_date" hide="false" inpartitions="" />
+        <column name="modified_date" hide="false" inpartitions="" />
+        <column name="stable_id" hide="false" inpartitions="" />
+        <column name="translation_id" hide="false" inpartitions="" />
+        <column name="version" hide="false" inpartitions="" />
         <primarykey name="translation_id_pk" internalname="translation_id_pk" displayname="translation_id_pk" description="translation_id_pk" column="translation_id" />
         <foreignkey name="translation_id_fk" internalname="translation_id_fk" displayname="translation_id_fk" description="translation_id_fk" column="translation_id" />
       </table>
       <table name="unconventional_transcript_association" internalname="unconventional_transcript_association" displayname="unconventional_transcript_association" description="unconventional_transcript_association" id="69" hide="false">
-        <column name="gene_id" inpartitions="" />
-        <column name="interaction_type" inpartitions="" />
-        <column name="transcript_id" inpartitions="" />
+        <column name="gene_id" hide="false" inpartitions="" />
+        <column name="interaction_type" hide="false" inpartitions="" />
+        <column name="transcript_id" hide="false" inpartitions="" />
         <foreignkey name="gene_id_fk" internalname="gene_id_fk" displayname="gene_id_fk" description="gene_id_fk" column="gene_id" />
         <foreignkey name="transcript_id_fk" internalname="transcript_id_fk" displayname="transcript_id_fk" description="transcript_id_fk" column="transcript_id" />
       </table>
       <table name="unmapped_object" internalname="unmapped_object" displayname="unmapped_object" description="unmapped_object" id="70" hide="false">
-        <column name="analysis_id" inpartitions="" />
-        <column name="ensembl_id" inpartitions="" />
-        <column name="ensembl_object_type" inpartitions="" />
-        <column name="external_db_id" inpartitions="" />
-        <column name="identifier" inpartitions="" />
-        <column name="parent" inpartitions="" />
-        <column name="query_score" inpartitions="" />
-        <column name="target_score" inpartitions="" />
-        <column name="type" inpartitions="" />
-        <column name="unmapped_object_id" inpartitions="" />
-        <column name="unmapped_reason_id" inpartitions="" />
+        <column name="analysis_id" hide="false" inpartitions="" />
+        <column name="ensembl_id" hide="false" inpartitions="" />
+        <column name="ensembl_object_type" hide="false" inpartitions="" />
+        <column name="external_db_id" hide="false" inpartitions="" />
+        <column name="identifier" hide="false" inpartitions="" />
+        <column name="parent" hide="false" inpartitions="" />
+        <column name="query_score" hide="false" inpartitions="" />
+        <column name="target_score" hide="false" inpartitions="" />
+        <column name="type" hide="false" inpartitions="" />
+        <column name="unmapped_object_id" hide="false" inpartitions="" />
+        <column name="unmapped_reason_id" hide="false" inpartitions="" />
         <primarykey name="unmapped_object_id_pk" internalname="unmapped_object_id_pk" displayname="unmapped_object_id_pk" description="unmapped_object_id_pk" column="unmapped_object_id" />
         <foreignkey name="analysis_id_fk" internalname="analysis_id_fk" displayname="analysis_id_fk" description="analysis_id_fk" column="analysis_id" />
         <foreignkey name="external_db_id_fk" internalname="external_db_id_fk" displayname="external_db_id_fk" description="external_db_id_fk" column="external_db_id" />
         <foreignkey name="unmapped_reason_id_fk" internalname="unmapped_reason_id_fk" displayname="unmapped_reason_id_fk" description="unmapped_reason_id_fk" column="unmapped_reason_id" />
       </table>
       <table name="unmapped_reason" internalname="unmapped_reason" displayname="unmapped_reason" description="unmapped_reason" id="71" hide="false">
-        <column name="full_description" inpartitions="" />
-        <column name="summary_description" inpartitions="" />
-        <column name="unmapped_reason_id" inpartitions="" />
+        <column name="full_description" hide="false" inpartitions="" />
+        <column name="summary_description" hide="false" inpartitions="" />
+        <column name="unmapped_reason_id" hide="false" inpartitions="" />
         <primarykey name="unmapped_reason_id_pk" internalname="unmapped_reason_id_pk" displayname="unmapped_reason_id_pk" description="unmapped_reason_id_pk" column="unmapped_reason_id" />
       </table>
       <table name="xref" internalname="xref" displayname="xref" description="xref" id="72" hide="false">
-        <column name="dbprimary_acc" inpartitions="" />
-        <column name="description" inpartitions="" />
-        <column name="display_label" inpartitions="" />
-        <column name="external_db_id" inpartitions="" />
-        <column name="info_text" inpartitions="" />
-        <column name="info_type" inpartitions="" />
-        <column name="version" inpartitions="" />
-        <column name="xref_id" inpartitions="" />
+        <column name="dbprimary_acc" hide="false" inpartitions="" />
+        <column name="description" hide="false" inpartitions="" />
+        <column name="display_label" hide="false" inpartitions="" />
+        <column name="external_db_id" hide="false" inpartitions="" />
+        <column name="info_text" hide="false" inpartitions="" />
+        <column name="info_type" hide="false" inpartitions="" />
+        <column name="version" hide="false" inpartitions="" />
+        <column name="xref_id" hide="false" inpartitions="" />
         <primarykey name="xref_id_pk" internalname="xref_id_pk" displayname="xref_id_pk" description="xref_id_pk" column="xref_id" />
         <foreignkey name="external_db_id_fk" internalname="external_db_id_fk" displayname="external_db_id_fk" description="external_db_id_fk" column="external_db_id" />
       </table>

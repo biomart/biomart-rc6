@@ -128,6 +128,7 @@ public class ConfigListTransferHandler extends TransferHandler {
     	}else
     		this.rootPanel.addMultipleConfigs(martList, user);
     	//clear the selection in source
+    	((McViewSourceGroup)McViews.getInstance().getView(IdwViewType.SOURCEGROUP)).unHighlightAllComponent();
     	((McViewSourceGroup)McViews.getInstance().getView(IdwViewType.SOURCEGROUP)).unselectOthers(null);
     }
     /**

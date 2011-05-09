@@ -206,7 +206,7 @@ var QueryResults = {
 
                             if (options.sort) self.sort(options.sort.order=='asc', options.sort.col);
                             if (self._isPaginated) element.paginate('page', options.page);
-                        } else {
+                        } else if (!element.datacontroller('hasError')) {
                             element.html(['<p class="empty">', _('no_results'), '</p>'].join(''));
                         }
 
@@ -391,6 +391,7 @@ var QueryResults = {
                                 // count on the first column then calculate ratio using second column as total 
                                 if (biomart.errorRegex.test(row[0])) {
                                     self._error = true;
+                                    element.datacontroller('error');
                                     aggr.addClass('error');
                                 } else if (row[0]) {
                                     var seen = cell.data('seen'),
@@ -485,7 +486,10 @@ var QueryResults = {
                     // data aggregation as they come in
                     preprocess: function(s) {
                         var row, id, ds;
-                        if (biomart.errorRegex.test(s)) return;
+                        if (biomart.errorRegex.test(s)) {
+                            element.datacontroller('error');
+                            return false;
+                        }
                         if (s) {
                             row = s.split('\t');
                             id = row[row.length-1];
@@ -615,7 +619,10 @@ var QueryResults = {
                     skip: 0,
                     // data aggregation as they come in
                     preprocess: function(s) {
-                        if (biomart.errorRegex.test(s)) return;
+                        if (biomart.errorRegex.test(s)) {
+                            element.datacontroller('error');
+                            return false;
+                        }
                         if (s) {
                             var row = s.split('\t'),
                                 label = row[0],
@@ -691,7 +698,7 @@ var QueryResults = {
                                     });
                                 }
                             }
-                        } else {
+                        } else if (!element.datacontroller('hasError')) {
                             this._writee.html(['<p class="empty">', _('no_results'), '</p>'].join(''));
                         }
 

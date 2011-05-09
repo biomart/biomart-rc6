@@ -1,14 +1,30 @@
 package org.biomart.processors.sequence;
 
 import java.io.IOException;
-import java.util.List;
 import org.biomart.common.exceptions.ValidationException;
+import org.biomart.common.resources.Log;
 
 /**
  *
  * @author jhsu, jguberman
  */
 public class TranscriptFlankParser extends SequenceParser {
+    // "Flank (Transcript)"
+
+    // Set up the fields
+    private static final int transcriptIDField = 0;
+    private static final int chrField = 1;
+    private static final int startField = 2;
+    private static final int endField = 3;
+    private static final int strandField = 4;
+
+    // Initialize the variables for the first transcript ID
+    private String transcriptID = null;
+    private String chr = null;
+    private String strand = null;
+    private int start = 0;
+    private int end = 0;
+
     public TranscriptFlankParser() {
         super(5);
     }
@@ -31,57 +47,38 @@ public class TranscriptFlankParser extends SequenceParser {
 	 * @throws IOException
 	 */
 	@Override
-    public void parse(List<List<String>> inputQuery) throws IOException {
-		// "Flank (Transcript)"
+    public String parseLine(String[] line) {
+        String results = "";
 
-		// Set up the fields
-		final int transcriptIDField = 0;
-		final int chrField = 1;
-		final int startField = 2;
-		final int endField = 3;
-		final int strandField = 4;
+        // Check if the current row belongs to the same transcript
+        if (line[transcriptIDField].equals(transcriptID)) {
+            // If it does, adjust start and end as needed
+            start = Math.min(start, Integer.parseInt(line[startField]));
+            end = Math.max(end, Integer.parseInt(line[endField]));
+        } else {
+            if (transcriptID != null) {
+                // If it isn't, we print the last sequence and initialize the next
+                results = getTranscriptFlank(getHeader(), chr, start, end, strand);
+            }
 
-		// Initialize the variables for the first transcript ID
-        String transcriptID = null;
-        String chr = null;
-        String strand = null;
-		int start = 0;
-		int end = 0;
+            transcriptID = line[transcriptIDField];
+            chr = line[chrField];
+            start = Integer.parseInt(line[startField]);
+            end = Integer.parseInt(line[endField]);
+            strand = line[strandField];
+            clearHeader();
 
-        boolean done = false;
-
-		for(List<String> line : inputQuery){
-
-			// Check if the current row belongs to the same transcript
-			if (line.get(transcriptIDField).equals(transcriptID)) {
-				// If it does, adjust start and end as needed
-				start = Math.min(start, Integer.parseInt(line.get(startField)));
-				end = Math.max(end, Integer.parseInt(line.get(endField)));
-			} else {
-                if (transcriptID != null) {
-                    // If it isn't, we print the last sequence and initialize the next
-                    done = printTranscriptFlank(getHeader(), chr, start, end, strand);
-                }
-
-				transcriptID = line.get(transcriptIDField);
-				chr = line.get(chrField);
-				start = Integer.parseInt(line.get(startField));
-				end = Integer.parseInt(line.get(endField));
-				strand = line.get(strandField);
-                clearHeader();
-
-                if (done) {
-                    break;
-                }
-
-			}
-            storeHeaderInfo(line);
-		}
-		// Print the final sequence
-        if (!done) {
-            printTranscriptFlank(getHeader(), chr, start, end, strand);
         }
+        storeHeaderInfo(line);
+
+        return results;
 	}
+
+    @Override
+    public String parseLast() {
+        return getTranscriptFlank(getHeader(), chr, start, end, strand);
+    }
+
 	/**
 	 * Retrieves and prints sequence for QueryType TRANSCRIPT_FLANK
 	 * @param flank	Array containing the upstream/downstream flank information.
@@ -92,28 +89,23 @@ public class TranscriptFlankParser extends SequenceParser {
 	 * @param strand	Sequence strand.
 	 * @throws IOException
 	 */
-	protected final boolean printTranscriptFlank(String header, String chr,
-			int start, int end, String strand) throws IOException {
-        try {
-            String sequence;
-            // Check whether we're dealing with the 5' flank or the 3', and handle accordingly
-            if (upstreamFlank > 0){
-                if (strand.equals("-1")){
-                    sequence = reverseComplement(getSequence(chr, end+1, end+upstreamFlank));
-                } else {
-                    sequence = (getSequence(chr, Math.max(start-upstreamFlank,0), start-1));
-                }
+	protected final String getTranscriptFlank(String header, String chr,
+			int start, int end, String strand) {
+        String sequence;
+        // Check whether we're dealing with the 5' flank or the 3', and handle accordingly
+        if (upstreamFlank > 0){
+            if (strand.equals("-1")){
+                sequence = reverseComplement(getSequence(chr, end+1, end+upstreamFlank));
             } else {
-                if (strand.equals("-1")){
-                    sequence = reverseComplement(getSequence(chr, Math.max(start-downstreamFlank,0), start-1));
-                } else {
-                    sequence = (getSequence(chr, end+1, end+downstreamFlank));
-                }
+                sequence = (getSequence(chr, Math.max(start-upstreamFlank,0), start-1));
             }
-            return printFASTA(sequence, header);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return printFASTA(SEQUENCE_UNAVAILABLE, header);
+        } else {
+            if (strand.equals("-1")){
+                sequence = reverseComplement(getSequence(chr, Math.max(start-downstreamFlank,0), start-1));
+            } else {
+                sequence = (getSequence(chr, end+1, end+downstreamFlank));
+            }
         }
+        return getFASTA(sequence, header);
 	}
 }

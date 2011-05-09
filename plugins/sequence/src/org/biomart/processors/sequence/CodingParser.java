@@ -5,13 +5,49 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.TreeMap;
 import org.biomart.common.exceptions.ValidationException;
+import org.biomart.common.resources.Log;
 
 /**
  *
  * @author jhsu, jguberman
  */
 public class CodingParser extends SequenceParser {
+    private static final int transcriptIDField = 0;
+    private static final int chrField = 1;
+    private static final int startField = 2;
+    private static final int endField = 3;
+    private static final int codingOffsetStartField = 4;
+    private static final int codingOffsetEndField = 5;
+    private static final int strandField = 6;
+    private static final int exonIDField = 7;
+    private static final int rankField = 8;
+    private static final int startExonIDField = 9;
+    private static final int endExonIDField = 10;
+    private static final int phaseField = 11;
+    private static final int codonTableField = 12;
+    private static final int seqEditField = 13;
+
     private final boolean isProtein;
+
+    // These TreeMaps will keep track of the exons
+    private TreeMap<Integer, Integer> start = new TreeMap<Integer, Integer>();
+    private TreeMap<Integer, Integer> end = new TreeMap<Integer, Integer>();
+
+    private String transcriptID = null;
+    private String startExonID = null;
+    private String endExonID = null;
+    private int startExonRank = 0;
+    private int endExonRank = 0;
+    private String exonID = null;
+    private String chr = null;
+    private int codingStartOffset = 0;
+    private int codingEndOffset = 0;
+    private int startPhase = 0;
+    private int currentRank = 0;
+    private String strand = null;
+    private String codonTableID = null;
+
+    private HashSet<String> seqEdit = new HashSet<String>();
 
     public CodingParser() { this(false, 12); }
     public CodingParser(boolean isProtein, int i) {
@@ -34,103 +70,67 @@ public class CodingParser extends SequenceParser {
 	 * @throws IOException
 	 */
 	@Override
-    public void parse(List<List<String>> inputQuery) throws IOException {
-		// "Coding sequence" and "Protein"
-		final int transcriptIDField = 0;
-		final int chrField = 1;
-		final int startField = 2;
-		final int endField = 3;
-		final int codingOffsetStartField = 4;
-		final int codingOffsetEndField = 5;
-		final int strandField = 6;
-		final int exonIDField = 7;
-		final int rankField = 8;
-		final int startExonIDField = 9;
-		final int endExonIDField = 10;
-		final int phaseField = 11;
-		final int codonTableField = 12;
-		final int seqEditField = 13;
+    public String parseLine(String[] line) {
+        String results = "";
 
-        boolean done = false;
+        exonID = line[exonIDField];
 
-		// These TreeMaps will keep track of the exons
-		TreeMap<Integer, Integer> start = new TreeMap<Integer, Integer>();
-		TreeMap<Integer, Integer> end = new TreeMap<Integer, Integer>();
+        if (!line[transcriptIDField].equals(transcriptID)) {
+            //If it's a new transcript, print the current sequence
+            if (transcriptID != null) {
+                results = getCoding(getHeader(), chr, start, end, codingStartOffset, codingEndOffset, startExonRank, endExonRank, strand, startPhase, codonTableID, seqEdit,isProtein);
+            }
 
-		String transcriptID = null;
-		String startExonID = null;
-		String endExonID = null;
-		int startExonRank = 0;
-		int endExonRank = 0;
-		String exonID = null;
-		String chr = null;
-		int codingStartOffset = 0;
-		int codingEndOffset = 0;
-		int startPhase = 0;
-		int currentRank = 0;
-		String strand = null;
-		String codonTableID = null;
-
-		HashSet<String> seqEdit = new HashSet<String>();
-
-		for(List<String> line : inputQuery) {
-			exonID = line.get(exonIDField);
-			if (!line.get(transcriptIDField).equals(transcriptID)) {
-				//If it's a new transcript, print the current sequence
-                if (transcriptID != null) {
-                    done = printCoding(getHeader(), chr, start, end, codingStartOffset, codingEndOffset, startExonRank, endExonRank, strand, startPhase, codonTableID, seqEdit,isProtein);
-                }
-
-				transcriptID = line.get(transcriptIDField);
-				startExonID = line.get(startExonIDField);
-				endExonID = line.get(endExonIDField);
-				startExonRank = 0;
-				endExonRank = 0;
-				startPhase = 0;
-				chr = "";
-				start.clear();
-				end.clear();
-				strand = line.get(strandField);
-				if(isProtein){
-					codonTableID = line.get(codonTableField);
-					seqEdit = new HashSet<String>();
-					seqEdit.add(line.get(seqEditField));
-				}
-                clearHeader();
-                if (done) {
-                    break;
-                }
-			}
-			currentRank = Integer.parseInt(line.get(rankField))-1; // Subtract 1 to convert to zero indexing
-			if(isProtein){
-				seqEdit.add(line.get(seqEditField));
-			}
-			if (!startExonID.equals("")) {
-				start.put(currentRank, Integer.parseInt(line
-						.get(startField)));
-				end.put(currentRank, Integer.parseInt(line
-						.get(endField)));
-			}
-			if (exonID.equals(startExonID)){
-				// If it's the terminal exon, record the chromosome and codingOffset and Phase
-				chr = line.get(chrField);
-				codingStartOffset = Integer.parseInt(line.get(codingOffsetStartField));
-				startExonRank = currentRank;
-				startPhase = Integer.parseInt(line.get(phaseField));
-			}
-			if (exonID.equals(endExonID)){
-				// If it's the terminal exon, record the chromosome and codingOffset
-				chr = line.get(chrField);
-				codingEndOffset = Integer.parseInt(line.get(codingOffsetEndField));
-				endExonRank = currentRank;
-			}
-
-            storeHeaderInfo(line);
-		}
-        if (!done) {
-            printCoding(getHeader(), chr, start, end, codingStartOffset, codingEndOffset, startExonRank, endExonRank, strand, startPhase, codonTableID, seqEdit, isProtein);
+            transcriptID = line[transcriptIDField];
+            startExonID = line[startExonIDField];
+            endExonID = line[endExonIDField];
+            startExonRank = 0;
+            endExonRank = 0;
+            startPhase = 0;
+            chr = "";
+            start.clear();
+            end.clear();
+            strand = line[strandField];
+            if(isProtein){
+                codonTableID = line[codonTableField];
+                seqEdit = new HashSet<String>();
+                seqEdit.add(line[seqEditField]);
+            }
+            clearHeader();
         }
+        currentRank = Integer.parseInt(line[rankField])-1; // Subtract 1 to convert to zero indexing
+        if(isProtein){
+            seqEdit.add(line[seqEditField]);
+        }
+        if (!startExonID.equals("")) {
+            start.put(currentRank, Integer.parseInt(line
+                    [startField]));
+            end.put(currentRank, Integer.parseInt(line
+                    [endField]));
+        }
+        if (exonID.equals(startExonID)){
+            // If it's the terminal exon, record the chromosome and codingOffset and Phase
+            chr = line[chrField];
+            codingStartOffset = Integer.parseInt(line[codingOffsetStartField]);
+            startExonRank = currentRank;
+            startPhase = Integer.parseInt(line[phaseField]);
+        }
+        if (exonID.equals(endExonID)){
+            // If it's the terminal exon, record the chromosome and codingOffset
+            chr = line[chrField];
+            codingEndOffset = Integer.parseInt(line[codingOffsetEndField]);
+            endExonRank = currentRank;
+        }
+
+        storeHeaderInfo(line);
+
+        return results;
 	}
+
+    @Override
+    public String parseLast() {
+        return getCoding(getHeader(), chr, start, end, codingStartOffset, codingEndOffset, startExonRank, endExonRank, strand, startPhase, codonTableID, seqEdit,isProtein);
+    }
 
 	/**
 	 * Retrieves and prints sequence for QueryType CODING
@@ -146,9 +146,10 @@ public class CodingParser extends SequenceParser {
 	 * @param startPhase
 	 * @param isProtein	If TRUE, translate sequence to amino acid sequence.
 	 */
-	protected final boolean printCoding(String header, String chr,
+	protected final String getCoding(String header, String chr,
 			TreeMap<Integer, Integer> start, TreeMap<Integer, Integer> end, int codingStartOffset,
-			int codingEndOffset, int startExonRank, int endExonRank, String strand, int startPhase, String codonTableID ,HashSet<String> seqEdit,boolean isProtein) throws IOException {
+			int codingEndOffset, int startExonRank, int endExonRank, String strand, int startPhase,
+            String codonTableID ,HashSet<String> seqEdit,boolean isProtein) {
         try {
             StringBuilder sequence = new StringBuilder();
             if (!chr.equals("")){
@@ -180,13 +181,13 @@ public class CodingParser extends SequenceParser {
                 }
             }
             if(isProtein){
-                return printFASTA(SequenceTranslator.translateSequence(sequence.toString(), seqEdit, codonTableID), header);
+                return getFASTA(SequenceTranslator.translateSequence(sequence.toString(), seqEdit, codonTableID), header);
             } else {
-                return  printFASTA(sequence.toString(), header);
+                return getFASTA(sequence.toString(), header);
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            return printFASTA(SEQUENCE_UNAVAILABLE, header);
+            Log.debug(e);
+            return getFASTA(SEQUENCE_ERROR_ENCOUNTERED, header);
         }
 	}
 }

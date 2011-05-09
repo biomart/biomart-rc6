@@ -83,11 +83,11 @@ $.namespace('biomart.sequence', function(self) {
 
         _elements.attributeContainer
             .delegate('.attribute-container', 'addattribute', function() {
-                var item = $(this).addClass('active').data('item');
+                var item = $(this).addClass('ui-active').data('item');
                 _state.attributes[item.name] = item;
             })
             .delegate('.attribute-container', 'removeattribute', function() {
-                var item = $(this).removeClass('active').data('item');
+                var item = $(this).removeClass('ui-active').data('item');
                 delete _state.attributes[item.name];
             })
 
@@ -96,15 +96,15 @@ $.namespace('biomart.sequence', function(self) {
                 var $this = $(this),
                     value = biomart.validator.filter($this);
                 if (value && (!$.isArray(value) || value[0])) {
-                    $this.addClass('active').data('value', value);
+                    $this.addClass('ui-active').data('value', value);
                 } else {
-                    $this.removeClass('active').data('value', null);
+                    $this.removeClass('ui-active').data('value', null);
                 }
                 item.value = value;
                 _state.filters[item.name] = item;
             })
             .delegate('.filter-container', 'removefilter', function(ev, item) {
-                biomart.clearFilter($(this).removeClass('active').data('value', null));
+                biomart.clearFilter($(this).removeClass('ui-active').data('value', null));
                 item.value = null;
                 delete _state.filters[item.name];
             });
@@ -254,12 +254,12 @@ $.namespace('biomart.sequence', function(self) {
         });
 
         _elements.attributeTitle.animate({
-            color: '#fff'
+            color: '#000'
         }, {
             duration: 200,
             complete: function() {
                 _elements.attributeTitle.animate({
-                    color: '#897048'
+                    color: '#fff'
                 }, 200);
             }
         });

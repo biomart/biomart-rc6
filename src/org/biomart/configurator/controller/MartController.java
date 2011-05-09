@@ -17,7 +17,6 @@
 
 package org.biomart.configurator.controller;
 
-import java.awt.Frame;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -35,7 +34,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -67,12 +65,10 @@ import org.biomart.configurator.utils.McUtils;
 import org.biomart.configurator.utils.Validation;
 import org.biomart.configurator.utils.type.Cardinality;
 import org.biomart.configurator.utils.type.ComponentStatus;
-import org.biomart.configurator.utils.type.DataLinkType;
 import org.biomart.configurator.utils.type.DatasetTableType;
 import org.biomart.configurator.utils.type.PartitionType;
 import org.biomart.configurator.utils.type.ValidationStatus;
 import org.biomart.configurator.view.gui.dialogs.MartRunnerMonitorDialog;
-import org.biomart.configurator.view.gui.dialogs.SaveOrphanKeyDialog;
 import org.biomart.objects.objects.Attribute;
 import org.biomart.objects.objects.Column;
 import org.biomart.objects.objects.Config;

@@ -401,6 +401,8 @@ $.namespace('biomart.renderer', function(self) {
                         '<p class="error">', _('error_timeout_msg'), '</p>'
                     ].join('')).addClass('error');
                     break;
+                default:
+                    writee.html(_('error has occurred', biomart.CAPITALIZE)).addClass('error');
             }
         },
         clear: function() {},
