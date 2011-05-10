@@ -58,7 +58,7 @@
 		<menuItem name="searchsource" title="Search" disabled="0"/>
 	</sourcecontainer>
 	<checkboxlist>
-		<menuItem name="checkall" title="Check all" disabled="0" advanced="true"/>	
-		<menuItem name="uncheckall" title="Uncheck all" disabled="0" advanced="true"/>
+		<menuItem name="checkall" title="Check all" disabled="0"/>	
+		<menuItem name="uncheckall" title="Uncheck all" disabled="0"/>
 	</checkboxlist>
 </contextMenu>
