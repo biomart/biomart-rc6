@@ -159,6 +159,9 @@ public class MartComponent extends JPanel implements MouseListener, Transferable
 		if(!(e.isMetaDown() || (e.isPopupTrigger() && this.isSelected()) || e.isShiftDown() || ((MartComponent)e.getSource()).isSelected())) {
 			this.clearOthers((Component)e.getSource());
 		}
+		if(!this.isSelected() && e.getButton() == MouseEvent.BUTTON3){
+			this.clearOthers((Component)e.getSource());
+		}
 
 		McViewSourceGroup groupview = (McViewSourceGroup)McViews.getInstance().getView(IdwViewType.SOURCEGROUP);
 		if(e.isShiftDown() && groupview.getLastpoint()!=null) {

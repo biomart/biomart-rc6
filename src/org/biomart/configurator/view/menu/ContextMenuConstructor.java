@@ -138,9 +138,10 @@ public class ContextMenuConstructor implements ActionListener {
 				if(advancedMenu && 
 						!Boolean.parseBoolean(Settings.getProperty("showadvancedmenu")))
 					shows = false;
+				boolean enable = true;
 				if(multiselect) {
 					if(!Boolean.parseBoolean(item.getAttributeValue("multiselect")))
-						shows = false;
+						enable = false;
 				}
 
 				if(shows) {
@@ -151,10 +152,14 @@ public class ContextMenuConstructor implements ActionListener {
 						JMenu menu = new JMenu(item.getAttributeValue("title"));
 						contextMenu.add(menu);
 						for(Element subItem:subMenu){
-							menu.add(createMenuItem(subItem));
+							JMenuItem mi = createMenuItem(subItem);
+							mi.setEnabled(enable);
+							menu.add(mi);
 						}
 					}else {
-					    contextMenu.add(createMenuItem(item));
+						JMenuItem mi = createMenuItem(item);
+						mi.setEnabled(enable);
+					    contextMenu.add(mi);
 					}	
 				}
 			}
