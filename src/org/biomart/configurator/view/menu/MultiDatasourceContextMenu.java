@@ -102,7 +102,7 @@ public class MultiDatasourceContextMenu extends JPopupMenu implements
 			hideItem.setSelected(!mart.getSchemaPartitionTable().isRowVisible(selectedRow));
 			this.add(hideItem);						
 		}else if(model.displayToPartitionCol(this.selectedCol) == PartitionUtils.KEY) {
-			JMenuItem editkeyItem = new JMenuItem("edit key name");
+			JMenuItem editkeyItem = new JMenuItem("edit key");
 			editkeyItem.setActionCommand("editkeyname");
 			editkeyItem.addActionListener(this);
 			this.add(editkeyItem);

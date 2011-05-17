@@ -37,7 +37,7 @@ public class AddDatasetDialog extends JDialog implements ItemListener{
 	private JPanel cardPanel;
 	private JTextField dbhostTF;
 	private JTextField urlhostTF;
-	private JComboBox protocalCB;
+	private JComboBox protocolCB;
 	private List<String> result;
 	private JTextField dbportTF;
 	private JTextField urlportTF;
@@ -186,7 +186,7 @@ public class AddDatasetDialog extends JDialog implements ItemListener{
 			if(index>=0) {
 				index = this.col0.indexOf("://");
 				String hostStr = this.col0.substring(index+3);
-				this.protocalCB.setSelectedItem(HTTP);
+				this.protocolCB.setSelectedItem(HTTP);
 				this.urlhostTF.setText(hostStr);
 				this.urlportTF.setText(col1);
 				this.pathTF.setText(col2);
@@ -195,7 +195,7 @@ public class AddDatasetDialog extends JDialog implements ItemListener{
 			if(index >=0){
 				index = this.col0.indexOf("://");
 				String hostStr = this.col0.substring(index+3);
-				this.protocalCB.setSelectedItem(HTTPS);
+				this.protocolCB.setSelectedItem(HTTPS);
 				this.urlhostTF.setText(hostStr);
 				this.urlportTF.setText(col1);
 				this.pathTF.setText(col2);
@@ -263,7 +263,7 @@ public class AddDatasetDialog extends JDialog implements ItemListener{
 				return;
 			}
 			/*if(hostStr.indexOf("http")<0)*/
-			hostStr = this.protocalCB.getSelectedItem()+"://"+hostStr;
+			hostStr = this.protocolCB.getSelectedItem()+"://"+hostStr;
 			String pathStr = this.pathTF.getText();
 			if(!pathStr.startsWith("/")) {
 				pathStr = "/"+pathStr;
@@ -372,16 +372,16 @@ public class AddDatasetDialog extends JDialog implements ItemListener{
 	private JPanel createURLPanel() {
 		JPanel panel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
-		JLabel protocalLabel = new JLabel("protocal:");
+		JLabel protocolLabel = new JLabel("protocol:");
 		c.anchor = GridBagConstraints.LINE_END;
 		c.gridx = 0;
 		c.gridy = 0;
-		panel.add(protocalLabel,c);
-		String[] protocals = {HTTP, HTTPS};
-		this.protocalCB = new JComboBox(protocals);
+		panel.add(protocolLabel,c);
+		String[] protocols = {HTTP, HTTPS};
+		this.protocolCB = new JComboBox(protocols);
 		c.gridx = 1;
 		c.anchor = GridBagConstraints.LINE_START;
-		panel.add(protocalCB,c);
+		panel.add(protocolCB,c);
 		
 		JLabel hostLabel = new JLabel("host:");
 		c.anchor = GridBagConstraints.LINE_END;
