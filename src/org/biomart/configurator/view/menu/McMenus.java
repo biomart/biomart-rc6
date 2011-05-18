@@ -1,85 +1,6 @@
 package org.biomart.configurator.view.menu;
 
 import java.awt.Container;
-import java.awt.HeadlessException;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Writer;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import javax.swing.Action;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JSeparator;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import javax.swing.TransferHandler;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-import net.infonode.docking.RootWindow;
-import net.infonode.docking.util.DockingUtil;
-
-import org.biomart.common.exceptions.MartBuilderException;
-import org.biomart.common.resources.Log;
-import org.biomart.common.resources.Resources;
-import org.biomart.common.resources.Settings;
-import org.biomart.common.utils.XMLElements;
-import org.biomart.common.view.gui.SwingWorker;
-import org.biomart.common.view.gui.dialogs.ProgressDialog;
-import org.biomart.common.view.gui.dialogs.StackTrace;
-import org.biomart.configurator.controller.MartController;
-import org.biomart.configurator.controller.TreeNodeHandler;
-import org.biomart.configurator.jdomUtils.McTreeNode;
-import org.biomart.configurator.utils.McGuiUtils;
-import org.biomart.configurator.utils.McUtils;
-import org.biomart.configurator.utils.Validation;
-import org.biomart.configurator.utils.type.IdwViewType;
-import org.biomart.configurator.utils.type.ValidationStatus;
-import org.biomart.configurator.view.MartConfigTree;
-import org.biomart.configurator.view.gui.dialogs.AddUserDialog;
-import org.biomart.configurator.view.gui.dialogs.MartSelectionDialog;
-import org.biomart.configurator.view.gui.dialogs.SearchComponentDialog;
-import org.biomart.configurator.view.idwViews.McViewPortal;
-import org.biomart.configurator.view.idwViews.McViewSourceGroup;
-import org.biomart.configurator.view.idwViews.McViews;
-import org.biomart.objects.objects.Config;
-import org.biomart.objects.objects.Dataset;
-import org.biomart.objects.objects.Mart;
-import org.biomart.objects.objects.MartRegistry;
-import org.biomart.objects.objects.Options;
-import org.biomart.objects.objects.SourceContainer;
-import org.biomart.objects.portal.GuiContainer;
-import org.biomart.objects.portal.MartPointer;
-import org.biomart.objects.portal.Portal;
-import org.biomart.objects.portal.UserGroup;
-import org.biomart.objects.portal.Users;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 
 /**
  * a singleton class
@@ -464,8 +385,16 @@ public class McMenus implements ActionListener {
 	
 	private void importWithProgressBar(final File file, final String key) {
 		final ProgressDialog progressMonitor = ProgressDialog.getInstance();	
-		final SwingWorker worker = new SwingWorker() {
-			public Object construct() {
+		final SwingWorker<Void,Void> worker = new SwingWorker<Void,Void>() {
+
+			@Override
+			protected void done() {
+				// Close the progress dialog.
+				progressMonitor.setVisible(false);
+			}
+
+			@Override
+			protected Void doInBackground() throws Exception {
 				try {
 					progressMonitor.setStatus("loading File "+file.getAbsolutePath());
 					importMcXML(file,key);
@@ -480,22 +409,24 @@ public class McMenus implements ActionListener {
 				}
 				return null;
 			}
-
-			public void finished() {
-				// Close the progress dialog.
-				progressMonitor.setVisible(false);
-			}
 		};
 		
-		worker.start();
+		worker.execute();
 		progressMonitor.start("processing ...");
 
 	}
 	
 	private void openWithProgressBar(final File file, final String key) {
 		final ProgressDialog progressMonitor = ProgressDialog.getInstance();	
-		final SwingWorker worker = new SwingWorker() {
-			public Object construct() {
+		final SwingWorker<Void,Void> worker = new SwingWorker<Void,Void>() {
+			@Override
+			protected void done() {
+				// Close the progress dialog.
+				progressMonitor.setVisible(false);
+			}
+
+			@Override
+			protected Void doInBackground() throws Exception {
 				try {
 					progressMonitor.setStatus("loading File "+file.getAbsolutePath());
 					openMcXML(file,key);
@@ -510,14 +441,9 @@ public class McMenus implements ActionListener {
 				}
 				return null;
 			}
-
-			public void finished() {
-				// Close the progress dialog.
-				progressMonitor.setVisible(false);
-			}
 		};
 		
-		worker.start();
+		worker.execute();
 		progressMonitor.start("processing ...");
 
 	}
@@ -646,15 +572,19 @@ public class McMenus implements ActionListener {
     	
     }
     
-    public void requestSavePortal() {
+    public boolean requestSavePortal() {
     	final String currentFileName = Settings.getProperty("currentFile");
-    	if(McUtils.isStringEmpty(currentFileName))
-    		this.requestSaveAsPortal(false);
+    	if(McUtils.isStringEmpty(currentFileName)){
+    		int retval = this.requestSaveAsPortal(false);
+    		if(retval == JFileChooser.CANCEL_OPTION)
+    			return false;
+    	}
     	else {
     		File file = new File(currentFileName);
     		this.savePortalToFileWithProgressBar(file);
     		MartController.getInstance().setChanged(false);
     	}
+    	return true;
     }
     
     public int requestSaveAsPortal(boolean showProgress) {
@@ -751,8 +681,16 @@ public class McMenus implements ActionListener {
     
     private void savePortalToFileWithProgressBar(final File file) {
 		final ProgressDialog progressMonitor = ProgressDialog.getInstance();	
-		final SwingWorker worker = new SwingWorker() {
-			public Object construct() {
+		final SwingWorker<Void,Void> worker = new SwingWorker<Void,Void>() {
+
+			@Override
+			protected void done() {
+				// Close the progress dialog.
+				progressMonitor.setVisible(false);
+			}
+
+			@Override
+			protected Void doInBackground() throws Exception {
 				try {
 					progressMonitor.setStatus("saving file: "+file.getName());
 					savePortalToFile(file);
@@ -766,15 +704,11 @@ public class McMenus implements ActionListener {
 					progressMonitor.setVisible(false);
 				}
 				return null;
-			}
 
-			public void finished() {
-				// Close the progress dialog.
-				progressMonitor.setVisible(false);
 			}
 		};
 		
-		worker.start();
+		worker.execute();
 		progressMonitor.start("processing ...");
 
     }
@@ -832,8 +766,16 @@ public class McMenus implements ActionListener {
 		final ProgressDialog progressMonitor = ProgressDialog.getInstance();
 	
 
-		final SwingWorker worker = new SwingWorker() {
-			public Object construct() {
+		final SwingWorker<Void,Void> worker = new SwingWorker<Void,Void>() {
+
+			@Override
+			protected void done() {
+				// Close the progress dialog.
+				progressMonitor.setVisible(false);
+			}
+
+			@Override
+			protected Void doInBackground() throws Exception {
 				try {
 					if(bServerStarted){
 						progressMonitor.setStatus("Starting server, please wait...");
@@ -854,14 +796,9 @@ public class McMenus implements ActionListener {
 				}
 				return null;
 			}
-
-			public void finished() {
-				// Close the progress dialog.
-				progressMonitor.setVisible(false);
-			}
 		};
 		
-		worker.start();
+		worker.execute();
 		progressMonitor.start("deploying ...");
 
     }
@@ -1220,9 +1157,12 @@ public class McMenus implements ActionListener {
 			
 		}else if(e.getActionCommand().equals("exit")){
 			if(MartController.getInstance().isRegistryChanged()){
-				this.requestSaveAsPortal(true);
+				if(this.requestSavePortal())
+					Runtime.getRuntime().exit(0);
+			}else{
+				Runtime.getRuntime().exit(0);
 			}
-			Runtime.getRuntime().exit(0);
+			
 		}
 			
 		
