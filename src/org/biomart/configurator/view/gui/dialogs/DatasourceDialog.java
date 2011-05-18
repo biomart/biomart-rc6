@@ -1,6 +1,41 @@
 package org.biomart.configurator.view.gui.dialogs;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import org.biomart.common.exceptions.MartBuilderException;
+import org.biomart.common.resources.Resources;
+import org.biomart.common.resources.Settings;
+import org.biomart.common.utils.PartitionUtils;
+import org.biomart.common.utils.XMLElements;
+import org.biomart.common.view.gui.dialogs.ProgressDialog;
+import org.biomart.common.view.gui.dialogs.StackTrace;
+import org.biomart.configurator.component.MultiDatasourcePanel;
+import org.biomart.configurator.controller.MartController;
+import org.biomart.configurator.update.UpdateMart;
+import org.biomart.configurator.utils.McUtils;
+import org.biomart.objects.objects.Dataset;
+import org.biomart.objects.objects.Mart;
+import org.biomart.objects.objects.PartitionTable;
+import static java.awt.event.InputEvent.CTRL_DOWN_MASK;
 public class DatasourceDialog extends JDialog implements ActionListener, ListSelectionListener {
 
 	/**
