@@ -57,16 +57,12 @@ public class UserResource {
     @Inject
     public UserResource(MartRegistryFactory factory) {
         this.factory = factory;
-        try {
-            manager = new ConsumerManager();
-            manager.setAllowStateless(true);
-            manager.setMaxAssocAttempts(0);
-            manager.getRealmVerifier().setEnforceRpId(false);
-            Integer maxNonceAge = Integer.getInteger("openid.maxnonceage", 60);
-            manager.setMaxNonceAge(maxNonceAge);
-        } catch(ConsumerException  ce) {
-            Log.error(ce.getMessage());
-        }
+        manager = new ConsumerManager();
+        manager.setAllowStateless(true);
+        manager.setMaxAssocAttempts(0);
+        manager.getRealmVerifier().setEnforceRpId(false);
+        Integer maxNonceAge = Integer.getInteger("openid.maxnonceage", 60);
+        manager.setMaxNonceAge(maxNonceAge);
     }
 
     @Path("relogin")
