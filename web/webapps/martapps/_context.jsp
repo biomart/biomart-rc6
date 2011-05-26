@@ -83,10 +83,9 @@
   <p class="info login-info"><bm:message code="Sign in using your openid account"/></p>
 	<form id="biomart-login-form" action="/martservice/user/auth" method="GET"></form>
   <p class="login-info error invisible">&nbsp;</p>
-	<p class="help login-help">
-    <a target="_blank" href="http://openid.net/"><bm:message code="Learn more about openid"/></a>
-		<span class="ui-icon ui-icon-help"></span> 
-	</p>
+  <div class="login-help clearfix">
+    <bm:message code="login_help_text" empty=""/>
+  </div>
 	<div id="biomart-openid-post-form" style="visibility: hidden"></div>
 	<div class="loading" style="display: none"></div>
 </div>

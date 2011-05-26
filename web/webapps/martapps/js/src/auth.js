@@ -43,7 +43,7 @@ $.namespace('biomart.auth', function(self) {
     self.setupOpenId = function() {
         var offset,
             width = 600,
-            height = 350,
+            height = 400,
             divWidth;
 
         divWidth = div.width();

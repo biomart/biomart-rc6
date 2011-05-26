@@ -93,4 +93,5 @@ a.openid_large_btn:focus {
 }
 .login-help {
     padding: 10px 85px 0 !important;
+    font-size: 14px;
 }

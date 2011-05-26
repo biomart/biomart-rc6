@@ -16,11 +16,16 @@ public class MessageTag  implements Tag {
 	private PageContext pageContext = null;
 	private Tag parent = null;
     private String code = null;
+    private String empty = null;
     private boolean capitalize = false;
     private boolean plural = false;
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public void setEmpty(String empty) {
+        this.empty = empty;
     }
 
     public void setCapitalize(String capitalize) {
@@ -40,6 +45,11 @@ public class MessageTag  implements Tag {
 
             if (messages.containsKey(key)) {
                 value = messages.getString(key);
+            } else if (empty != null) {
+                // If empty text is set then just print it and return
+                this.pageContext.getOut().write(empty);
+                return SKIP_BODY;
+
             } else {
                 value = code.replaceAll("_", " ");
             }
