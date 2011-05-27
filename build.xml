@@ -169,13 +169,20 @@
     <chmod perm="+x" file="${dist.dir}/scripts/generate-password.sh"/>
     <replace file="${dist.dir}/biomart.properties" token="/path/to/registry_file" value="${registry.file}"/>
     <replace file="${dist.dir}/biomart.properties" token="/path/to/registry_key_file" value="${registry.key.file}"/>
-    <copy todir="${dist.web.dir}/includes">
-      <fileset dir="${web.dir}/includes">
+    <!-- copy default theme -->
+    <copy todir="${dist.web.dir}/includes" preservelastmodified="yes">
+      <fileset dir="${themes.dir}/default/includes">
         <include name="**/*"/>
       </fileset>
     </copy>
-    <copy todir="${dist.web.dir}/pages">
-      <fileset dir="${web.dir}/pages">
+    <copy todir="${dist.web.dir}/pages" preservelastmodified="yes">
+      <fileset dir="${themes.dir}/default/pages">
+        <include name="**/*"/>
+      </fileset>
+    </copy>
+    <!-- copy theme files -->
+    <copy todir="${dist.web.dir}" preservelastmodified="yes" failonerror="no">
+      <fileset dir="${themes.dir}/${theme}">
         <include name="**/*"/>
       </fileset>
     </copy>
