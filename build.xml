@@ -143,7 +143,7 @@
         <patternset refid="project.jars"/>
       </fileset>
     </copy>
-    <copy todir="${dist.web.dir}/etc">
+    <copy todir="${dist.web.dir}/etc" preservelastmodified="yes">
       <fileset dir="${web.dir}/etc" includes="**/*"/>
     </copy>
     <copy todir="${dist.dir}/conf/xml">
