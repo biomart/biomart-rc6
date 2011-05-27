@@ -37,7 +37,7 @@
     </p>
     <br />
     <p>
-    For general questions related to the ICGC project, please refer to the ICGC Home at <a href='http://icgc.org'>http://icgc.org</a>.
+    For general questions related to the ICGC project, please refer to the ICGC contacts page at <a href='https://www.icgc.org/icgc/contacts'>https://www.icgc.org/icgc/contacts</a>.
     </p>
 
     </div>
