@@ -95,6 +95,8 @@ p.empty {
 .invisible {
     visibility: hidden;
 }
+/* for image replacement */
+.ir { display: block; text-indent: -999em; overflow: hidden; background-repeat: no-repeat; text-align: left; direction: ltr; }
 
 .ui-state-default a,
 .ui-widget-content a {

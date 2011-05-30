@@ -40,4 +40,10 @@
     <bodycontent>empty</bodycontent>
     <info>Locale</info>
   </tag>         
+  <tag>
+    <name>locationCode</name>
+    <tagclass>org.biomart.web.LocationCodeTag</tagclass>
+    <bodycontent>empty</bodycontent>
+    <info>Location</info>
+  </tag>         
 </taglib>

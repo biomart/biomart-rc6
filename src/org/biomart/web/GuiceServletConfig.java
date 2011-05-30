@@ -32,13 +32,16 @@ public class GuiceServletConfig extends GuiceServletContextListener {
     private static Injector injector = null;
 
     public final class Location {
+        final String code;
         final String label;
         final String url;
         final boolean current;
+        public String getCode() { return code; }
         public String getLabel() { return label; }
         public String getUrl() { return url; }
         public boolean getCurrent() { return current; }
-        public Location(String label, String url, boolean current) {
+        public Location(String code, String label, String url, boolean current) {
+            this.code = code;
             this.label = label;
             this.url = url;
             this.current = current;
@@ -50,6 +53,7 @@ public class GuiceServletConfig extends GuiceServletContextListener {
     protected static ResourceBundle _messages = null;
 
     protected static Map<String,List<Location>> _locations = null;
+	protected static Location _currLocation = null;
 
     protected static String _locale = null;
 
@@ -124,11 +128,13 @@ public class GuiceServletConfig extends GuiceServletContextListener {
                         }
 
                         List<Location> list = _locations.get(country);
-                        list.add(new Location(label, url, selected));
+                        Location loc = new Location(baseKey, label, url, selected);
+                        list.add(loc);
                         _locations.put(country, list);
 
                         // User specified location must exist
                         if (selected) {
+							_currLocation = loc;
                             locationValid = true;
                         }
                     }

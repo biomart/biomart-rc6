@@ -24,6 +24,7 @@ public class LocationsFilter implements Filter {
 		throws IOException, ServletException {
         if (!GuiceServletConfig.isMediaResource(request)) {
             request.setAttribute("locations", GuiceServletConfig._locations);
+            request.setAttribute("currLocation", GuiceServletConfig._currLocation);
         }
         chain.doFilter(request, response);
         return;
