@@ -8,11 +8,11 @@ import com.google.inject.servlet.GuiceServletContextListener;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletRequest;
@@ -99,7 +99,7 @@ public class GuiceServletConfig extends GuiceServletContextListener {
             if (currLocation != null) {
                 boolean locationValid = false;
                 LinkedProperties props = new LinkedProperties();
-                _locations = new LinkedHashMap<String,List<Location>>();
+                _locations = new TreeMap<String,List<Location>>();
                 props.load(new FileInputStream(dir + "/etc/locations.properties"));
                 for (Object key : props.keySet()) {
                     String keyStr = (String)key,
@@ -142,6 +142,9 @@ public class GuiceServletConfig extends GuiceServletContextListener {
 
                 if (locationValid) {
                     Log.error("Location code \"" + currLocation + "\" is not valid");
+                } else {
+                    List<String> locationKeys = (List)_locations.keySet();
+                    Collections.sort(locationKeys);
                 }
             }
 
