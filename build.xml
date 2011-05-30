@@ -181,9 +181,15 @@
       </fileset>
     </copy>
     <!-- copy theme files -->
-    <copy todir="${dist.web.dir}" preservelastmodified="yes" failonerror="no">
+    <copy todir="${dist.web.dir}" overwrite="yes" failonerror="no">
       <fileset dir="${themes.dir}/${theme}">
         <include name="**/*"/>
+        <exclude name="**/_*"/>
+      </fileset>
+    </copy>
+    <copy todir="${dist.web.dir}" preservelastmodified="yes" failonerror="no">
+      <fileset dir="${themes.dir}/${theme}">
+        <include name="**/_*"/>
       </fileset>
     </copy>
     <!-- substitute web cache token to prevent browser caching on newly built scripts -->
