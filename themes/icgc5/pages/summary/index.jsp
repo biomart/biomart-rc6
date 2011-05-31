@@ -400,7 +400,7 @@ Dataset Summary
         </tr>
 
         <tr class='center_other top-row'>
-            <td class='verticall'>Other</td>
+             <td class='spacer-cell'></td>
             <%--        <td>Other</td> --%>
             <td class='dataset_brain project-name' bgcolor="orange">Glioblastoma Multiforme <span class='project-center'>(JHU, US)<sup>4</sup></td>
             <td class='dataset_brain tissue' bgcolor="Crimson">Brain</td>
@@ -431,7 +431,7 @@ Dataset Summary
             <td><p class="empty">-</p></td>
         </tr>
         <tr class='center_other'>
-            <td class='spacer-cell'></td>
+            <td class='verticall'>Other</td>
             <%--        <td>Other</td> --%>
             <td class='dataset_colon project-name' bgcolor="orange">Colorectal Cancer <span class='project-center'>(JHU, US)<sup>6,7</sup></td>
             <td class='dataset_colon tissue' bgcolor="MediumOrchid">Colon</td>
