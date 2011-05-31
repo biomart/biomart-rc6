@@ -399,9 +399,23 @@ Dataset Summary
             <td><p class="empty">-</p></td>
         </tr>
 
-
-
         <tr class='center_other top-row'>
+            <td class='verticall'>Other</td>
+            <%--        <td>Other</td> --%>
+            <td class='dataset_brain project-name' bgcolor="orange">Glioblastoma Multiforme <span class='project-center'>(JHU, US)<sup>4</sup></td>
+            <td class='dataset_brain tissue' bgcolor="Crimson">Brain</td>
+            <td align="center" bgcolor="DarkSeaGreen">106</td>
+            <td align="center" bgcolor="cyan"><a href='/martanalysis/#!/Quick/sample_config_quick?ds=sample_hopkinsGBM'>90</a></td>
+            <td><p class="empty">-</p></td>
+            <td><p class="empty">-</p></td>
+            <td align="center" bgcolor="cyan"><a href='/martanalysis/#!/Quick/cnv_config_quick?ds=cnv_hopkinsGBM'>22</a></td>
+            <td align="center" bgcolor="cyan"><a href='/martanalysis/#!/Quick/snp_config_quick?ds=snp_hopkinsGBM'>89</a></td>
+            <td><p class="empty">-</p></td>
+            <td><p class="empty">-</p></td>
+            <td><p class="empty">-</p></td>
+            <td><p class="empty">-</p></td>
+        </tr>
+        <tr class='center_other'>
              <td class='spacer-cell'></td>
             <td class='dataset_breast project-name' bgcolor="orange">Breast Cancer <span class='project-center'>(JHU, US)<sup>6,7</sup></td>
             <td class='dataset_breast tissue' bgcolor="Olive">Breast</td>
@@ -427,22 +441,6 @@ Dataset Summary
             <td><p class="empty">-</p></td>
             <td><p class="empty">-</p></td>
             <td align="center" bgcolor="cyan"><a href='/martanalysis/#!/Quick/snp_config_quick?ds=snp_hopkinsColon'>36</a></td>
-            <td><p class="empty">-</p></td>
-            <td><p class="empty">-</p></td>
-            <td><p class="empty">-</p></td>
-            <td><p class="empty">-</p></td>
-        </tr>
-        <tr class='center_other'>
-            <td class='verticall'>Other</td>
-            <%--        <td>Other</td> --%>
-            <td class='dataset_brain project-name' bgcolor="orange">Glioblastoma Multiforme <span class='project-center'>(JHU, US)<sup>4</sup></td>
-            <td class='dataset_brain tissue' bgcolor="Crimson">Brain</td>
-            <td align="center" bgcolor="DarkSeaGreen">106</td>
-            <td align="center" bgcolor="cyan"><a href='/martanalysis/#!/Quick/sample_config_quick?ds=sample_hopkinsGBM'>90</a></td>
-            <td><p class="empty">-</p></td>
-            <td><p class="empty">-</p></td>
-            <td align="center" bgcolor="cyan"><a href='/martanalysis/#!/Quick/cnv_config_quick?ds=cnv_hopkinsGBM'>22</a></td>
-            <td align="center" bgcolor="cyan"><a href='/martanalysis/#!/Quick/snp_config_quick?ds=snp_hopkinsGBM'>89</a></td>
             <td><p class="empty">-</p></td>
             <td><p class="empty">-</p></td>
             <td><p class="empty">-</p></td>
