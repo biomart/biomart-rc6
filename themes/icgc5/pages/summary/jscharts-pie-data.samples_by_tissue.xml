@@ -32,7 +32,6 @@
     </colorset>
     <optionset>
         <option set="setSize" value="400,400"/>
-        <option set="setFontFamily" value="'HelveticaNeue,&quot;Helvetica Neue&quot;,Helvetica,Arial,sans-serif'"/>
         <option set="setTextPaddingTop" value="10"/>
         <option set="setTextPaddingLeft" value="0"/>
         <option set="setTextPaddingBottom" value="0"/>
