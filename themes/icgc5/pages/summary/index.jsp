@@ -268,7 +268,7 @@ Dataset Summary
         <tr class='center_icgc'>
             <td class='spacer-cell'></td>
             <%--        <td>ICGC</td> --%>
-            <td class='dataset_lung project-name' bgcolor="orange">Small Cell Lung Carcinoma <span class='project-center'>(WTSI, UK)</td>
+            <td class='dataset_lung project-name' bgcolor="orange">Small Cell Lung Carcinoma <span class='project-center'>(WTSI, UK)<sup>5</sup></td>
             <td class='dataset_lung tissue' bgcolor="LightSkyblue">Lung</td>
             <td align="center" bgcolor="DarkSeaGreen">1</td>
             <td align="center" bgcolor="cyan"><a href='/martanalysis/#!/Quick/sample_config_quick?ds=sample_sangerLung'>1</a></td>
