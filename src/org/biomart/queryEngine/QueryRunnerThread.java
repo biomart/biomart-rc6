@@ -38,11 +38,11 @@ public final class QueryRunnerThread implements Callable {
     /**
      *
      */
-    public int batchSize = 0;
+    public final int batchSize;
     /**
      *
      */
-    public List<SubQuery> sub_queries;
+    public final List<SubQuery> sub_queries;
     /**
      *
      */
@@ -206,13 +206,14 @@ public final class QueryRunnerThread implements Callable {
                 this.qRunnerObj.printResults(retRT, this.name);
                 retRT = null;
             }
-            batchStart += this.batchSize;
-            batchEnd += this.batchSize;
 
             // what happens for empty batches ? should work i guess as it only returns empty rows, but there are rows!
-            if (r_size < this.batchSize || this.qRunnerObj.query.limit == 0) {
+            if (r_size < this.batchSize || this.qRunnerObj.getRemainingRows() == 0) {
                 break;
             }
+
+            batchStart += this.batchSize;
+            batchEnd += this.batchSize;
         }
        sqObj.cleanUp();
     }

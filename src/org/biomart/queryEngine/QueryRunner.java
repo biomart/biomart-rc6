@@ -257,15 +257,22 @@ public final class QueryRunner implements OutputConstants {
                     if (rows%FLUSH_INTERVAL == 0) {
                         this.outputHandle.flush();
                     }
-                    this.limit--;
+                    if (this.limit > 0)
+                        this.limit--;
                     // Log.debug("row: "+out_row.toString());
                     this.uniqueResults.add(bytes);
                 }
-                if (this.limit == 0) {
+                if (this.limit == 0)
                     break;
-                }
             }
         }
+    }
+
+     /**
+     * @return Number of remaining rows that need to be retrieved, or -1 if no query limit was set.
+     */
+    public int getRemainingRows() {
+        return this.limit;
     }
 
     /**
