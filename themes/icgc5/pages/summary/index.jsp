@@ -310,8 +310,8 @@ Dataset Summary
             <td align="center" bgcolor="cyan"><a href='/martanalysis/#!/Quick/sample_config_quick?ds=sample_oicrPanc'>8</a></td>
             <td><p class="empty">-</p></td>
             <td align="center" bgcolor="cyan"><a href='/martanalysis/#!/Quick/exp_config_quick?ds=exp_oicrPanc'>1</a></td>
-            <td align="center">5</td>
-            <td align="center">5</td>
+            <td align="center"><a href='/martanalysis/#!/Quick/cnv_config_quick?ds=cnv_oicrPanc'>5</a></td>
+            <td align="center"><a href='/martanalysis/#!/Quick/cnv_config_quick?ds=snp_oicrPanc'>5</a></td>
             <td align="center" bgcolor="cyan"><a href='/martanalysis/#!/Quick/mirna_config_quick?ds=mirna_oicrPanc'>3</a></td>
             <td><p class="empty">-</p></td>
             <td><p class="empty">-</p></td>
