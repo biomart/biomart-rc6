@@ -307,11 +307,11 @@ Dataset Summary
             <td class='dataset_pancreas project-name' bgcolor="orange">Pancreatic Cancer <span class='project-center'>(OICR, CA)</td>
             <td class='dataset_pancreas tissue' bgcolor="LimeGreen">Pancreas</td>
             <td align="center" bgcolor="DarkSeaGreen">5</td>
-            <td align="center" bgcolor="cyan"><a href='/martanalysis/#!/Quick/sample_config_quick?ds=sample_oicrPanc'>3</a></td>
+            <td align="center" bgcolor="cyan"><a href='/martanalysis/#!/Quick/sample_config_quick?ds=sample_oicrPanc'>8</a></td>
             <td><p class="empty">-</p></td>
             <td align="center" bgcolor="cyan"><a href='/martanalysis/#!/Quick/exp_config_quick?ds=exp_oicrPanc'>1</a></td>
-            <td><p class="empty">-</p></td>
-            <td><p class="empty">-</p></td>
+            <td align="center">5</td>
+            <td align="center">5</td>
             <td align="center" bgcolor="cyan"><a href='/martanalysis/#!/Quick/mirna_config_quick?ds=mirna_oicrPanc'>3</a></td>
             <td><p class="empty">-</p></td>
             <td><p class="empty">-</p></td>
