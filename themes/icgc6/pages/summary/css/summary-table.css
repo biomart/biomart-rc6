@@ -1,0 +1,122 @@
+SUP {
+font-size: 0.8em;
+vertical-align: super;
+}
+
+.citation_list li {
+    padding-top: 0.2em;
+}
+
+.center_tcga td {
+/*    background: #E0E0E0; */
+}
+.vertical {
+    writing-mode: bt-lr; 
+    -webkit-transform: rotate(270deg);  
+   -moz-transform: rotate(270deg);
+   -ms-transform: rotate(270deg);
+   -o-transform: rotate(270deg);
+   transform: rotate(270deg);
+}
+
+.verticallll {
+   -moz-transform: rotate(-90deg) translate(0, 100%);
+   -moz-transform-origin: 25% 75%;
+   -o-transform: rotate(-90deg) translate(0, 100%);
+   -o-transform-origin: 0% 100%;
+   -webkit-transform: rotate(-90deg) translate(0, 100%);
+   -webkit-transform-origin: 0% 100%;
+   transform: rotate(-90deg) translate(0, 100%);
+   transform-origin: 0% 100%;
+}
+
+.verticalll {
+    writing-mode: bt-lr;
+    -webkit-transform: rotate(270deg);
+    -moz-transform: rotate(270deg);
+    -o-transform: rotate(270deg);
+    white-space: nowrap;
+    bottom: 0;
+    border: 0;
+    display: inline; 
+    width: 10px;
+    height: 10px;
+}
+
+.dataset-summary tbody tr:hover td.spacer-cell:hover {
+    background: #FFF;
+}
+.dataset-summary tbody tr:hover td.verticall:hover {
+    background: #FFF;
+}
+.dataset-summary tbody tr:hover td.spacer-cell {
+    background: #FFF;
+}
+.dataset-summary tbody tr:hover td.verticall {
+    background: #FFF;
+}
+.dataset-summary td.spacer-cell {
+    border: 0px;
+   background: #FFF;
+}
+.dataset-summary th.verticall {
+    font-weight: 900;
+    font-size: 1.1em;
+    border: 0;
+    background: transparent;
+}
+.dataset-summary td.verticall {
+    font-weight: 900;
+    font-size: 1.1em;
+    border: 0;
+    background: transparent;
+}
+
+td.vertical {
+    height: 2em;
+    z-index: -1;
+    cell-height: 10px;
+    cell-width: 10px;
+    background-color: #FFFFFF;
+}
+td.vertical:hover {
+    background-color: #FFFFFF;
+}
+
+.dataset-summary th {
+   border: 2px solid #000000;
+   font-weight: 600;
+   vertical-align: middle;
+}
+.dataset-summary tr.top-row {
+    border-top: 2px solid #000000;
+}
+.dataset-summary tr.bottom-row {
+    border-bottom: 2px solid #000000;
+}
+table.dataset-summary td {
+    text-align: center;
+    font-weight: 600;
+}
+table.dataset-summary {
+   font-family: serif;
+    border: 2px solid #000000;
+    font-size: 0.85em;
+}
+.dataset-summary td.project-name {
+   text-align: left;
+   background: #E0E0E0;
+   border-left: 2px solid #000000;
+   border-right: 2px solid #000000;
+   font-weight: 900;
+}
+
+.project-center {
+    font-size: 0.8em;
+    font-weight: 200;
+}
+.dataset-summary td.tissue {
+   border-right: 2px solid #000000;
+}
+
+
