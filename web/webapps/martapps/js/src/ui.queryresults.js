@@ -457,7 +457,7 @@ var QueryResults = {
 
                         cell.html(html);
                     }
-                    else if (total) cell.html(['<span class="zero">0.00% (0/', total, ')</span>'].join(''));
+                    else if (seen && seen.length) cell.html(['<span class="zero">0.00%</span>'].join(''));
                     else cell.html(['<span class="empty">', _('empty_value'), '</span>'].join(''));
                 });
             }
