@@ -74,8 +74,7 @@
     <javac srcdir="${start.dir}" destdir="${build.classes}/start" deprecation="${build.deprecation}" depend="no" debug="true" source="1.6">
       <classpath>
         <fileset dir="${basedir}/lib">
-          <include name="jetty*.jar"/>
-          <include name="servlet-api-2.5.jar"/>
+          <include name="*.jar"/>
         </fileset>
         <fileset dir="${build.lib}" includes="${name}-${version}.jar"/>
       </classpath>
@@ -171,12 +170,12 @@
     <replace file="${dist.dir}/biomart.properties" token="/path/to/registry_key_file" value="${registry.key.file}"/>
     <!-- copy default theme -->
     <copy todir="${dist.web.dir}/includes" preservelastmodified="yes">
-      <fileset dir="${themes.dir}/default/includes">
+      <fileset dir="${web.dir}/includes">
         <include name="**/*"/>
       </fileset>
     </copy>
     <copy todir="${dist.web.dir}/pages" preservelastmodified="yes">
-      <fileset dir="${themes.dir}/default/pages">
+      <fileset dir="${web.dir}/pages">
         <include name="**/*"/>
       </fileset>
     </copy>
