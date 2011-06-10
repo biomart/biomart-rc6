@@ -227,7 +227,7 @@ public class ElementList extends MartConfiguratorObject implements Comparable<El
 				if(filter!=null)
 					this.filterList.add(filter);
 				else
-					Log.error("invalid filter in importable "+this.getName());
+					Log.debug("invalid filter in importable "+this.getName());
 			}
 		}else {
 			String[] attributes = this.getPropertyValue(XMLElements.ATTRIBUTES).split(",");

@@ -137,7 +137,7 @@ public abstract class Relation extends MartConfiguratorObject implements Compara
 		}
 		// Check the relation doesn't already exist.
 		if (firstkey.getRelations().contains(this)) {
-			Log.error("duplicated relation "+this);
+			Log.debug("duplicated relation "+this);
 			throw new AssociationException(Resources
 					.get("relationAlreadyExists"));
 		}
@@ -515,12 +515,12 @@ public abstract class Relation extends MartConfiguratorObject implements Compara
 		DatasetTable ft = ((Mart)this.getParent()).getTableByName(this.getPropertyValue(XMLElements.FIRSTTABLE));
 		DatasetTable st = ((Mart)this.getParent()).getTableByName(this.getPropertyValue(XMLElements.SECONDTABLE));
 		if(ft==null) {
-			Log.error("cannot find table "+this.getPropertyValue(XMLElements.FIRSTTABLE));
+			Log.debug("cannot find table "+this.getPropertyValue(XMLElements.FIRSTTABLE));
 			this.setObjectStatus(ValidationStatus.INVALID);
 			return;
 		}
 		if(st == null) {
-			Log.error("relation error: "+this.getPropertyValue(XMLElements.FIRSTTABLE)+
+			Log.debug("relation error: "+this.getPropertyValue(XMLElements.FIRSTTABLE)+
 					" "+this.getPropertyValue(XMLElements.SECONDTABLE));
 			this.setObjectStatus(ValidationStatus.INVALID);
 			return;			
@@ -536,7 +536,7 @@ public abstract class Relation extends MartConfiguratorObject implements Compara
 		String firstKeyName = this.getPropertyValue(XMLElements.FIRSTKEY);
 		if (fKey == null || !fKey.getName().equals(firstKeyName) || sKey == null) {
 			//should not go here
-			Log.error("*** relation error: CHECK in mart "+this.getParent().getName() +  
+			Log.debug("*** relation error: CHECK in mart "+this.getParent().getName() +  
 					" ft "+this.getPropertyValue(XMLElements.FIRSTTABLE) + " fk "+
 					firstKeyName + " st "+st.getName() + " sk " +
 					this.getPropertyValue(XMLElements.SECONDKEY) + 

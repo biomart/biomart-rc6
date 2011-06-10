@@ -102,7 +102,7 @@ public class UserGroup extends MartConfiguratorObject {
 				if(mp!=null)
 					this.mpList.add(mp);
 				else
-					Log.error("invalid config "+conStr);
+					Log.debug("invalid config "+conStr);
 			}
 		}
 		this.setObjectStatus(ValidationStatus.VALID);

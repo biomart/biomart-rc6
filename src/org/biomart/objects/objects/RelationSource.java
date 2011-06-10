@@ -44,7 +44,7 @@ public class RelationSource extends Relation {
 		String firstKeyName = this.getPropertyValue(XMLElements.FIRSTKEY);
 		if (fKey == null || !fKey.getName().equals(firstKeyName) || sKey == null) {
 			//should not go here
-			Log.error("**** relation error: CHECK in mart "+this.getParent().getName() +  
+			Log.debug("**** relation error: CHECK in mart "+this.getParent().getName() +  
 					" ft "+this.getPropertyValue(XMLElements.FIRSTTABLE) + " fk "+
 					this.getPropertyValue(XMLElements.FIRSTKEY) + " st "+st.getName() + " sk " +
 					this.getPropertyValue(XMLElements.SECONDKEY) + 

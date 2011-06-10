@@ -240,7 +240,7 @@ public final class Config extends MartConfiguratorObject {
 					newName = c.getName()+"_"+c.getParentContainer().getName();
 				}
 				String nextName = McGuiUtils.INSTANCE.getNextUniqueContainerName(this,newName);
-				Log.error("change container " + c.getName() + " to "+nextName);
+				Log.debug("change container " + c.getName() + " to "+nextName);
 				c.setName(nextName);
 			}
 			this.containerMap.put(c.getName(), c);

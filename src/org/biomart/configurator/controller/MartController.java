@@ -1270,7 +1270,7 @@ public class MartController {
 						if(pConfig == null) {
 							pConfig = pointedMart.getDefaultConfig();
 							if(pConfig == null) {
-								Log.error("config is null "+pointedConfigName+ " in pointed mart "+pointedMart.getName()
+								Log.debug("config is null "+pointedConfigName+ " in pointed mart "+pointedMart.getName()
 										+" in filter pointer "+filter.getName());
 								continue;
 							}

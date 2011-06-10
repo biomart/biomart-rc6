@@ -578,7 +578,7 @@ public class Filter extends Element	{
 				String ptName = McUtils.getPartitionTableName(ptRef);
 				PartitionTable pt = this.getParentConfig().getMart().getPartitionTableByName(ptName);
 				if(pt == null) {
-					Log.error(Resources.get("INVALIDOBJECT",this.getName()));
+					Log.debug(Resources.get("INVALIDOBJECT",this.getName()));
 					return this.getName();
 				} else 
 					return McUtils.replacePartitionReferences(pt, row, ptRefList);
@@ -599,7 +599,7 @@ public class Filter extends Element	{
 				String ptName = McUtils.getPartitionTableName(ptRef);
 				PartitionTable pt = this.getParentConfig().getMart().getPartitionTableByName(ptName);
 				if(pt == null) {
-					Log.error(Resources.get("INVALIDOBJECT",this.getDisplayName()));
+					Log.debug(Resources.get("INVALIDOBJECT",this.getDisplayName()));
 					return this.getName();
 				} else 
 					return McUtils.replacePartitionReferences(pt, row, ptRefList);

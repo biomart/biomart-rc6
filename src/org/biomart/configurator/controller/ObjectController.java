@@ -830,7 +830,7 @@ public class ObjectController {
     		if(!mart.isHidden()) 
     			isNewMartVisible = true;
     		else
-    			Log.error("mart is hidden "+mart.getName());
+    			Log.debug("mart is hidden "+mart.getName());
     		//handle partition table
     		PartitionTable existingPt = mart.getSchemaPartitionTable();
     		//assume only one row for now TODO
@@ -881,7 +881,7 @@ public class ObjectController {
     				for(Column col: srcColumns) {
     					Column tmp = datasetTable.getColumnByName(col.getName()); 
     					if(tmp == null)
-    						Log.error("could not find column");
+    						Log.debug("could not find column"); 
     					dscs.add(tmp);
     				}
     				if(dscs.size() ==0)
@@ -984,7 +984,7 @@ public class ObjectController {
     					for(Filter filter: imps.getFilterList()) {
     						Filter newFilter = newConfig.getRootContainer().getFilterRecursively(filter.getName());
     						if(newFilter == null) {
-    							Log.error("merge importable: could not find filter "+filter.getName());
+    							Log.debug("merge importable: could not find filter "+filter.getName());
     							continue;
     						}
     						newImp.addFilter(newFilter);
@@ -998,7 +998,7 @@ public class ObjectController {
     					for(Attribute attribute: exps.getAttributeList()) {
     						Attribute newAttribute = newConfig.getRootContainer().getAttributeRecursively(attribute.getName());
     						if(newAttribute == null) {
-    							Log.error("merge exportable: could not find attribute "+attribute.getName());
+    							Log.debug("merge exportable: could not find attribute "+attribute.getName());
     							continue;
     						}
     						newExp.addAttribute(newAttribute);
@@ -1023,7 +1023,7 @@ public class ObjectController {
         					for(Filter filter: imps.getFilterList()) {
         						Filter newFilter = newConfig.getRootContainer().getFilterRecursively(filter.getName());
         						if(newFilter == null) {
-        							Log.error("merge importable: could not find filter "+filter.getName());
+        							Log.debug("merge importable: could not find filter "+filter.getName());
         							continue;
         						}
         						newImp.addFilter(newFilter);
@@ -1039,7 +1039,7 @@ public class ObjectController {
         					for(Attribute attribute: exps.getAttributeList()) {
         						Attribute newAttribute = newConfig.getRootContainer().getAttributeRecursively(attribute.getName());
         						if(newAttribute == null) {
-        							Log.error("merge exportable: could not find attribute "+attribute.getName());
+        							Log.debug("merge exportable: could not find attribute "+attribute.getName());
         							continue;
         						}
         						newExp.addAttribute(newAttribute);

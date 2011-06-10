@@ -85,9 +85,9 @@ public class LinkIndices {
 					break;
 				}
 			}
-			Log.error("LinkIndices query: " + subquery.getQuery());
+			Log.debug("LinkIndices query: " + subquery.getQuery());
 			try {
-				Log.error("LinkIndices: retrieving results");
+				Log.debug("LinkIndices: retrieving results");
 				subquery.executeQuery();
 				int batchsize = 5000;
 				int start = 1;
@@ -105,7 +105,7 @@ public class LinkIndices {
 					//Log.error(test.toString());
 					start+=batchsize;
 				}
-				Log.error("LinkIndices: results retrieved");
+				Log.debug("LinkIndices: results retrieved");
 				File registryIndiceFile = McGuiUtils.INSTANCE.getIndicesDirectory();
 				FileWriter registryWriter = null;
 				String pointeddsName = link.getPointedDataset();
@@ -125,7 +125,7 @@ public class LinkIndices {
                     fileName);
 
 				for(List<String> row : linkIndexResults){
-                    Log.error("> "+ row.toString());
+                    Log.debug("> "+ row.toString());
                     if(row.contains(null) != true) {
                         for(String entry : row){
                 			writer.write(entry);

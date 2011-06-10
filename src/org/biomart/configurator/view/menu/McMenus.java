@@ -902,7 +902,7 @@ public class McMenus implements ActionListener {
             Log.info("stop exitValue: "+exitCode);
             //wait for 5 seconds
             Thread.sleep(5000);
-            Log.error(serverStart);
+            Log.info(serverStart);
             Process proc = rt.exec(serverStart);
             //if windows dont wait for the process to finish, cause it never will untill user stop the service
             //if(os.indexOf("win")>=0){
@@ -913,13 +913,13 @@ public class McMenus implements ActionListener {
             InputStreamReader isr = new InputStreamReader(stderr);
             BufferedReader br = new BufferedReader(isr);
             String line = null;
-            Log.error("<Info>");
+            Log.info("<Info>");
             while ( (line = br.readLine()) != null)
-                Log.error(line);
-            Log.error("</Info>");
+                Log.info(line);
+            Log.info("</Info>");
          
             int exitVal = proc.waitFor();
-            Log.error("start exitValue: " + exitVal);
+            Log.info("start exitValue: " + exitVal);
            	}catch(Exception e){
            		e.printStackTrace();
            	}
@@ -986,8 +986,8 @@ public class McMenus implements ActionListener {
 	        int timeout = 0;
 	        //listening on server port untill server is up and running
 	        while(!McUtils.isHttpServerAvailable(url)){
-	       	 Thread.sleep(100);
-	       	 timeout += 100;
+	       	 Thread.sleep(1000);
+	       	 timeout += 1000;
 	       	 //for slower processors , time out set to 2 min
 	       	 if(timeout > 120000){
 	       		 JOptionPane.showMessageDialog(null, "Time out error! server is not started within 2 min.");
@@ -1226,7 +1226,7 @@ public class McMenus implements ActionListener {
 				}
 				if(!removedConfig.isEmpty()) {
 					for(Config config: removedConfig) {
-						Log.error("remove config "+config.getName() + " in mart "+mart.getName());
+						Log.debug("remove config "+config.getName() + " in mart "+mart.getName());
 						mart.removeConfig(config);
 					}
 				}

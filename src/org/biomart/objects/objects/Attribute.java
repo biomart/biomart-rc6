@@ -54,7 +54,7 @@ public class Attribute extends Element implements Comparable<Attribute> {
 			String ptName = McUtils.getPartitionTableName(ptRef);
 			PartitionTable pt = this.getParentConfig().getMart().getPartitionTableByName(ptName);
 			if(pt == null) {
-				Log.error(Resources.get("INVALIDOBJECT",this.getName()));
+				Log.debug(Resources.get("INVALIDOBJECT",this.getName()));
 			} else {
 				int row = this.getParentConfig().getMart().getDatasetRowNumber(dataset);
 				
@@ -127,7 +127,7 @@ public class Attribute extends Element implements Comparable<Attribute> {
 	public Attribute(String name, Attribute pointedAttribute) {
 		super(name);
 		if(pointedAttribute == null) {
-			Log.error("error **** pointedAttribute is null for attribute "+name);
+			Log.debug("error **** pointedAttribute is null for attribute "+name);
 			this.setObjectStatus(ValidationStatus.POINTERINCOMPLETE);
 		}else
 			this.setObjectStatus(ValidationStatus.VALID);
@@ -168,7 +168,7 @@ public class Attribute extends Element implements Comparable<Attribute> {
 	public Attribute(DatasetColumn dsColumn, String name) {
 		super(name);
 		if(dsColumn==null) {
-			Log.error("error *** datasetcolumn is null for attribute "+name);
+			Log.debug("error *** datasetcolumn is null for attribute "+name);
 			this.setObjectStatus(ValidationStatus.INVALID);
 		} else {
 			this.updateDatasetColumn(dsColumn);
@@ -200,7 +200,7 @@ public class Attribute extends Element implements Comparable<Attribute> {
 			if(pointedAttribute == null)
 				return null;
 			if(pointedAttribute.isPointer()) {
-				Log.error("nested pointer");
+				Log.debug("nested pointer");
 				return null;
 			}
 			return pointedAttribute.getDataSetColumn();			

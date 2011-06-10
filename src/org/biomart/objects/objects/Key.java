@@ -104,7 +104,7 @@ public abstract class Key extends MartConfiguratorObject implements Comparable<K
 		for(String col: cols) {
 			Column column = this.getTable().getColumnByName(col);
 			if(column == null)
-				Log.error("null column");
+				Log.debug("null column");
 			else
 				result.add(column);
 		}

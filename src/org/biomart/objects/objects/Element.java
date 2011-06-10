@@ -151,7 +151,7 @@ public abstract class Element extends MartConfiguratorObject {
  	
 	public void addPointedDataset(Dataset ds) {
 		if(ds == null) {
-			Log.error("pointed attribute error ********** " + this.getName());
+			Log.debug("pointed attribute error ********** " + this.getName());
 			return;
 		}
 		List<String> pdList = this.getPointedDatasetList();

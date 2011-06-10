@@ -120,7 +120,7 @@ public class UpdateCLI {
 					tmpMartStr = "gene_ensembl";
 				Mart mart = registry.getMartByName(tmpMartStr);
 				if(mart!=null) {
-					Log.error("updating mart "+martStr);
+					Log.info("updating mart "+martStr);
 					//change connection parameters for dataset
 					String datasetname = martStr+"_"+dsName;
 					PartitionTable pt = mart.getSchemaPartitionTable();
@@ -135,12 +135,12 @@ public class UpdateCLI {
 						List<Dataset> dsList = new ArrayList<Dataset>();
 						dsList.add(mart.getDatasetByName(datasetname));
 						updateModel.updateDatasets(dsList, true);
-						Log.error("updating dataset "+datasetname);
+						Log.info("updating dataset "+datasetname);
 					} else {
-						Log.error("cannot find dataset "+datasetname);
+						Log.debug("cannot find dataset "+datasetname);
 					}
 				}else {
-					Log.error("cannot find mart "+martStr);
+					Log.debug("cannot find mart "+martStr);
 				}
 			}
 		}

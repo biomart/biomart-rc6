@@ -752,7 +752,7 @@ public class McUtils {
 			return true;
 		}
 		catch(Exception e){
-			Log.error("checking url "+url + " ...");
+			Log.debug("checking url "+url + " ...");
 			return false;
 		}
 	}
@@ -965,7 +965,7 @@ public class McUtils {
 			String newValue = McUtils.getRealName(pt, row, pointedDsName);
 			//split by ","
 			if(newValue == null) {
-				Log.error("check pointeddataset value");
+				Log.debug("check pointeddataset value");
 				continue;
 			}
 			String[] _newDs = newValue.split(",");

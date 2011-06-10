@@ -590,19 +590,19 @@ public class Container extends MartConfiguratorObject {
 			if(this.getAttributeByName(a1.getName())==null) {
 				//update dataset column
 				if(a1.getDataSetColumn()==null) {
-					Log.error("merge container for attribute: "+a1.getName()+" could not find source datasetcollumn ");
+					Log.debug("merge container for attribute: "+a1.getName()+" could not find source datasetcollumn ");
 					continue;
 				}
 				String dstName = a1.getDataSetColumn().getTable().getName();
 				String dscName = a1.getDataSetColumn().getName();
 				DatasetTable dst = this.getParentConfig().getMart().getTableByName(dstName);
 				if(dst == null) {
-					Log.error("merge container for attribute: "+a1.getName()+" could not find datasettable "+dstName);
+					Log.debug("merge container for attribute: "+a1.getName()+" could not find datasettable "+dstName);
 					continue;
 				}
 				DatasetColumn dsc = dst.getColumnByName(dscName);
 				if(dsc == null) {
-					Log.error("merge container for attribute: "+a1.getName()+" could not find datasetcolumn "+dscName);
+					Log.debug("merge container for attribute: "+a1.getName()+" could not find datasetcolumn "+dscName);
 				}
 				a1.updateDatasetColumn(dsc);
 				this.addAttribute(a1);
