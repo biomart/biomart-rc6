@@ -60,4 +60,5 @@ var iOS = /iPhone|iPad/.test(navigator.platform)
 if (iOS) document.documentElement.className += ' ios'
 </script>
 
+<c:import url="/head_extra.jsp" context="/includes" charEncoding="UTF-8"/>
 
