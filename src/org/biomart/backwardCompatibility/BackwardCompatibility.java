@@ -160,7 +160,7 @@ public class BackwardCompatibility {
 					document = builder.build(is);
 				} else {
 					rstream = xmlList2.get(xmlGZkey).openStream();
-					Log.error("Trying to connect to: " + xmlGZkey + " " + xmlList2.get(xmlGZkey).toString());
+					Log.debug("Trying to connect to: " + xmlGZkey + " " + xmlList2.get(xmlGZkey).toString());
 					//System.err.println(xmlList2.get(xmlGZkey).getContent().toString());
 					document = builder.build(xmlList2.get(xmlGZkey));
 				}
@@ -369,9 +369,6 @@ public class BackwardCompatibility {
 						String tableName = attribute.getAttributeValue("tableConstraint");
 						String columnName = attribute.getAttributeValue("field");
 						String keyName = attribute.getAttributeValue("key");
-						if(columnName!=null && columnName.equals("orthologs_plant_genome_1_togo_bool")){
-							Log.error("Foudn one");
-						}
 						if(tableName!=null && columnName!=null && keyName!=null){
 							if(tableName.endsWith("__dm")){
 								if(tableName.split("__").length < 3)
@@ -525,7 +522,7 @@ public class BackwardCompatibility {
 								ForeignKey fKey = table.getFirstForeignKey();
 								if(fKey == null) {
 									if(keyColumn==null)
-										Log.error("No key: " + tableName);
+										Log.warn("No key: " + tableName);
 									else
 										fKey = new ForeignKey(keyColumn);
 								}
@@ -539,7 +536,7 @@ public class BackwardCompatibility {
 									}
 								}*/
 							} else {
-								Log.error("Weird naming convention: " + tableName);
+								Log.warn("Unsupported naming convention: " + tableName);
 							}
 						} else if(tableName.endsWith("__main")){
 //							String[] splitName = tableName.split("__");
@@ -936,14 +933,14 @@ public class BackwardCompatibility {
 														String currentTableName = tableName;
 														DatasetTable currentTable = mart.getTableByName(currentTableName);
 														if(currentTable==null){
-															Log.error("Can't create attribute, because table " + currentTableName + " not found; trying " + mart.getName() + "__" + currentTableName);
+															Log.warn("Can't create attribute, because table " + currentTableName + " not found; trying " + mart.getName() + "__" + currentTableName);
 															currentTable = mart.getTableByName("(p0c5)__" + currentTableName);
 														}
 														if(currentTable==null && currentTableName.split("__",2).length>1){
 															currentTable = mart.getTableByName("(p0c5)__" + currentTableName.split("__",2)[1]);
 														}
 														if(currentTable==null){
-															Log.error("Nope, still missing");
+															Log.debug("Nope, still missing");
 														} else {
 															DatasetColumn currentColumn = currentTable.getColumnByName(fieldName);
 															if(currentColumn!=null){
@@ -1006,7 +1003,7 @@ public class BackwardCompatibility {
 															pointerAttribute.setLinkOutUrl(processLinkoutURL(attributeDescription, config));
 
 														} else if (pointerDataset.length > 3){
-															Log.error("Too many aliases in pointerDataset property!");
+															Log.warn("Too many aliases in pointerDataset property!");
 														} else {
 															PartitionTable mainPartition = mart.getPartitionTableByName("p0");
 															HashMap<String, String> internalNameToValue = oldPartitionAliases.get(pointerDataset[1]);
@@ -1068,12 +1065,10 @@ public class BackwardCompatibility {
 										Iterator filterDescriptionIterator = filterDescriptions.iterator();
 										while(filterDescriptionIterator.hasNext()){
 											Element filterDescription = (Element) filterDescriptionIterator.next();
-											if(filterDescription.getAttributeValue("internalName","").equals("plant_genome_1_togo_bool"))
-												Log.error("Found");
 											if(filterDescription.getAttributeValue("hidden","false").equals("false") && filterDescription.getAttributeValue("pointerFilter")==null){
 												String displayType = filterDescription.getAttributeValue("displayType");
 												if(displayType==null){
-													Log.error("Filter "+ filterDescription.getAttributeValue("internalName") + " is missing a displayType");
+													Log.warn("Filter "+ filterDescription.getAttributeValue("internalName") + " is missing a displayType");
 												
 												} else {
 													if(displayType.equals("container")){
@@ -1099,8 +1094,7 @@ public class BackwardCompatibility {
 														Iterator filterListFiltersIterator = filterListFilters.iterator();
 														while(filterListFiltersIterator.hasNext()){
 															Element filterListFilter = (Element) filterListFiltersIterator.next();
-														//	if(filterListFilter.getAttributeValue("internalName","").equals("uniprot_swissprot"))
-														//		Log.error("Got one");
+
 															if(filterListFilter.getAttributeValue("hidden","false").equals("false")){
 																String subDisplayType = filterListFilter.getAttributeValue("displayType","text");
 
@@ -1133,7 +1127,7 @@ public class BackwardCompatibility {
 																		}
 																	}
 																	if (newType == null){
-																		Log.error("FilterList: Invalid type in old XML!");
+																		Log.warn("FilterList: Invalid type in old XML!");
 																	}
 
 																	org.biomart.objects.objects.Attribute attribute = fieldTableKeyToAttribute.get(fieldName+tableName+keyName);
@@ -1155,14 +1149,14 @@ public class BackwardCompatibility {
 																				currentTable = mart.getTableByName(webTemplateName + "__" + currentTableName);
 																			}
 																			if(currentTable==null){
-																				Log.error("Can't create attribute, because table " + currentTableName + " not found; trying " + mart.getName() + "__" + currentTableName);
+																				Log.warn("Can't create attribute, because table " + currentTableName + " not found; trying " + mart.getName() + "__" + currentTableName);
 																				currentTable = mart.getTableByName("(p0c5)__" + currentTableName);
 																			}
 																			if(currentTable==null && currentTableName.split("__",2).length>1){
 																				currentTable = mart.getTableByName("(p0c5)__" + currentTableName.split("__",2)[1]);
 																			}
 																			if(currentTable==null){
-																				Log.error("Nope, still missing");
+																				Log.debug("Nope, still missing");
 																			}else {
 																				DatasetColumn currentColumn = currentTable.getColumnByName(fieldName);
 																				if(currentColumn==null){
@@ -1293,7 +1287,7 @@ public class BackwardCompatibility {
 															}
 														}
 														if (newType == null){
-															Log.error("Invalid filter type in old XML! Setting to text");
+															Log.warn("Invalid filter type in old XML! Setting to text");
 															newType = FilterType.TEXT;
 														}
 														org.biomart.objects.objects.Attribute attribute = fieldTableKeyToAttribute.get(fieldName+tableName+keyName);
@@ -1309,14 +1303,14 @@ public class BackwardCompatibility {
 																	String currentTableName = tableName;
 																	DatasetTable currentTable = mart.getTableByName(currentTableName);
 																	if(currentTable==null){
-																		Log.error("Can't create filter, because table " + currentTableName + " not found; trying " + mart.getName() + "__" + currentTableName);
+																		Log.warn("Can't create filter, because table " + currentTableName + " not found; trying " + mart.getName() + "__" + currentTableName);
 																		currentTable = mart.getTableByName("(p0c5)__" + currentTableName);
 																	}
 																	if(currentTable==null && currentTableName.split("__",2).length>1){
 																		currentTable = mart.getTableByName("(p0c5)__" + currentTableName.split("__",2)[1]);
 																	}
 																	if(currentTable==null){
-																		Log.error("Nope, still missing");
+																		Log.debug("Nope, still missing");
 																	} else {
 																		DatasetColumn currentColumn = currentTable.getColumnByName(fieldName);
 																		if(currentColumn!=null){
@@ -1337,7 +1331,7 @@ public class BackwardCompatibility {
 																		}
 																	}
 																	if(attribute==null){
-																		Log.error("Something's wrong");
+																		Log.debug("Something's wrong");
 																	}
 																}
 															} else if (tableName!=null && (tableName.equalsIgnoreCase("main") || tableName.endsWith("__main") )){
@@ -1427,7 +1421,7 @@ public class BackwardCompatibility {
 												}
 											} else if(filterDescription.getAttributeValue("hidden","false").equals("false")){ //TODO add in Filter Pointers
 												if(filterDescription.getAttributeValue("pointerDataset") == null){
-													Log.error("Invalid pointer filter: " + config.getName() + " " + filterDescription.getAttributeValue("internalName"));
+													Log.warn("Invalid pointer filter: " + config.getName() + " " + filterDescription.getAttributeValue("internalName"));
 												} else if(isRemotePointer(mart.getPartitionTableByName("p0"), internalNames, filterDescription.getAttributeValue("pointerDataset",""), oldPartitionToColumn)){ // It's a non-local pointer
 													String[] pointerDataset = filterDescription.getAttributeValue("pointerDataset").split("\\*",-1);
 													if(pointerDataset.length <= 3){
@@ -1441,7 +1435,7 @@ public class BackwardCompatibility {
 
 
 													} else if (pointerDataset.length > 3){
-														Log.error("Too many aliases in pointerDataset property!");
+														Log.warn("Too many aliases in pointerDataset property!");
 													} else {
 														PartitionTable mainPartition = mart.getPartitionTableByName("p0");
 														HashMap<String, String> internalNameToValue = oldPartitionAliases.get(pointerDataset[1]);
@@ -1487,12 +1481,8 @@ public class BackwardCompatibility {
 					newImportable.setLinkVersion(replaceAliases(oldImportable.getAttributeValue("linkVersion", ""), oldPartitionToColumn));
 					newImportable.setProperty(XMLElements.TYPE,oldImportable.getAttributeValue("type","link"));
 
-					if(newImportable.getName().equals("anatomical_system_term"))
-						Log.error("Checking importable");
 
 					for(String filterName : filters){
-						if(filterName.equals("link_anatomical_system"))
-							Log.error("checking filter");
 						Filter filterObject = rootContainer.getFilterRecursively2(filterName);
 						if(filterObject == null){
 							include = false;
@@ -1504,8 +1494,8 @@ public class BackwardCompatibility {
 					if(include && newImportable.getFilterList().size()>0){
 						config.addElementList(newImportable);
 					} else {
-						Log.error("Importable warning: " + newImportable.getName() + " not added");
-						Log.error("\t" + oldImportable.getAttributeValue("filters"));
+						Log.warn("Importable warning: " + newImportable.getName() + " not added");
+						Log.warn("\t" + oldImportable.getAttributeValue("filters"));
 					}
 
 				}
@@ -1519,8 +1509,7 @@ public class BackwardCompatibility {
 					newExportable.setProperty(XMLElements.ORDERBY, oldExportable.getAttributeValue("orderBy",""));
 					newExportable.setLinkVersion(replaceAliases(oldExportable.getAttributeValue("linkVersion", ""), oldPartitionToColumn));
 					newExportable.setProperty(XMLElements.TYPE,oldExportable.getAttributeValue("type","link"));
-					if(newExportable.getName().endsWith("uniprot_id"))
-						Log.error("Checking exportable");
+
 					String defaultState = oldExportable.getAttributeValue("default","false");
 					if(defaultState.equals("true") || defaultState.equals("1"))
 						defaultState = "true";
@@ -1532,7 +1521,7 @@ public class BackwardCompatibility {
 						org.biomart.objects.objects.Attribute attributeObject = rootContainer.getAttributeRecursively2(attributeName);
 						if(attributeObject == null){
 							include = false;
-							Log.error("Attribute not found: " + attributeName);
+							Log.warn("Attribute not found: " + attributeName);
 							break;
 						} else {
 							attributeObject.setName(attributeObject.getInternalName());
@@ -1542,8 +1531,8 @@ public class BackwardCompatibility {
 					if(include && newExportable.getAttributeList().size()>0){
 						config.addElementList(newExportable);
 					} else {
-						Log.error("Exportable warning: " + newExportable.getName() + " not added");
-						Log.error("\t" + oldExportable.getAttributeValue("attributes"));
+						Log.warn("Exportable warning: " + newExportable.getName() + " not added");
+						Log.warn("\t" + oldExportable.getAttributeValue("attributes"));
 					}
 				}
 				if(dataRoot.getChildren().size()>0){
@@ -1561,7 +1550,7 @@ public class BackwardCompatibility {
 				e.printStackTrace();
 			}
 		}
-		Log.error("Done");
+		Log.debug("Done");
 		return martList;
 	}
 
