@@ -2,33 +2,33 @@
 <JSChart>
     <dataset type="pie">
         <data unit="Blood" value="192"/>
-        <data unit="Brain" value="468"/>
-        <data unit="Breast" value="438"/>
-        <data unit="Colon" value="223"/>
-        <data unit="Kidney" value="442"/>
+        <data unit="Brain" value="555"/>
+        <data unit="Breast" value="416"/>
+        <data unit="Colon" value="203"/>
+        <data unit="Kidney" value="112"/>
         <data unit="Liver" value="2"/>
-        <data unit="Lung" value="480"/>
+        <data unit="Lung" value="267"/>
         <data unit="Ovary" value="546"/>
-        <data unit="Pancreas" value="126"/>
-        <data unit="Rectum" value="73"/>
+        <data unit="Pancreas" value="131"/>
+        <data unit="Rectum" value="69"/>
         <data unit="Skin" value="1"/>
         <data unit="Stomach" value="142"/>
         <data unit="Uterus" value="71"/>
     </dataset>
     <colorset>
         <color value="#FF0000"/>
-        <color value="#FF3300"/> 
-        <color value="#FF6600"/> 
+        <color value="#FF3300"/>
+        <color value="#FF6600"/>
         <color value="#FF9900"/>
-        <color value="#FFCC00"/> 
-        <color value="#FFFF00"/> 
-        <color value="#CCFF00"/> 
-        <color value="#99FF00"/> 
-        <color value="#33FF00"/> 
-        <color value="#00FF66"/> 
-        <color value="#00FF99"/> 
-        <color value="#00FFCC"/> 
-        <color value="#6699CC"/> 
+        <color value="#FFCC00"/>
+        <color value="#FFFF00"/>
+        <color value="#CCFF00"/>
+        <color value="#99FF00"/>
+        <color value="#33FF00"/>
+        <color value="#00FF66"/>
+        <color value="#00FF99"/>
+        <color value="#00FFCC"/>
+        <color value="#6699CC"/>
     </colorset>
     <optionset>
         <option set="setSize" value="400,400"/>
