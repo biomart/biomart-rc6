@@ -6,7 +6,7 @@
         <data unit="Breast" value="416"/>
         <data unit="Colon" value="203"/>
         <data unit="Kidney" value="112"/>
-        <data unit="Liver" value="2"/>
+        <data unit="Liver" value="27"/>
         <data unit="Lung" value="267"/>
         <data unit="Ovary" value="546"/>
         <data unit="Pancreas" value="131"/>
