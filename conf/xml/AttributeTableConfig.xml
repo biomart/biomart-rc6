@@ -326,6 +326,9 @@
 		<item name="inusers" editable="1" visible="1"/>
 		<item name="dependson" editable="1" visible="1"/>
 		<item name="rdf" editable="1" visible="1" autosave="true"/>
+		<item name="required" editable="1" visible="1" autosave="true">
+			<editor type="boolean"/>
+		</item>
 		<doubleclickitem name="filterlist"/>
 	</node>	
 	<node name="rdfclass">

@@ -944,4 +944,7 @@ public class Filter extends Element	{
 			return super.getDisplayName();
 	}
 
+	public boolean isRequired() {
+		return Boolean.parseBoolean(this.getPropertyValue(XMLElements.REQUIRED));
+	}
 }

@@ -125,6 +125,7 @@ public enum XMLElements {
 	 DEPENDSON("dependson"),
 	 RDF("rdf"),
 	 RDFCLASS("rdfclass"),
+	 REQUIRED ("required"),
 	//value
 	 TRUE_VALUE("true"),
 	 FALSE_VALUE("false"),

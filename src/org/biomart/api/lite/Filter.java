@@ -181,7 +181,9 @@ public class Filter extends LiteMartConfiguratorObject implements Serializable {
 		}
 	}
 
-	
+	public boolean isRequired() {
+		return this.filterObject.isRequired();
+	}
 	// From simple filter
     @JsonIgnore
 	public String getDisplayType() {
