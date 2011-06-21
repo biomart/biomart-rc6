@@ -341,6 +341,10 @@ $.namespace('biomart', function(self) {
         return select;
     };
 
+    self.escapeHTML = function(str) {
+         return str.replace(/&(?!\w+;)/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    };
+
     $('#biomart-locations').bind('change.location', function() {
         location = $(this).val();
     });

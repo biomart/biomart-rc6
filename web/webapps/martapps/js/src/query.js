@@ -180,7 +180,7 @@ $.namespace('biomart.query', function(self) {
             arr.push('<Processor>');
             for (i=0, item; item=params[i]; i++) {
                 arr.push([
-                    '<Parameter name="', item.name, '" value="', item.value, '"/>'
+                    '<Parameter name="', biomart.escapeHTML(item.name), '" value="', biomart.escapeHTML(item.value), '"/>'
                 ].join(''));
             }
             arr.push('</Processor>');
@@ -201,7 +201,7 @@ $.namespace('biomart.query', function(self) {
 
             if (value !== null && $.trim(value)) {
                 arr.push([
-                    '<Filter name="', name, '" value="', value, '"/>'
+                    '<Filter name="', biomart.escapeHTML(name), '" value="', biomart.escapeHTML(value), '"/>'
                 ].join(''));
             }
         }
@@ -211,12 +211,12 @@ $.namespace('biomart.query', function(self) {
                 var list = item.attributes;
                 for (var j=0; j<list.length; j++) {
                     arr.push([
-                        '<Attribute name="', list[j].name, '"/>'
+                        '<Attribute name="', biomart.escapeHTML(list[j].name), '"/>'
                     ].join(''));
                 }
             } else {
                 arr.push([
-                    '<Attribute name="', item.name, '"/>'
+                    '<Attribute name="', biomart.escapeHTML(item.name), '"/>'
                 ].join(''));
             }
         }
@@ -294,11 +294,11 @@ $.namespace('biomart.query', function(self) {
                     ('"' + mart.config + '"') : 'null', ');'].join(''));
 
         for (var i=0, filter; filter=filters[i]; i++) {
-            arr.push(['        ds.addFilter("', filter.name, '", "', filter.value, '");'].join(''));
+            arr.push(['        ds.addFilter("', biomart.escapeHTML(filter.name), '", "', biomart.escapeHTML(filter.value), '");'].join(''));
         }
 
         for (var i=0, attribute; attribute=attributes[i]; i++) {
-            arr.push(['        ds.addAttribute("', attribute.name, '");'].join(''));
+            arr.push(['        ds.addAttribute("', biomart.escapeHTML(attribute.name), '");'].join(''));
         }
 
         return arr.join('\n');
