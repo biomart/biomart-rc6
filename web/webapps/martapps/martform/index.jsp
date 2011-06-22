@@ -70,6 +70,7 @@
       <div class="message select-attributes" style="display:none">
         <bm:message code="please select attributes" capitalize="true"/>
       </div>
+      <div id="error-message" class="message" style="display:none"></div>
       <div id="biomart-submit" class="clearfix">
         <button class="large green awesome"><bm:message code="go" capitalize="true"/> &raquo;</button>
       </div>

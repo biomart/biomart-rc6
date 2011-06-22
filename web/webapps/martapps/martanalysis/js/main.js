@@ -275,7 +275,7 @@ $.namespace('biomart.martform', function(self) {
                         a.datasets = [dataset]; 
                     }
                     $node = biomart.renderer.attribute('li', a, false);
-                    if (a.independent !== true) $node.simplerattribute();
+                    if (a.independent !== true) $node.simplerattribute({radio:true});
 
                     nodes[a.name] = {
                         element: $node,
@@ -491,7 +491,16 @@ $.namespace('biomart.martform', function(self) {
                 self.params.setParam('col', null);
             });
 
-        $('#biomart-submit').delegate('button', 'click', self.params.setPreview.partial(true));
+        $('#biomart-submit').delegate('button', 'click', function() {
+            var invalid = biomart.checkRequiredFilters(_elements.filters.find('.filter-container'));
+
+            if (!invalid) {
+                self.params.setPreview(true);
+            } else {
+                var element = invalid;
+                setTimeout(function() { element.fadeAndRemove() }, 3000);
+            }
+        });
 
         // Handles selecting/unselecting attributes
         _elements.attributes.click(function(ev) {
@@ -627,7 +636,6 @@ $.namespace('biomart.martform', function(self) {
                 _elements.results.resultsPanel('run', title, options);
             }
         });
-
     };
 
     /*
@@ -806,8 +814,6 @@ $.namespace('biomart.martform', function(self) {
         return queries;
     }
 });
-
-biomart.error = function() { $('#biomart-loading').remove(); $('#biomart-error').show() };
 
 $.subscribe('biomart.init', biomart.martform, 'init');
 $.subscribe('biomart.ready', biomart.martform, 'ready');

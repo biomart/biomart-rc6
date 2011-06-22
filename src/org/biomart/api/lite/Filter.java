@@ -18,7 +18,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.annotate.JsonPropertyOrder;
 
 @XmlRootElement(name="filter")
-@JsonPropertyOrder({"name", "displayName", "description", "type", "isHidden", "depends", "qualifier"})
+@JsonPropertyOrder({"name", "displayName", "description", "type", "isHidden", "depends", "qualifier", "required"})
 public class Filter extends LiteMartConfiguratorObject implements Serializable {
 
 	private static final long serialVersionUID = 3717403391079076481L;
@@ -181,6 +181,8 @@ public class Filter extends LiteMartConfiguratorObject implements Serializable {
 		}
 	}
 
+    @JsonProperty("required")
+    @XmlAttribute(name="required")
 	public boolean isRequired() {
 		return this.filterObject.isRequired();
 	}

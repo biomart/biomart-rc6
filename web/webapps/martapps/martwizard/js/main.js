@@ -557,7 +557,7 @@ $.namespace('biomart.martwizard', function(self) {
                     params.config = biomart._state.queryMart.config;
                 biomart.resource.load('attributes', function(json) {
                     for (var i=0, a; a=json[i]; i++) {
-                        if ($.inArray(a.name, biomart._state.selectedAttributes) != -1) {
+                        if (a.selected || $.inArray(a.name, biomart._state.selectedAttributes) != -1) {
                             biomart._state.queryMart.attributes = { name: a.name };
                             $.publish('biomart.change', 'attributes', a, true);
                         }

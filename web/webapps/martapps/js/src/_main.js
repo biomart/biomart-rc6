@@ -140,6 +140,28 @@ $.namespace('biomart', function(self) {
             .dialog('open');
     };
 
+    self.message = function(msg) {
+        $('#biomart-message-dialog')
+            .html(msg)
+            .dialog({
+                dialogClass: 'message',
+                autoOpen: true,
+                resizable: false,
+                draggable: false,
+                modal: true,
+                width: 400,
+                height: 200,
+                buttons: {
+                    'OK': function() {
+                        $(this).dialog('close')
+                    }
+                },
+                close: function() {
+                    $(this).dialog('destroy');
+                }
+            });
+    };
+
     self.stripHtml = function(str) {
         return str.replace(self.htmlRegex, '');
     };
@@ -343,6 +365,27 @@ $.namespace('biomart', function(self) {
 
     self.escapeHTML = function(str) {
          return str.replace(/&(?!\w+;)/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    };
+
+    self.checkRequiredFilters = function(filterElements) {
+        for (var i=0; i<filterElements.length; i++) {
+            var filterElement = filterElements.eq(i),
+                item = filterElement.data('item'),
+                isActive = filterElement.hasClass('ui-active');
+            if (item.required && !isActive) {
+                var message = _('This filter is required'),
+                    element = $('<div class="tipsy tipsy-east"><div class="tipsy-arrow"></div><div class="tipsy-inner">' 
+                        + message + '</div></div>'),
+                    position = filterElement.offset();
+                filterElement.scrollTo();
+                element.css('position', 'absolute').appendTo(document.body);
+                element.css({
+                        top: position.top + 'px',
+                        left: (position.left - element.width() - 10) + 'px'
+                    });
+                return element;
+            }
+        }
     };
 
     $('#biomart-locations').bind('change.location', function() {

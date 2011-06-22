@@ -634,6 +634,21 @@ textarea.xml {
     margin-top: 1px;
 }
 
+.validation-message {
+    position: absolute;
+    left: -220px;
+    top: 0;
+    width: 200px;
+    height: 25px;
+    text-align: center;
+    line-height: 25px;
+    background-color: rgb(50,50,50);
+    background-color: rgba(50,50,50,.8);
+    color: #fff;
+    border: 1px solid #000;
+    padding: 2px;
+}
+
 #biomart-flash-message {
     border: 1px solid #fff47f;
     background-color: #fffcdf;

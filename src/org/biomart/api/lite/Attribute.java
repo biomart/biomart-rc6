@@ -18,7 +18,7 @@ import org.codehaus.jackson.annotate.JsonPropertyOrder;
 
 
 @XmlRootElement(name="attribute")
-@JsonPropertyOrder({"name", "displayName", "description", "isHidden", "linkURL", "value"})
+@JsonPropertyOrder({"name", "displayName", "description", "isHidden", "linkURL", "selected", "value"})
 public class Attribute extends LiteMartConfiguratorObject implements Serializable {
 
 	private static final long serialVersionUID = 7606339732698858011L;

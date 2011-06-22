@@ -81,11 +81,12 @@ $.namespace('biomart.martform', function(self) {
             marts: $('#field-marts'),
             datasets: $('#field-datasets')
         };
-        _elements.filterContainers = _elements.section.filters.find('div.containers');
-        _elements.filterMessage = _elements.section.filters.find('div.message');
-        _elements.attributeContainers = _elements.section.attributes.find('div.containers');
-        _elements.attributeMessage = _elements.section.attributes.find('div.message');
-        _elements.resultsMessage = _elements.resultsWrapper.find('div.select-attributes');
+        _elements.filterContainers = _elements.section.filters.find('.containers');
+        _elements.filterMessage = _elements.section.filters.find('.message');
+        _elements.attributeContainers = _elements.section.attributes.find('.containers');
+        _elements.attributeMessage = _elements.section.attributes.find('.message');
+        _elements.resultsMessage = _elements.resultsWrapper.find('.select-attributes');
+        _elements.errorMessage = $('#error-message')
     };
     _init.params = function() {
         // Grab relevant info from URL fragment
@@ -390,6 +391,7 @@ $.namespace('biomart.martform', function(self) {
 
         _elements.filterMessage.hide();
         _elements.attributeMessage.hide();
+        _elements.errorMessage.hide();
         _elements.section.filters.block(BLOCK_OPTIONS);
         _elements.section.attributes.block(BLOCK_OPTIONS);
 
@@ -482,6 +484,14 @@ $.namespace('biomart.martform', function(self) {
         }, $.extend({withfilters: false, withattributes: true}, reqParams));
     };
     _loader.results = function() {
+        var invalid = biomart.checkRequiredFilters(_elements.filterContainers.find('.filter-container'));
+
+        if (invalid) {
+            var element = invalid;
+            setTimeout(function() { element.fadeAndRemove() }, 3000);
+            return;
+        }
+
         var mart = getQueryMart(),
             xml = biomart.query.compile('XML', mart, 'TSVX', QUERY_LIMIT, QUERY_CLIENT),
             downloadXml = biomart.query.compile('XML', mart, 'TSV', -1, QUERY_CLIENT),
@@ -556,22 +566,30 @@ $.namespace('biomart.martform', function(self) {
             if (item)
                 mart.datasets.push($(this).data('item').name);
         });
-        _elements.filterContainers.find('.filter-container.ui-active').each(function() {
-            var $this = $(this),
-                item = $this.data('item'),
-                value = $this.data('value'),
+
+        // Get a list of selected filters
+        // Also make sure that required filters are selected
+        var filterElements = _elements.filterContainers.find('.filter-container');
+        for (var i=0, filterElement; i<filterElements.length; i++) {
+                filterElement = filterElements.eq(i);
+                isActive = filterElement.hasClass('ui-active'),
+                item = filterElement.data('item'),
+                value = filterElement.data('value'),
                 name;
 
             if (item) {
-                if ($.isArray(value)) {
-                    name = value[0];
-                    value = value[1];
-                } else {
-                    name = item.name;
+                if (isActive) {
+                    if ($.isArray(value)) {
+                        name = value[0];
+                        value = value[1];
+                    } else {
+                        name = item.name;
+                    }
+                    mart.filters[name] = {name: name, value: value};
                 }
-                mart.filters[name] = {name: name, value: value};
             }
-        });
+        }
+
         for (var k in biomart._state.attributes) {
             var item = biomart._state.attributes[k];
             mart.attributes[item.name] = {name: item.name};

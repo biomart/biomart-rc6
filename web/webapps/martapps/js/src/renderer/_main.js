@@ -186,7 +186,8 @@ $.namespace('biomart.renderer', function(self) {
 
             html.push([
                 '<', tagName, ' class="clearfix item filter-container ', s, ' ', type,
-                (value ? ' ui-active' : ''), '" container="', item['parent'], 
+                (value ? ' ui-active' : ''), (item.required ? ' ui-required' : ''),
+                '" container="', item['parent'], 
                 '" filter-type="', type, '"', 'filter-name="', s, '"',
                 item.dependsOn ? (' data-depends="' +  item.dependsOn + '"') : ''
             ].join(''));
@@ -203,7 +204,8 @@ $.namespace('biomart.renderer', function(self) {
 
             html.push('<input type="checkbox" class="checkbox ' + s + '"' +
                     (value ? ' checked="checked"' : '') + ' id="' + id + '"/>' +
-                    '<label for="' + id + '" class="item-name">' + item.displayName + '</label> ');
+                    '<label for="' + id + '" class="item-name">' + item.displayName + 
+                    (item.required ? ' (' + _('required')  + ')' : "") + '</label> ');
             html.push(formatted);
             html.push('</' + tagName + '>');
 
@@ -216,6 +218,10 @@ $.namespace('biomart.renderer', function(self) {
             id = biomart.uuid(),
             html = [],
             s = self.makeClassName(item.name);
+
+        if (item.selected) {
+            checked = true;
+        }
 
         html.push('<' + tagName + ' class="clearfix item attribute-container ' + s +  
                 (checked ? ' ui-active' : '') + '" container="' + item['parent'] + 
@@ -306,7 +312,9 @@ $.namespace('biomart.renderer', function(self) {
             if (item.attributes.length) {
                 var list = $('<ul class="items attributes clearfix"/>').appendTo(element);
                 for (var i=0, a, formatted, checked; a=item.attributes[i]; i++) {
-                    checked = o.selectedAttributes && $.inArray(a.name, o.selectedAttributes) != -1;
+                    // Either a default selected attribute, or it's selected from URL query param
+                    checked = a.selected || (o.selectedAttributes && $.inArray(a.name, o.selectedAttributes) != -1);
+
                     formatted = $(biomart.renderer.attribute('li', a, checked));
                     formatted
                         .simplerattribute({radio:false})

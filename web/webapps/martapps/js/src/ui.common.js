@@ -367,8 +367,8 @@ $.widget('ui.simplerfilter', {
         }
         select.prettybox();
 
-        element.find('.item-name')
-            .append(':').bind('click.simplerfilter', function() {
+        var label = element.find('.item-name');
+        label.append(':').bind('click.simplerfilter', function() {
                 // prevent checkbox from being checked/unchecked
                 return false;
             });
@@ -572,7 +572,7 @@ $.widget('ui.simplerattribute', {
             element = self.element.addClass('simplerattribute'),
             name = element.data('item').name;
 
-        if (self.option.radio) {
+        if (self.options.radio) {
             var checkbox = element.find('input.checkbox'),
                 radio = $('<input type="radio" name="attribute"/>')
                     .attr('id', checkbox.attr('id'))

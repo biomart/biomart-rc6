@@ -619,7 +619,7 @@ $.namespace('biomart.martexplorer', function(self) {
                     params.config = biomart._state.queryMart.config;
                 biomart.resource.load('attributes', function(json) {
                     for (var i=0, a; a=json[i]; i++) {
-                        if (biomart._state.queryMart.attributes[a.name]) {
+                        if (a.selected || biomart._state.queryMart.attributes[a.name]) {
                             $.publish('biomart.change', 'attributes', a, true);
                         }
                     }
@@ -1128,6 +1128,7 @@ $.namespace('biomart.martexplorer', function(self) {
             selectedAttributes: biomart.params.attributes ? biomart.params.attributes.split(',') : [], 
             onAttributeSelect: function(item) {
                 biomart._state.queryMart.attributes[item.name] = {name:item.name};
+                $.publish('biomart.change', 'attributes', item, true);
             },
             extras: function(item, element) {
                 if (item.maxContainers) {

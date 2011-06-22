@@ -206,7 +206,6 @@
     position: absolute;
     top: 0;
     right: 0;
-
 }
 .biomart .item .subgroup {
     float: left;
@@ -243,6 +242,9 @@
     float: left;
     line-height: 2em;
     margin-right: .5em;
+}
+.biomart .ui-required .item-name {
+    font-weight: bold;
 }
 
 /* Attributes */
