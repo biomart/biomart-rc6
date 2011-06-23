@@ -660,30 +660,31 @@ public class TreeNodeHandler {
     public void requestNewAttribute(DatasetColumn column) {
     	DatasetTable dst = column.getDatasetTable();
     	Mart mart = dst.getMart();
-    	for(Config config: mart.getConfigList()) {
-    		//find container
-    		String attContainerName = dst.getName()+"_attribute";
-    		Container c = config.getContainerByName(attContainerName);
-    		if(c == null) {
-    			c = new Container(attContainerName);
-    			config.getRootContainer().addContainer(c);
-    		}
-    		Attribute a = new Attribute(column,dst.getName()+"__"+column.getName());
-    		c.addAttribute(a);
-    		a.setVisibleModified(true);
-    		c.setVisibleModified(true);
-    		
-    		String filContainerName = dst.getName()+"_filter";
-    		Container c1 = config.getContainerByName(filContainerName);
-    		if(c1 == null) {
-    			c1 = new Container(filContainerName);
-    			config.getRootContainer().addContainer(c1);
-    		}
-    		Filter filter = new Filter(a,a.getName());
-    		c1.addFilter(filter); 
-    		filter.setVisibleModified(true);
-    		c1.setVisibleModified(true);
-    	}
+    	Config config = mart.getMasterConfig();
+    	
+		//find container
+		String attContainerName = dst.getName()+"_attribute";
+		Container c = config.getContainerByName(attContainerName);
+		if(c == null) {
+			c = new Container(attContainerName);
+			config.getRootContainer().addContainer(c);
+		}
+		Attribute a = new Attribute(column,dst.getName()+"__"+column.getName());
+		c.addAttribute(a);
+		a.setVisibleModified(true);
+		c.setVisibleModified(true);
+		
+		String filContainerName = dst.getName()+"_filter";
+		Container c1 = config.getContainerByName(filContainerName);
+		if(c1 == null) {
+			c1 = new Container(filContainerName);
+			config.getRootContainer().addContainer(c1);
+		}
+		Filter filter = new Filter(a,a.getName());
+		c1.addFilter(filter); 
+		filter.setVisibleModified(true);
+		c1.setVisibleModified(true);
+    	
     	dst.setOrphan(false);
     	column.setOrphan(false);
     }
