@@ -193,7 +193,7 @@ var QueryResults = {
                             // Paginate if the renderer supports it
                             // Also check that paginateBy is a proper number
                             // Lastly, there has to be enough rows to paginate
-                            if (this._renderer.canPaginage && options.paginateBy && end < total) {
+                            if (this._renderer.canPaginate && options.paginateBy && end < total) {
                                 self._isPaginated = true;
                                 element.paginate(paginateOptions);
                                 if (total >= 1000 && options.footer) {
