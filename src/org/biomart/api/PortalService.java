@@ -31,9 +31,9 @@ public interface PortalService {
 
     public List<FilterData> getFilterValues(String datasets, String filter, String value);
 
-    public List<Attribute> getAttributes(String datasets, String config, String containerName);
+    public List<Attribute> getAttributes(String datasets, String config, String containerName, Boolean allowPartialLists);
 
-    public Container getContainers(String datasets, String config, Boolean withattributes, Boolean withfilters);
+    public Container getContainers(String datasets, String config, Boolean withAttributes, Boolean withFilters, Boolean allowPartialLists);
 
     public List<Dataset> getLinkables(String datasets);
 

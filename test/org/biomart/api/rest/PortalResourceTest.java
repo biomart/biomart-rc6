@@ -16,20 +16,19 @@ import static org.junit.Assert.*;
  *
  * @author jhsu
  */
-public class RestApplicationTest extends JerseyTest {
+public class PortalResourceTest extends JerseyTest {
     static {
         System.setProperty("biomart.registry.file", "./testdata/restapi.xml");
-        System.setProperty("biomart.registry.key.file", "./testdata/.restapi");
 
         System.setProperty("jersey.test.containerFactory",
                 "com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory");
     }
 
-    public RestApplicationTest() throws Exception {
+    public PortalResourceTest() throws Exception {
         super(new WebAppDescriptor.Builder()
                 .contextListenerClass(TestServletConfig.class)
                 .filterClass(GuiceFilter.class)
-                .contextPath("jersey-guice-filter")
+                .contextPath("/")
                 .servletPath("/")
                 .build()
         );
@@ -238,42 +237,42 @@ public class RestApplicationTest extends JerseyTest {
         assertEquals(14, count);
     }
 
-    @Test
-    public void testGetProcessorGroups() throws IOException {
-        WebResource webResource = resource();
-        String responseMsg = webResource.path("/martservice/processorgroups")
-                .queryParam("mart", "gene")
-                .accept("application/json")
-                .get(String.class);
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode node = mapper.readTree(responseMsg);
-
-        assertTrue(node.isArray());
-
-        for(Iterator<JsonNode> it = node.iterator(); it.hasNext();) {
-            JsonNode curr = it.next();
-            assertPropertiesNotNull(curr, "displayName", "name");
-        }
-    }
-
-    @Test
-    public void testGetProcessors() throws IOException {
-        WebResource webResource = resource();
-        String responseMsg = webResource.path("/martservice/processors")
-                .queryParam("mart", "gene")
-                .queryParam("processorgroup", "Tabular")
-                .accept("application/json")
-                .get(String.class);
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode node = mapper.readTree(responseMsg);
-
-        assertTrue(node.isArray());
-
-        for(Iterator<JsonNode> it = node.iterator(); it.hasNext();) {
-            JsonNode curr = it.next();
-            assertPropertiesNotNull(curr, "displayName", "name");
-        }
-    }
+//    @Test
+//    public void testGetProcessorGroups() throws IOException {
+//        WebResource webResource = resource();
+//        String responseMsg = webResource.path("/martservice/processorgroups")
+//                .queryParam("mart", "gene")
+//                .accept("application/json")
+//                .get(String.class);
+//        ObjectMapper mapper = new ObjectMapper();
+//        JsonNode node = mapper.readTree(responseMsg);
+//
+//        assertTrue(node.isArray());
+//
+//        for(Iterator<JsonNode> it = node.iterator(); it.hasNext();) {
+//            JsonNode curr = it.next();
+//            assertPropertiesNotNull(curr, "displayName", "name");
+//        }
+//    }
+//
+//    @Test
+//    public void testGetProcessors() throws IOException {
+//        WebResource webResource = resource();
+//        String responseMsg = webResource.path("/martservice/processors")
+//                .queryParam("mart", "gene")
+//                .queryParam("processorgroup", "Tabular")
+//                .accept("application/json")
+//                .get(String.class);
+//        ObjectMapper mapper = new ObjectMapper();
+//        JsonNode node = mapper.readTree(responseMsg);
+//
+//        assertTrue(node.isArray());
+//
+//        for(Iterator<JsonNode> it = node.iterator(); it.hasNext();) {
+//            JsonNode curr = it.next();
+//            assertPropertiesNotNull(curr, "displayName", "name");
+//        }
+//    }
 //
 //    @Test
 //    public void testResults() {

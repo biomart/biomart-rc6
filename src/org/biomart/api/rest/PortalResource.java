@@ -47,6 +47,8 @@ import org.biomart.common.resources.Log;
 /**
  *
  * @author jhsu
+ *
+ * Contains endpoints for the MartService web API.
  */
 @Singleton
 @Path("/martservice")
@@ -85,7 +87,7 @@ public class PortalResource implements PortalService {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Override
     @Cache(maxAge = MAX_AGE)
-    public List<Mart> getMarts( @QueryParam("guicontainer") String guiContainerName) {
+    public List<Mart> getMarts(@QueryParam("guicontainer") String guiContainerName) {
         return getPortal().getMarts(guiContainerName);
     }
 
@@ -120,9 +122,10 @@ public class PortalResource implements PortalService {
     public List<Attribute> getAttributes(
             @QueryParam("datasets") String datasets,
             @QueryParam("config") String config,
-            @QueryParam("container") String container) {
+            @QueryParam("container") String container,
+            @QueryParam("allowPartialList") @DefaultValue("true") Boolean allowPartialList) {
         Portal portal = getPortal();
-        return portal.getAttributes(datasets, config, container);
+        return portal.getAttributes(datasets, config, container, allowPartialList);
     }
 
     @Path("containers")
@@ -133,9 +136,10 @@ public class PortalResource implements PortalService {
     public Container getContainers(
             @QueryParam("datasets") String datasets,
             @QueryParam("config") String config,
-            @QueryParam("withattributes") @DefaultValue("true") Boolean withattributes,
-            @QueryParam("withfilters") @DefaultValue("true") Boolean withfilters) {
-        return getPortal().getContainers(datasets, config, withattributes, withfilters);
+            @QueryParam("withattributes") @DefaultValue("true") Boolean withAttributes,
+            @QueryParam("withfilters") @DefaultValue("true") Boolean withFilters,
+            @QueryParam("allowPartialList") @DefaultValue("true") Boolean allowPartialList) {
+        return getPortal().getContainers(datasets, config, withAttributes, withFilters, allowPartialList);
     }
 
     @Path("linkables")
@@ -147,8 +151,9 @@ public class PortalResource implements PortalService {
         return getPortal().getLinkables(datasets);
     }
 
-
-    // Special requests
+    /*
+     * Special requests
+     */
     @Path("datasets/mapped")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -212,7 +217,9 @@ public class PortalResource implements PortalService {
         } catch (Exception e) { throw new BioMartApiException(e); }
     }
 
-    // Only available for XML
+    /*
+     * Only available for XML
+     */
     @Path("xml/configs/{mart}")
     @GET
     @Produces(MediaType.APPLICATION_XML)

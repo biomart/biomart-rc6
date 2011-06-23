@@ -1,8 +1,6 @@
 package org.biomart.api;
 
 import org.biomart.api.lite.GuiContainer;
-import org.biomart.api.lite.Processor;
-import org.biomart.api.lite.ProcessorGroup;
 import org.biomart.api.lite.Container;
 import org.biomart.api.lite.Attribute;
 import org.biomart.api.lite.Filter;
@@ -19,7 +17,7 @@ import static org.junit.Assert.*;
  *
  * @author jhsu
  */
-public class PortalApiTest {
+public class PortalTest {
     private static Portal _portal;
 
     static {
@@ -84,35 +82,35 @@ public class PortalApiTest {
     @Test
     public void testGetAttributes() {
         List<Attribute> attributes = _portal.getAttributes("hsapiens_gene_ensembl",
-                null, null);
+                null, null, null);
         assertEquals(1399, attributes.size());
 
         attributes = _portal.getAttributes("hsapiens_gene_ensembl",
-                "hsapiens_gene_ensembl_config", null);
+                "hsapiens_gene_ensembl_config", null, null);
         assertEquals(1399, attributes.size());
 
         attributes = _portal.getAttributes("hsapiens_gene_ensembl",
-                "hsapiens_gene_ensembl_config", "ensembl_attributes");
+                "hsapiens_gene_ensembl_config", "ensembl_attributes", null);
         assertEquals(23, attributes.size());
     }
 
     @Test
     public void testGetContainers() {
-        Container container = _portal.getContainers("hsapiens_gene_ensembl", null, true, true);
+        Container container = _portal.getContainers("hsapiens_gene_ensembl", null, true, true, null);
         assertEquals("root", container.getName());
     }
 
-/*    @Test
-    public void testGetProcessorGroups() {
-        List<ProcessorGroup> groups = _portal.getProcessorGroups("hsapiens_gene_ensembl_config");
-        assertEquals(3, groups.size());
-    }
-
-    @Test
-    public void testGetProcessor() {
-        List<Processor> processors = _portal.getProcessors("hsapiens_gene_ensembl_config", "Tabular");
-        assertEquals(3, processors.size());
-    }*/
+//    @Test
+//    public void testGetProcessorGroups() {
+//        List<ProcessorGroup> groups = _portal.getProcessorGroups("hsapiens_gene_ensembl_config");
+//        assertEquals(3, groups.size());
+//    }
+//
+//    @Test
+//    public void testGetProcessor() {
+//        List<Processor> processors = _portal.getProcessors("hsapiens_gene_ensembl_config", "Tabular");
+//        assertEquals(3, processors.size());
+//    }
 
     /*
      * Tests for exceptions
@@ -134,23 +132,23 @@ public class PortalApiTest {
 
     @Test(expected=BioMartApiException.class)
     public void testGetAttributesWithNullDatasets() {
-        _portal.getAttributes(null, null, null);
+        _portal.getAttributes(null, null, null, null);
     }
 
     @Test(expected=BioMartApiException.class)
     public void testGetContainersWithNullDatasets() {
-        _portal.getContainers(null, null, null, true);
+        _portal.getContainers(null, null, null, true, null);
     }
-
-/*    @Test(expected=BioMartApiException.class)
-    public void testGetProcessorGroupsWithNullMartName() {
-        _portal.getProcessors(null, "Tabular");
-    }
-
-    @Test(expected=BioMartApiException.class)
-    public void testGetProcessorsWithNullMartName() {
-        _portal.getProcessors("hsapiens_gene_ensembl_config", null);
-    }*/
+//
+//    @Test(expected=BioMartApiException.class)
+//    public void testGetProcessorGroupsWithNullMartName() {
+//        _portal.getProcessors(null, "Tabular");
+//    }
+//
+//    @Test(expected=BioMartApiException.class)
+//    public void testGetProcessorsWithNullMartName() {
+//        _portal.getProcessors("hsapiens_gene_ensembl_config", null);
+//    }
 
     @Test
     public void testGetLinkables() {

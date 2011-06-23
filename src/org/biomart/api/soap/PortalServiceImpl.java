@@ -74,16 +74,18 @@ public class PortalServiceImpl implements PortalService {
     @Override
     @WebResult(name="attribute")
     public List<Attribute> getAttributes(@WebParam(name="datasets") String datasets,
-            @WebParam(name="config") String config, @WebParam(name="container") String containerName) {
-        return getPortal().getAttributes(datasets, config, containerName);
+            @WebParam(name="config") String config, @WebParam(name="container") String containerName,
+            @WebParam(name="allowPartialList") Boolean allowPartialList) {
+        return getPortal().getAttributes(datasets, config, containerName, allowPartialList);
     }
 
     @Override
     @WebResult(name="container")
     public Container getContainers(@WebParam(name="datasets") String datasets,
-            @WebParam(name="config") String config, @WebParam(name="withattributes") Boolean withattributes,
-            @WebParam(name="withfilters") Boolean withfilters) {
-        return getPortal().getContainers(datasets, config, withattributes, withfilters);
+            @WebParam(name="config") String config, @WebParam(name="withAttributes") Boolean withAttributes,
+            @WebParam(name="withFilters") Boolean withFilters,
+        @WebParam(name="allowPartialList") Boolean allowPartialList) {
+        return getPortal().getContainers(datasets, config, withAttributes, withFilters, allowPartialList);
     }
 
     @Override
@@ -91,7 +93,6 @@ public class PortalServiceImpl implements PortalService {
     public List<Dataset> getLinkables(@WebParam(name="datasets") String datasets) {
         return getPortal().getLinkables(datasets);
     }
-
 
     @Override
     @WebResult(name="result")

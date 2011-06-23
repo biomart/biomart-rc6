@@ -106,8 +106,13 @@ public final class Portal {
     }
 
     public List<Attribute> getAttributes(@Nonnull String datasets,
-            @Nullable String config, @Nullable String container) {
+            @Nullable String config, @Nullable String container, @Nullable Boolean allowPartialList /* for attribute lists */) {
         enforceNonnullAndNonEmpty(datasets);
+
+        // Default includes partial attribute lists
+        if (allowPartialList == null) {
+            allowPartialList = true;
+        }
 
         Mart mart;
         List<Attribute> list;
@@ -118,10 +123,10 @@ public final class Portal {
             mart = _registry.getMartByConfigName(config);
 
         if (container == null)
-            list = mart.getAttributes(datasets,true);
+            list = mart.getAttributes(datasets, allowPartialList);
         else
             list = mart
-                    .getRootContainer(datasets, true, false,true)
+                    .getRootContainer(datasets, true, false, allowPartialList)
                     .getContainerByName(container).getAttributeList();
 
         return list;
@@ -169,9 +174,14 @@ public final class Portal {
     }
 
     public Container getContainers(@Nonnull String datasets, @Nullable String config,
-            Boolean withattributes, Boolean withfilters) {
+            Boolean withattributes, Boolean withfilters, Boolean allowPartialList /* for attribute lists */) {
 
         enforceNonnullAndNonEmpty(datasets);
+
+        // Default allows partial attribute lists
+        if (allowPartialList == null) {
+            allowPartialList = true;
+        }
 
         Mart mart;
 
@@ -181,7 +191,7 @@ public final class Portal {
             mart = _registry.getMartByConfigName(config);
         }
 
-        return mart.getRootContainer(datasets, withattributes, withfilters,true);
+        return mart.getRootContainer(datasets, withattributes, withfilters, allowPartialList);
     }
 
     public List<Dataset> getLinkables(@Nonnull String datasets) {

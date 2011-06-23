@@ -57,7 +57,7 @@ public class RestApplicationSPARQLTest extends JerseyTest {
         super(new WebAppDescriptor.Builder()
                 .contextListenerClass(TestServletConfig.class)
                 .filterClass(GuiceFilter.class)
-                .contextPath("jersey-guice-filter")
+                .contextPath("/")
                 .servletPath("/")
                 .build()
         );
@@ -122,7 +122,7 @@ public class RestApplicationSPARQLTest extends JerseyTest {
 		ProcessorRegistry.register("TSV", TSV.class);
 		Mart mart = portal.getMarts(null).get(0);
 		Dataset ds = portal.getDatasets(mart.getName()).get(0);
-		Attribute attr = portal.getAttributes(ds.getName(), null, null).get(0);
+		Attribute attr = portal.getAttributes(ds.getName(), null, null, null).get(0);
 		Element element = SettingsForTest.getTestCase(testcase);
 		Element queryElement = element.getChild("Query");
 		XMLOutputter outputter = new XMLOutputter();
