@@ -60,7 +60,8 @@ $.namespace('biomart.martform', function(self) {
         });
 
         queue.queue(function() {
-            var params = {datasets: biomart._state.datasets, independent: independent},
+            // Don't allow partial attribute lists to be returned
+            var params = { datasets: biomart._state.datasets, independent: independent, allowPartialList: false },
                 mart;
 
             if (biomart._state.config)
@@ -730,7 +731,8 @@ $.namespace('biomart.martform', function(self) {
 
         // Independent querying means we need to get attributes for each dataset 
         queue.queue(function() {
-            var params = {datasets: biomart._state.datasets, independent: independent};
+            // Don't allow partial attribute lists to be returned
+            var params = { datasets: biomart._state.datasets, independent: independent, allowPartialList: false };
 
             if (biomart._state.config)
                 params.config = biomart._state.config;
