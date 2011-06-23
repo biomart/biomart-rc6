@@ -102,7 +102,7 @@ public class PortalApiTest {
         assertEquals("root", container.getName());
     }
 
-    @Test
+/*    @Test
     public void testGetProcessorGroups() {
         List<ProcessorGroup> groups = _portal.getProcessorGroups("hsapiens_gene_ensembl_config");
         assertEquals(3, groups.size());
@@ -112,7 +112,7 @@ public class PortalApiTest {
     public void testGetProcessor() {
         List<Processor> processors = _portal.getProcessors("hsapiens_gene_ensembl_config", "Tabular");
         assertEquals(3, processors.size());
-    }
+    }*/
 
     /*
      * Tests for exceptions
@@ -142,7 +142,7 @@ public class PortalApiTest {
         _portal.getContainers(null, null, null, true);
     }
 
-    @Test(expected=BioMartApiException.class)
+/*    @Test(expected=BioMartApiException.class)
     public void testGetProcessorGroupsWithNullMartName() {
         _portal.getProcessors(null, "Tabular");
     }
@@ -150,7 +150,7 @@ public class PortalApiTest {
     @Test(expected=BioMartApiException.class)
     public void testGetProcessorsWithNullMartName() {
         _portal.getProcessors("hsapiens_gene_ensembl_config", null);
-    }
+    }*/
 
     @Test
     public void testGetLinkables() {

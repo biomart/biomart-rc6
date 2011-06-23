@@ -37,9 +37,5 @@ public interface PortalService {
 
     public List<Dataset> getLinkables(String datasets);
 
-    public List<ProcessorGroup> getProcessorGroups(String martName);
-
-    public List<Processor> getProcessors(String martName, String processorGroupName);
-
     public String getResults(String xml);
 }

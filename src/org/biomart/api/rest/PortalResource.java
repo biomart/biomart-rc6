@@ -147,24 +147,6 @@ public class PortalResource implements PortalService {
         return getPortal().getLinkables(datasets);
     }
 
-    @Path("processorgroups")
-    @GET
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Override
-    @Cache(maxAge = MAX_AGE)
-    public List<ProcessorGroup> getProcessorGroups(@QueryParam("mart") String mart) {
-        return getPortal().getProcessorGroups(mart);
-    }
-
-    @Path("processors")
-    @GET
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Cache(maxAge = MAX_AGE)
-    @Override
-    public List<Processor> getProcessors(@QueryParam("mart") String mart,
-            @QueryParam("processorgroup") String group) {
-        return getPortal().getProcessors(mart, group);
-    }
 
     // Special requests
     @Path("datasets/mapped")

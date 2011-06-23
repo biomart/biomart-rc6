@@ -270,7 +270,7 @@ public class QueryValidator {
                 }
             }
 
-            attributeList.add(attribute.getAttributeList(new ArrayList<String>(){{add(dataset.getName());}}).size());
+            attributeList.add(attribute.getAttributeList(new ArrayList<String>(){{add(dataset.getName());}},true).size());
             originalAttributeOrder.add(new QueryElement(attribute, dataset));
 
             // Add all of the linkAttributes for this attribute to the set of linkAttributes, for use in the code below outside the loop

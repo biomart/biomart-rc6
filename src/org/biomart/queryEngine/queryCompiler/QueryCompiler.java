@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.biomart.common.resources.Log;
 import org.biomart.configurator.utils.McUtils;
 import org.biomart.configurator.utils.type.DatasetTableType;
@@ -61,7 +62,7 @@ public class QueryCompiler {
 	private Map<Filter,String> selectedFilters;
 	@SuppressWarnings("unused")
 	private Boolean leftFlag;
-	private final String only = "1";
+	private final String only = "NOT NULL";
 	private final String excluded = "NULL";
 	private String quoteChar = "";
 	
@@ -718,7 +719,7 @@ public class QueryCompiler {
 				switch(queryElement.getType()){
 				case ATTRIBUTE:
 					attribute = (Attribute) queryElement.getElement();
-					List<Attribute> attributeList = attribute.getAttributeList(datasets);
+					List<Attribute> attributeList = attribute.getAttributeList(datasets,true);
 					if(attributeList.isEmpty()){
 						attributeList = new ArrayList<Attribute>();
 						attributeList.add(attribute);
@@ -755,6 +756,7 @@ public class QueryCompiler {
 							for(Filter subFilter : filter.getFilterList(datasets)){
 								if(subFilter.getFilterType()==FilterType.BOOLEAN){
 									if(queryElement.getFilterValues().equals("only")){
+										subFilter.setQualifier(OperatorType.IS);
 										queryElement.setFilterValues(this.only);
 									} else if(queryElement.getFilterValues().equals("excluded")){
 										subFilter.setQualifier(OperatorType.IS);
@@ -768,6 +770,7 @@ public class QueryCompiler {
 					if(subQuery.isDatabase() || subQuery.getVersion().equals("0.7")){
 						if(filter.getFilterType()==FilterType.BOOLEAN){
 							if(queryElement.getFilterValues().equals("only")){
+								filter.setQualifier(OperatorType.IS);
 								this.selectedFilters.put(filter,this.only);
 							} else if(queryElement.getFilterValues().equals("excluded")){
 								filter.setQualifier(OperatorType.IS);
@@ -793,14 +796,14 @@ public class QueryCompiler {
 			subQuery.setTotalCols(this.selectedAttributes.size());
 			if(subQuery.isDatabase()){
 				String prefix = "";
-				if (subQuery.getDbType() == DBType.ORACLE || subQuery.getDbType() == DBType.POSTGRES)
+				if (subQuery.getDbType() == DBType.ORACLE || subQuery.getDbType() == DBType.POSTGRES || subQuery.getDbType() == DBType.DB2)
 					quoteChar = "\"";
 				if(subQuery.useDbName() && subQuery.useSchema())
-					prefix = subQuery.getDatabaseName() + "." + subQuery.getSchemaName();
+					prefix = quoteChar + subQuery.getDatabaseName() + quoteChar + "." + quoteChar + subQuery.getSchemaName() + quoteChar;
 				else if(subQuery.useDbName())
-					prefix = subQuery.getDatabaseName();
+					prefix = quoteChar + subQuery.getDatabaseName() + quoteChar;
 				else if(subQuery.useSchema())
-					prefix = subQuery.getSchemaName();
+					prefix = quoteChar + subQuery.getSchemaName() + quoteChar;
 				
 				return searchSchema(prefix, subQuery.getDataset(), forceSource);
 			}
@@ -838,13 +841,13 @@ public class QueryCompiler {
 
 		for(Attribute attribute : this.selectedAttributes){
 			org.jdom.Element attributeElement = new org.jdom.Element("Attribute");
-			attributeElement.setAttribute("name", attribute.getName());
+			attributeElement.setAttribute("name", attribute.getInternalName());
 			datasetElement.addContent(attributeElement);
 		}
 
 		for(Filter filter : this.selectedFilters.keySet()){
 			org.jdom.Element filterElement = new org.jdom.Element("Filter");
-			filterElement.setAttribute("name", filter.getName());
+			filterElement.setAttribute("name", filter.getInternalName());
 			System.err.println(filter.getFilterType());
 			if(subQuery.getVersion().equals("0.7") && filter.getFilterType()==FilterType.BOOLEAN){
 				if(this.selectedFilters.get(filter).equals(this.only)){

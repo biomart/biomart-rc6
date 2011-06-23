@@ -414,19 +414,26 @@ public class Attribute extends Element implements Comparable<Attribute> {
 		return attList;
 	}
 	
-	public List<Attribute> getAttributeList(List<String> datasets) {
+	public List<Attribute> getAttributeList(List<String> datasets, boolean allowPartialList) {
 		List<Attribute> attList = new ArrayList<Attribute>();
 		String attListStr = this.getPropertyValue(XMLElements.ATTRIBUTELIST);
 		if(McUtils.isStringEmpty(attListStr))
 			return attList;
 		String[] list = attListStr.split(",");
+		boolean valid = true;
 		for(String att: list) {
 			Attribute attribute = this.getParentConfig().getAttributeByName(att, datasets);
 			if(attribute!=null)
 				attList.add(attribute);
+			else {
+				valid = false;
+			}
 		}
+		if(!valid && !allowPartialList)
+			attList.clear();
 		return attList;
 	}
+
 
 	/*
 	 * attributepointer, attributelist, filter

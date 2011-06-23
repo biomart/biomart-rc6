@@ -43,6 +43,8 @@ public class Attribute extends LiteMartConfiguratorObject implements Serializabl
 	//will changed based on the user selected datasets from the web gui;
     @JsonIgnore @XmlTransient
 	private List<String> range;
+    
+    private boolean allowPartialList;
 
     @JsonIgnore @XmlTransient
 	private String field;
@@ -137,7 +139,7 @@ public class Attribute extends LiteMartConfiguratorObject implements Serializabl
 		attribute = this.attributeObject;
 
 		
-		for(org.biomart.objects.objects.Attribute a: attribute.getAttributeList(this.range)) {
+		for(org.biomart.objects.objects.Attribute a: attribute.getAttributeList(this.range,this.allowPartialList)) {
 			//if(a.inPartition(this.range))
 				attributeList.add(new Attribute(this.getParent(),a));
 			//else {
@@ -221,5 +223,8 @@ public class Attribute extends LiteMartConfiguratorObject implements Serializabl
 		return jsoml;
 	}
 
+	public void setAllowPartialList(boolean allowPartialList) {
+		this.allowPartialList = allowPartialList;
+	}
 
 }

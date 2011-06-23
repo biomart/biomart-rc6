@@ -99,7 +99,7 @@ public final class Portal {
             list = mart.getFilters(datasets, false, false);
         else
             list = mart
-                    .getRootContainer(datasets, false, true)
+                    .getRootContainer(datasets, false, true, true)
                     .getContainerByName(container).getFilterList();
 
         return list;
@@ -118,10 +118,10 @@ public final class Portal {
             mart = _registry.getMartByConfigName(config);
 
         if (container == null)
-            list = mart.getAttributes(datasets);
+            list = mart.getAttributes(datasets,true);
         else
             list = mart
-                    .getRootContainer(datasets, true, false)
+                    .getRootContainer(datasets, true, false,true)
                     .getContainerByName(container).getAttributeList();
 
         return list;
@@ -181,18 +181,7 @@ public final class Portal {
             mart = _registry.getMartByConfigName(config);
         }
 
-        return mart.getRootContainer(datasets, withattributes, withfilters);
-    }
-
-    public List<ProcessorGroup> getProcessorGroups(@Nonnull String martName) {
-        enforceNonnullAndNonEmpty(martName);
-        return _registry.getMartByName(martName).getProcessorGroups();
-    }
-
-    public List<Processor> getProcessors(@Nonnull String martName,
-            @Nonnull String processorGroupName) {
-        enforceNonnullAndNonEmpty(martName, processorGroupName);
-        return _registry.getMartByName(martName).getProcessors(processorGroupName);
+        return mart.getRootContainer(datasets, withattributes, withfilters,true);
     }
 
     public List<Dataset> getLinkables(@Nonnull String datasets) {
@@ -257,7 +246,7 @@ public final class Portal {
         String[] ds = datasets.split(",");
         Map<String,List<Attribute>> map = new LinkedHashMap<String,List<Attribute>>();
         for (String d : ds) {
-            map.put(d, mart.getAttributes(d));
+            map.put(d, mart.getAttributes(d,true));
         }
         return map;
     }
@@ -273,7 +262,7 @@ public final class Portal {
         String[] ds = datasets.split(",");
         Map<String,List<Attribute>> map = new LinkedHashMap<String,List<Attribute>>();
         for (String d : ds) {
-            Container container = mart.getRootContainer(d, true, false).getContainerByName(containerName);
+            Container container = mart.getRootContainer(d, true, false,true).getContainerByName(containerName);
             map.put(d, container.getAttributeList());
         }
         return map;
@@ -282,7 +271,7 @@ public final class Portal {
         String[] ds = datasets.split(",");
         Map<String,List<Filter>> map = new LinkedHashMap<String,List<Filter>>();
         for (String d : ds) {
-            Container container = mart.getRootContainer(d, false, true).getContainerByName(containerName);
+            Container container = mart.getRootContainer(d, false, true,true).getContainerByName(containerName);
             map.put(d, container.getFilterList());
         }
         return map;

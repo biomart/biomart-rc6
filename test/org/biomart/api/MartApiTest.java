@@ -60,7 +60,7 @@ public class MartApiTest {
     
     @Test
     public void testHideAttribute(){
-    	List<Attribute> atts = _mart.getAttributes("hsapiens_gene_vega",false);
+    	List<Attribute> atts = _mart.getAttributes("hsapiens_gene_vega",false,true);
     	boolean containHideAttribute = false;
     	for(Attribute a : atts){
     		if(a.getName().equals("exon_id")){
@@ -73,7 +73,7 @@ public class MartApiTest {
     	}
     	assertTrue(!containHideAttribute);
     	
-    	atts = _mart.getAttributes("hsapiens_gene_vega",true);
+    	atts = _mart.getAttributes("hsapiens_gene_vega",true,true);
     	containHideAttribute = false;
     	for(Attribute a : atts){
     		if(a.getName().equals("exon_id")){

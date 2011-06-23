@@ -12,6 +12,7 @@ import org.biomart.common.exceptions.FunctionalException;
 import org.biomart.common.utils.PartitionUtils;
 import org.biomart.configurator.utils.McUtils;
 import org.biomart.configurator.utils.type.PartitionType;
+import org.biomart.configurator.utils.type.ValidationStatus;
 import org.biomart.objects.objects.PartitionTable;
 import org.biomart.objects.portal.UserGroup;
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -36,12 +37,12 @@ public class Container extends LiteMartConfiguratorObject implements Serializabl
     public Container() {}
 
 	public Container(org.biomart.objects.objects.Container container, List<String> datasetList, boolean includeAttributes,
-			boolean includeFilters, UserGroup user) {
-        this(container, datasetList, includeAttributes, includeFilters, false, user);
+			boolean includeFilters, UserGroup user, boolean allowPartialList) {
+        this(container, datasetList, includeAttributes, includeFilters, false, user, allowPartialList);
     }
 
 	public Container(org.biomart.objects.objects.Container container, List<String> datasetList, boolean includeAttributes, 
-			boolean includeFilters, boolean containersOnly, UserGroup user) {
+			boolean includeFilters, boolean containersOnly, UserGroup user, boolean allowPartialList) {
 		super(container);
 		this.currentUser = user;
 		this.containerList = new ArrayList<Container>();
@@ -50,16 +51,16 @@ public class Container extends LiteMartConfiguratorObject implements Serializabl
 		this.containerObject = container;
 		this.containersOnly = containersOnly;
 		//get the sub containers/filters/attributes;
-		this.createSubComponents(container, datasetList, includeAttributes, includeFilters, containersOnly, this);
+		this.createSubComponents(container, datasetList, includeAttributes, includeFilters, containersOnly, this, allowPartialList);
 	}
 	
 	private void createSubComponents(org.biomart.objects.objects.Container container, List<String> datasetList, 
-			boolean includeAttributes, boolean includeFilters, boolean containersOnly, Container parent) {
+			boolean includeAttributes, boolean includeFilters, boolean containersOnly, Container parent, boolean allowPartialList) {
 		if(container.isHidden())
 			return;
 		if(includeAttributes) {
 			for(org.biomart.objects.objects.Attribute attribute: container.getAttributeList()) {
-				if(!attribute.isValid())
+				if(attribute.getObjectStatus()!=ValidationStatus.VALID)
 					continue;
 				if(!attribute.isHidden() && attribute.inPartition(datasetList) && attribute.inUser(this.currentUser.getName(),datasetList)) {		
 					//create multiple one if it is partitioned
@@ -83,6 +84,7 @@ public class Container extends LiteMartConfiguratorObject implements Serializabl
 							if(realName !=null) {
 								org.biomart.api.lite.Attribute liteAttribute = new org.biomart.api.lite.Attribute(parent,attribute);
 								liteAttribute.setRange(datasetList);
+								liteAttribute.setAllowPartialList(allowPartialList);
 								this.attributeList.add(liteAttribute);
 								break;
 							}
@@ -91,6 +93,7 @@ public class Container extends LiteMartConfiguratorObject implements Serializabl
 						if(attribute.inPartition(datasetList)) {
 							Attribute liteAtt = new Attribute(parent,attribute);
 							liteAtt.setRange(datasetList);
+							liteAtt.setAllowPartialList(allowPartialList);
 							this.attributeList.add(liteAtt);
 						}
 					}
@@ -100,7 +103,7 @@ public class Container extends LiteMartConfiguratorObject implements Serializabl
 		
 		if(includeFilters) {
 			for(org.biomart.objects.objects.Filter filter: container.getFilterList()) {
-				if(!filter.isValid())
+				if(filter.getObjectStatus()!=ValidationStatus.VALID)
 					continue;
 				if(!filter.isHidden() && filter.inPartition(datasetList) && filter.inUser(this.currentUser.getName(),datasetList)) {
 					//create multiple one if it is partitioned
@@ -139,7 +142,7 @@ public class Container extends LiteMartConfiguratorObject implements Serializabl
 		
 		for(org.biomart.objects.objects.Container subConObject: container.getContainerList()) {
 			if(!subConObject.isHidden()) {
-				Container subCon = new Container(subConObject,datasetList,includeAttributes,includeFilters,containersOnly,this.currentUser);
+				Container subCon = new Container(subConObject,datasetList,includeAttributes,includeFilters,containersOnly,this.currentUser,allowPartialList);
 				if(!subCon.isEmpty())
 					this.containerList.add(subCon);			
 			}

@@ -94,19 +94,6 @@ public class PortalServiceImpl implements PortalService {
 
 
     @Override
-    @WebResult(name="processorgroup")
-    public List<ProcessorGroup> getProcessorGroups(@WebParam(name="mart") String martName) {
-        return getPortal().getProcessorGroups(martName);
-    }
-
-    @Override
-    @WebResult(name="processor")
-    public List<Processor> getProcessors(@WebParam(name="mart") String martName,
-            @WebParam(name="processorgroup") String processorGroupName) {
-        return getPortal().getProcessors(martName, processorGroupName);
-    }
-
-    @Override
     @WebResult(name="result")
     public String getResults(@WebParam(name="query") String xml) {
         OutputStream out = new ByteArrayOutputStream();

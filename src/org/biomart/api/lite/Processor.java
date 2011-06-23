@@ -42,7 +42,7 @@ public class Processor extends LiteMartConfiguratorObject implements Serializabl
 		List<String> dsNames = new ArrayList<String>();
 		for(org.biomart.objects.objects.Dataset ds: dsList)
 			dsNames.add(ds.getName());
-		return (new org.biomart.api.lite.Container(c, dsNames, true, true,this.currentUser));
+		return (new org.biomart.api.lite.Container(c, dsNames, true, true,this.currentUser, true));
 	}
 	
 	public org.biomart.api.lite.Container getContainer(List<String> datasets, boolean includeAttributes, boolean includeFilters) {
@@ -50,7 +50,7 @@ public class Processor extends LiteMartConfiguratorObject implements Serializabl
 		
 		if(c.isEmpty() || c.isHidden())
 			return null;
-		return (new org.biomart.api.lite.Container(c, datasets, includeAttributes, includeFilters,this.currentUser));
+		return (new org.biomart.api.lite.Container(c, datasets, includeAttributes, includeFilters,this.currentUser, true));
 	}
 
     @Override

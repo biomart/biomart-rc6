@@ -81,15 +81,15 @@ public class Mart extends LiteMartConfiguratorObject implements Serializable {
 	/**
 	 * @return a list of processorGroup
 	 */
-    @JsonIgnore
-	public List<ProcessorGroup> getProcessorGroups() {
-		List<ProcessorGroup> result = new ArrayList<ProcessorGroup>();
-		List<org.biomart.processors.ProcessorGroup> list = this.martpointerObject.getProcessorGroupList();
-		for(org.biomart.processors.ProcessorGroup pg: list) {
-			result.add(new ProcessorGroup(pg,this.currentUser));
-		}
-		return result;
-	}
+//    @JsonIgnore
+//	public List<ProcessorGroup> getProcessorGroups() {
+//		List<ProcessorGroup> result = new ArrayList<ProcessorGroup>();
+//		List<org.biomart.processors.ProcessorGroup> list = this.martpointerObject.getProcessorGroupList();
+//		for(org.biomart.processors.ProcessorGroup pg: list) {
+//			result.add(new ProcessorGroup(pg,this.currentUser));
+//		}
+//		return result;
+//	}
 	
 	@Override
 	public String getDisplayName() {
@@ -101,55 +101,55 @@ public class Mart extends LiteMartConfiguratorObject implements Serializable {
 	 * @param pg
 	 * @return
 	 */
-    @JsonIgnore
-	public List<Processor> getProcessors(org.biomart.processors.ProcessorGroup pg) {
-		List<Processor> result = new ArrayList<Processor>();
-		List<org.biomart.processors.Processor> list = pg.getProcessorList();
-		for(org.biomart.processors.Processor p: list) {
-			result.add(new Processor(p,this.currentUser));
-		}
-		return result;
-	}
+//    @JsonIgnore
+//	public List<Processor> getProcessors(org.biomart.processors.ProcessorGroup pg) {
+//		List<Processor> result = new ArrayList<Processor>();
+//		List<org.biomart.processors.Processor> list = pg.getProcessorList();
+//		for(org.biomart.processors.Processor p: list) {
+//			result.add(new Processor(p,this.currentUser));
+//		}
+//		return result;
+//	}
 
-    @JsonIgnore
-	public List<Processor> getProcessors(String groupName) {
-        ProcessorGroup group = null;
-
-        for (ProcessorGroup g : getProcessorGroups()) {
-            if (groupName.equals(g.getName())) {
-                group = g;
-                break;
-            }
-        }
-
-		return group.getProcessorList();
-	}
+//    @JsonIgnore
+//	public List<Processor> getProcessors(String groupName) {
+//        ProcessorGroup group = null;
+//
+//        for (ProcessorGroup g : getProcessorGroups()) {
+//            if (groupName.equals(g.getName())) {
+//                group = g;
+//                break;
+//            }
+//        }
+//
+//		return group.getProcessorList();
+//	}
 	
 	/**
 	 * get all processors within all processorGroups
 	 * @return
 	 */
-    @JsonIgnore
-	public List<Processor> getProcessors() {
-		List<Processor> result = new ArrayList<Processor>();
-		for(org.biomart.processors.ProcessorGroup pg: this.martpointerObject.getProcessorGroupList()) {
-			List<org.biomart.processors.Processor> list = pg.getProcessorList();
-			for(org.biomart.processors.Processor p: list) {
-				result.add(new Processor(p,this.currentUser));
-			}
-
-		}
-		return result;
-	}
-
-    @JsonIgnore
-    public Processor getProcessorByName(String processorName) {
-		List<Processor> processors = this.getProcessors();
-        for (Processor p : processors) {
-            if (processorName.equals(p.getName())) return p;
-        }
-        return null;
-    }
+//    @JsonIgnore
+//	public List<Processor> getProcessors() {
+//		List<Processor> result = new ArrayList<Processor>();
+//		for(org.biomart.processors.ProcessorGroup pg: this.martpointerObject.getProcessorGroupList()) {
+//			List<org.biomart.processors.Processor> list = pg.getProcessorList();
+//			for(org.biomart.processors.Processor p: list) {
+//				result.add(new Processor(p,this.currentUser));
+//			}
+//
+//		}
+//		return result;
+//	}
+//
+//    @JsonIgnore
+//    public Processor getProcessorByName(String processorName) {
+//		List<Processor> processors = this.getProcessors();
+//        for (Processor p : processors) {
+//            if (processorName.equals(p.getName())) return p;
+//        }
+//        return null;
+//    }
 	
     @JsonIgnore
 	public String getQueryOperation() {
@@ -224,11 +224,11 @@ public class Mart extends LiteMartConfiguratorObject implements Serializable {
 	 * @param datasetName can be multiple datasets separate by ","
 	 * @param includeAttributes
 	 * @param includeFilters
+	 * @param allowPartialList allowPartialList in attribute.getAttributeList();
 	 * @return
 	 */
     @JsonIgnore
-	public Container getRootContainer(String datasetName, 
-			Boolean includeAttributes, Boolean includeFilters, Boolean containersOnly) {
+	public Container getRootContainer(String datasetName, Boolean includeAttributes, Boolean includeFilters, boolean allowPartialList) {
 		List<String> dsList = null;
 		if(McUtils.isStringEmpty(datasetName))
 			dsList = new ArrayList<String>();
@@ -236,13 +236,8 @@ public class Mart extends LiteMartConfiguratorObject implements Serializable {
 			dsList = Arrays.asList(datasetName.split(","));
 
 		org.biomart.objects.objects.Container container = this.martpointerObject.getConfig().getRootContainer();
-		Container rootContainer = new Container(container, dsList, includeAttributes, includeFilters, containersOnly, this.currentUser);
+		Container rootContainer = new Container(container, dsList, includeAttributes, includeFilters, false, this.currentUser, allowPartialList);
 		return rootContainer;
-	}
-
-    @JsonIgnore
-	public Container getRootContainer(String datasetName, Boolean includeAttributes, Boolean includeFilters) {
-        return getRootContainer(datasetName, includeAttributes, includeFilters, false);
     }
 	
     @XmlTransient @JsonIgnore
@@ -258,18 +253,18 @@ public class Mart extends LiteMartConfiguratorObject implements Serializable {
 	 * @param processor
 	 * @return
 	 */
-    @JsonIgnore
-
-	public Container getRootContainer(String datasetName, boolean includeAttributes, boolean includeFilters, Processor processor) {
-		List<String> dsList = null;
-		if(McUtils.isStringEmpty(datasetName))
-			dsList = new ArrayList<String>();
-		else 
-			dsList = Arrays.asList(datasetName.split(","));
-		
-		return processor.getContainer(dsList, includeAttributes, includeFilters);
-		
-	}
+//    @JsonIgnore
+//
+//	public Container getRootContainer(String datasetName, boolean includeAttributes, boolean includeFilters, Processor processor) {
+//		List<String> dsList = null;
+//		if(McUtils.isStringEmpty(datasetName))
+//			dsList = new ArrayList<String>();
+//		else
+//			dsList = Arrays.asList(datasetName.split(","));
+//
+//		return processor.getContainer(dsList, includeAttributes, includeFilters);
+//
+//	}
 
 	/**
 	 * get attributes for datasets, can be multiple datasets separated by ,
@@ -277,27 +272,32 @@ public class Mart extends LiteMartConfiguratorObject implements Serializable {
 	 * @return
 	 */
     @JsonIgnore
-	public List<Attribute> getAttributes(String datasetName) {
+	public List<Attribute> getAttributes(String datasetName, boolean allowPartialList) {
+		return getAttributes(datasetName,false, allowPartialList);
+	}
+	
+    @JsonIgnore
+	public List<Attribute> getAttributes(String datasetName, boolean includeHiddenAttributes, boolean allowPartialList) {
 		List<String> dslist = new ArrayList<String>();
 		if(!McUtils.isStringEmpty(datasetName)) {
 			String[] datasets = datasetName.split(",");
 			dslist.addAll(Arrays.asList(datasets));
 		}
-		return getAttributes(dslist,false,false,false);
+		return getAttributes(dslist, includeHiddenAttributes, includeHiddenAttributes,true, allowPartialList);		
 	}
 	
+    /**
+     * 
+     * @param datasetNames
+     * @param includeHiddenContainers
+     * @param includeHiddenAttriubtes
+     * @param setField set datasetcolumn name for the attribute
+     * @param allowPartialList a flag for getting partial/full attributelist
+     * @return
+     */
     @JsonIgnore
-	public List<Attribute> getAttributes(String datasetName, boolean includeHiddenAttributes) {
-		List<String> dslist = new ArrayList<String>();
-		if(!McUtils.isStringEmpty(datasetName)) {
-			String[] datasets = datasetName.split(",");
-			dslist.addAll(Arrays.asList(datasets));
-		}
-		return getAttributes(dslist, includeHiddenAttributes, includeHiddenAttributes,true);		
-	}
-	
-    @JsonIgnore
-	private List<Attribute> getAttributes(List<String> datasetNames, boolean includeHiddenContainers, boolean includeHiddenAttriubtes, boolean setField) {
+	private List<Attribute> getAttributes(List<String> datasetNames, boolean includeHiddenContainers, boolean includeHiddenAttriubtes, 
+			boolean setField, boolean allowPartialList) {
 		List<org.biomart.api.lite.Attribute> liteAttributeList = new ArrayList<org.biomart.api.lite.Attribute>();
 		List<org.biomart.objects.objects.Attribute> fullAttributeList = this.martpointerObject.getConfig().getAttributes(datasetNames,includeHiddenContainers,includeHiddenAttriubtes);
 		//need all parent containers
@@ -306,13 +306,13 @@ public class Mart extends LiteMartConfiguratorObject implements Serializable {
 			org.biomart.objects.objects.Container containerObj = attribute.getParentContainer();
 			Container liteContainer = containerMap.get(containerObj.getName());
 			if(liteContainer == null) {
-				liteContainer = new Container(containerObj,datasetNames,true,true,this.currentUser);
+				liteContainer = new Container(containerObj,datasetNames,true,true,this.currentUser, allowPartialList);
 				containerMap.put(containerObj.getName(), liteContainer);
 			}
 			if(!attribute.inUser(this.currentUser.getName(),datasetNames)) {
 				continue;
 			}
-			if(!attribute.isValid()) {
+			if(attribute.getObjectStatus()!=ValidationStatus.VALID) {
 				continue;
 			}
 			//create multiple one if it is partitioned
@@ -339,6 +339,7 @@ public class Mart extends LiteMartConfiguratorObject implements Serializable {
 						else
 							liteAttribute = new org.biomart.api.lite.Attribute(liteContainer,attribute);
 						liteAttribute.setRange(datasetNames);
+						liteAttribute.setAllowPartialList(allowPartialList);
 						liteAttributeList.add(liteAttribute);
 						break;
 					}
@@ -351,6 +352,7 @@ public class Mart extends LiteMartConfiguratorObject implements Serializable {
 				else
 					liteAttribute = new org.biomart.api.lite.Attribute(liteContainer,attribute);
 				liteAttribute.setRange(datasetNames);
+				liteAttribute.setAllowPartialList(allowPartialList);
 				liteAttributeList.add(liteAttribute);
 			}		
 		}
@@ -405,12 +407,12 @@ public class Mart extends LiteMartConfiguratorObject implements Serializable {
 			org.biomart.objects.objects.Container containerObj = filter.getParentContainer();
 			Container liteContainer = containerMap.get(containerObj.getName());
 			if(liteContainer == null) {
-				liteContainer = new Container(containerObj,datasetNames,true,true,this.currentUser);
+				liteContainer = new Container(containerObj,datasetNames,true,true,this.currentUser,true);
 				containerMap.put(containerObj.getName(), liteContainer);
 			}
 			if(!filter.inUser(this.currentUser.getName(),datasetNames))
 				continue;
-			if(!filter.isValid())
+			if(filter.getObjectStatus()!=ValidationStatus.VALID)
 				continue;
 			//create multiple one if it is partitioned
 			if(McUtils.hasPartitionBinding(filter.getName())) {
@@ -454,7 +456,7 @@ public class Mart extends LiteMartConfiguratorObject implements Serializable {
     @XmlAttribute(name="isHidden")
     @JsonProperty("isHidden")
 	public boolean isHidden() {
-		return this.martpointerObject.getMart().isHidden();
+		return this.martpointerObject.getMart().isHidden() || this.martpointerObject.getConfig().isHidden();
 	}
 
     @JsonIgnore
