@@ -10,6 +10,9 @@
 .biomart .panel {
      margin-bottom: 10px;
 }
+#biomart-top-wrapper {
+    overflow: hidden;
+}
 #biomart-wrapper {
     color: #333;
     background-image: none;
