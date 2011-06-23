@@ -47,7 +47,11 @@ var QueryResults = {
             options.queries = options.queries.replace(/limit=".+?"/, 'limit="-1"');
         }
 
-        if (options.displayType != 'table') options.sorting = false;
+        // No sorting or pagination for nontable types 
+        if (options.displayType != 'table') {
+            options.sorting = false;
+            options.paginateBy = false;
+        }
 
         // Make sure we have at least one query to run
         if (!options.queries && !options.data) {
