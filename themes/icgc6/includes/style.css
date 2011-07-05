@@ -566,7 +566,6 @@ margin:4px 0 8px;
     color:#666666;
 }
 .content {
-    text-align: center;
 }
 a.arrow {
     background: transparent url(../images/acc-arrow-right.gif) no-repeat scroll 5px 2px;
@@ -1580,3 +1579,7 @@ vertical-align: top;
 .padl10 {
 padding-left: 10px;
 }
+
+div.header-menu {
+    text-align: center;
+}    
