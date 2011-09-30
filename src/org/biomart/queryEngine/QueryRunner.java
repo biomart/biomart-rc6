@@ -58,6 +58,7 @@ public final class QueryRunner implements OutputConstants {
             );
 
     private boolean hasError = false; // this will be true when one ore more queries fail
+	private final boolean isCountQuery;
 
     /**
      *
@@ -65,8 +66,9 @@ public final class QueryRunner implements OutputConstants {
      * @throws SQLException
      * @throws TechnicalException
      */
-    public QueryRunner(Query query) throws SQLException, TechnicalException {
+    public QueryRunner(Query query, boolean isCountQuery) throws SQLException, TechnicalException {
         this.query = query;
+		this.isCountQuery = isCountQuery;
         this.limit = query.limit;
 
         this.outputOrder = query.outputOrder;
@@ -98,17 +100,21 @@ public final class QueryRunner implements OutputConstants {
     public void printHeader() throws IOException {
         if(Boolean.parseBoolean(this.query.getHeader().toLowerCase()) ||
                 "1".equals(this.query.getHeader())) {
-            int len = this.query.outputDisplayNames.length;
-            int i = 0;
-            String displayName = this.query.outputDisplayNames[i];
+			if (isCountQuery) {
+				this.outputHandle.write("Entries\tTotal".getBytes());
+			} else {
+				int len = this.query.outputDisplayNames.length;
+				int i = 0;
+				String displayName = this.query.outputDisplayNames[i];
 
-            for (; i<len-1; i++, displayName=this.query.outputDisplayNames[i]) {
-                this.outputHandle.write(displayName.getBytes());
-                this.outputHandle.write(TAB);
-            }
+				for (; i<len-1; i++, displayName=this.query.outputDisplayNames[i]) {
+					this.outputHandle.write(displayName.getBytes());
+					this.outputHandle.write(TAB);
+				}
 
-            this.outputHandle.write(displayName.getBytes());
-            this.outputHandle.write(NEWLINE);
+				this.outputHandle.write(displayName.getBytes());
+			}
+			this.outputHandle.write(NEWLINE);
         }
     }
 
@@ -227,25 +233,34 @@ public final class QueryRunner implements OutputConstants {
      */
     public synchronized void printResults(List<List<String>> interimRT, String threadName) throws IOException {
         int rows = interimRT.size();
-        int cols = this.query.outputOrder.length;
+
+        int cols = isCountQuery ? 2 : this.query.outputOrder.length;
+		
         // int unions = this.query.queryPlanMap.size();
         List<String> res_row = new ArrayList<String>();
 
         int j=0;
+
         if (this.limit != 0) {
             for (int i = 0; i < rows; i++) {
                 res_row = interimRT.get(i);
+
                 String[] curr_row = new String[cols];
 
-                //Log.debug("output atts length: " +this.outputOrder.length);
-                for (j = 0; j < cols; j++) {
-                    // its a pseudo att
-                    if (this.outputOrder[j] < 0)
-                        curr_row[j] = this.query.getPseudoAttributes().get(this.outputOrder[j]+1000).getPseudoAttributeValue(threadName) == null
-                            ? "" : this.query.getPseudoAttributes().get(this.outputOrder[j]+1000).getPseudoAttributeValue(threadName);
-                    else
-                        curr_row[j] = res_row.get(this.outputOrder[j]) == null ? "" : res_row.get(this.outputOrder[j]);
-                }
+				if (isCountQuery) {
+					curr_row[0] = res_row.get(0) == null ? "" : res_row.get(0);
+					curr_row[1] = res_row.get(1) == null ? "" : res_row.get(1);
+				} else {
+					//Log.debug("output atts length: " +this.outputOrder.length);
+					for (j = 0; j < cols; j++) {
+						// its a pseudo att
+						if (this.outputOrder[j] < 0)
+							curr_row[j] = this.query.getPseudoAttributes().get(this.outputOrder[j]+1000).getPseudoAttributeValue(threadName) == null
+								? "" : this.query.getPseudoAttributes().get(this.outputOrder[j]+1000).getPseudoAttributeValue(threadName);
+						else
+							curr_row[j] = res_row.get(this.outputOrder[j]) == null ? "" : res_row.get(this.outputOrder[j]);
+					}
+				}
 
                 String row = StringUtils.join(curr_row, "\t");
                 byte[] bytes = row.getBytes();
