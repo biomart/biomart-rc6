@@ -100,9 +100,8 @@ public final class QueryRunner implements OutputConstants {
     public void printHeader() throws IOException {
         if(Boolean.parseBoolean(this.query.getHeader().toLowerCase()) ||
                 "1".equals(this.query.getHeader())) {
-			if (isCountQuery) {
-				this.outputHandle.write("Entries\tTotal".getBytes());
-			} else {
+			// Don't print header for count queries
+			if (!isCountQuery) {
 				int len = this.query.outputDisplayNames.length;
 				int i = 0;
 				String displayName = this.query.outputDisplayNames[i];
@@ -113,8 +112,8 @@ public final class QueryRunner implements OutputConstants {
 				}
 
 				this.outputHandle.write(displayName.getBytes());
+				this.outputHandle.write(NEWLINE);
 			}
-			this.outputHandle.write(NEWLINE);
         }
     }
 
@@ -234,7 +233,7 @@ public final class QueryRunner implements OutputConstants {
     public synchronized void printResults(List<List<String>> interimRT, String threadName) throws IOException {
         int rows = interimRT.size();
 
-        int cols = isCountQuery ? 2 : this.query.outputOrder.length;
+        int cols = isCountQuery ? 1 : this.query.outputOrder.length;
 		
         // int unions = this.query.queryPlanMap.size();
         List<String> res_row = new ArrayList<String>();
@@ -249,7 +248,6 @@ public final class QueryRunner implements OutputConstants {
 
 				if (isCountQuery) {
 					curr_row[0] = res_row.get(0) == null ? "" : res_row.get(0);
-					curr_row[1] = res_row.get(1) == null ? "" : res_row.get(1);
 				} else {
 					//Log.debug("output atts length: " +this.outputOrder.length);
 					for (j = 0; j < cols; j++) {
