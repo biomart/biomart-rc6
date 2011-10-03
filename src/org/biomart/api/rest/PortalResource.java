@@ -295,7 +295,6 @@ public class PortalResource implements PortalService {
 		String count = out.toString();
 
 		estimate.entries = Integer.parseInt(count.trim());
-		estimate.query = xml;
 
 		return estimate;
     }
